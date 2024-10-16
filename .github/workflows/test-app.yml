@@ -36,3 +36,19 @@ jobs:
       - name: Test with pytest
         run: |
           PYTHONPATH=src:src/service:src/service/routers pytest
+
+      - name: Send Telegram Success Message
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="🎉 Build succeeded for ${{ github.repository }} on branch ${{ github.ref }}!" \
+          -d disable_notification=true
+
+      - name: Send Telegram Error Message
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="❌ Build failed for ${{ github.repository }} on branch ${{ github.ref }}." \
+          -d disable_notification=true
