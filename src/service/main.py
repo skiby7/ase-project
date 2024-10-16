@@ -28,6 +28,9 @@ app.add_middleware(
 )
 
 ### Implementation ###
+@app.get("/")
+def home():
+    return { "status": "ok" }
 
 def init():
     global log_level

@@ -4,9 +4,11 @@ WARN = 2
 ERROR = 3
 log_level = 0
 
+
 def set_log_level(level: int):
     global log_level
     log_level = level
+
 
 def log(level: int, message):
     global log_level
