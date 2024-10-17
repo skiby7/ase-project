@@ -1,8 +1,8 @@
 # 24/25 ASE project
 
-| Collaborators      |
-|--------------------|
-| Luca Rizzo         |
+|    Collaborators   |
+|:------------------:|
+|     Luca Rizzo     |
 | Leonardo Scoppitto |
-| Simone Stanganini  |
-| Filippo Fornai     |
+|  Simone Stanganini |
+|   Filippo Fornai   |
