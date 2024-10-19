@@ -1,12 +1,13 @@
 services:
-  gacha-backend:
+  authentication:
+    container_name: authentication
     restart: always
     build:
       context: ./service
     environment:
       - RESOURCE_PATH=/code/service/resources
     ports:
-      - 9090:9090
+      - 9091:9090
     volumes:
       - ${PWD}/service:/code/service
     networks:

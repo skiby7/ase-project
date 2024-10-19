@@ -1,5 +1,6 @@
 services:
-  gacha-backend:
+  payment:
+    container_name: payment
     restart: always
     build:
       context: ./service

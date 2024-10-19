@@ -1,7 +1,6 @@
 from routers.login.models import LoginModel
 from fastapi import APIRouter, HTTPException, Body, Header
 
-from libs.log import DEBUG, INFO, WARN, ERROR, log_level, log
 import routers.login.backend as lb
 
 router = APIRouter()

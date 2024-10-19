@@ -6,10 +6,10 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from libs.log import DEBUG, INFO, WARN, ERROR, set_log_level, log
 from routers.registration import registration
 from routers.login import login
 
+logger = getLogger("uvicorn.error")
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -42,18 +42,12 @@ def init():
             config = yaml.load(f.read(), Loader=yaml.Loader)
         # http_port = config.get("http_port", 9090)
         log_l = config.get("log_level", "info")
-        if "debug" in log_l: set_log_level(DEBUG)
-        elif "info" in log_l: set_log_level(INFO)
-        elif "warn" in log_l:
-            set_log_level(WARN)
-            log_l = "warning"
-        elif "error" in log_l: set_log_level(ERROR)
 
-        log(DEBUG, f"Configuration: {json.dumps(config, indent=4)}")
+        logger.debug(f"Configuration: {json.dumps(config, indent=4)}")
     else:
-        log(WARN, "Configuration file not found!")
+        logger.warning("Configuration file not found!")
         log_l = "debug"
-    log(INFO, "Starting v1.0.0")
+    logger.info("Starting v1.0.0")
 
     uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
 

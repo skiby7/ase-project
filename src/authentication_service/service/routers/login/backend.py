@@ -4,8 +4,9 @@ from datetime import datetime
 import json
 import os
 import string
+from logging import getLogger
 
-from libs.log import INFO, ERROR, DEBUG,  log
+logger = getLogger("uvicorn.error")
 
 def validate_login(username: str, password: str) -> bool:
     # Validation logic

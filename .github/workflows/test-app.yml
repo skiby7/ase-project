@@ -33,9 +33,21 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test with pytest
+      - name: Test auction service
         run: |
-          PYTHONPATH=src:src/*/service:src/*/service/routers pytest
+          PYTHONPATH=src/auction_service:src/auction_service/service pytest src/auction_service
+
+      - name: Test authentication service
+        run: |
+          PYTHONPATH=src/authentication_service:src/authentication_service/service pytest src/authentication_service
+
+      - name: Test gacha roll service
+        run: |
+          PYTHONPATH=src/gacha_service:src/gacha_service/service pytest src/gacha_service
+
+      - name: Test payment service
+        run: |
+          PYTHONPATH=src/payment_service:src/payment_service/service pytest src/payment_service
 
       - name: Send Telegram Success Message
         if: success()
