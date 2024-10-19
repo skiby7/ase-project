@@ -1,4 +1,4 @@
-from service.libs.utils import validate_user
+from authentication_service.service.libs.utils import validate_user
 
 def test_validate_user_valid():
     assert validate_user("Mario", "Rossi", "mariorossi@gmail.com")
