@@ -35,7 +35,7 @@ def init():
 
         with open(config_path, "r") as f:
             config = yaml.load(f.read(), Loader=yaml.Loader)
-        # http_port = config.get("http_port", 9090)
+        http_port = config.get("http_port", 9090)
         log_l = config.get("log_level", "info")
 
         logger.debug(f"Configuration: {json.dumps(config, indent=4)}")
