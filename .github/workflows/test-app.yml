@@ -26,10 +26,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest httpx
-          if [ -f src/auction_service/service/requirements.txt ]; then pip install -r src/auction_servic/eservice/requirements.txt; fi
-          if [ -f src/authentication_service/service/requirements.txt ]; then pip install -r src/authentication_servic/eservice/requirements.txt; fi
-          if [ -f src/gacha_service/service/requirements.txt ]; then pip install -r src/gacha_servic/eservice/requirements.txt; fi
-          if [ -f src/payment_service/service/requirements.txt ]; then pip install -r src/payment_servic/eservice/requirements.txt; fi
+          if [ -f src/auction_service/service/requirements.txt ]; then pip install -r src/auction_service/service/requirements.txt; fi
+          if [ -f src/authentication_service/service/requirements.txt ]; then pip install -r src/authentication_service/service/requirements.txt; fi
+          if [ -f src/gacha_service/service/requirements.txt ]; then pip install -r src/gacha_service/service/requirements.txt; fi
+          if [ -f src/payment_service/service/requirements.txt ]; then pip install -r src/payment_service/service/requirements.txt; fi
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
