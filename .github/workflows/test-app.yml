@@ -56,7 +56,7 @@ jobs:
       - name: Send Telegram Success Message
         if: success()
         run: |
-          false && curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          true || curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="🎉 Build succeeded for \`ase-project\` on branch \`${{ github.ref_name }}\`\\!" \
           -d parse_mode="Markdownv2" \
@@ -65,7 +65,7 @@ jobs:
       - name: Send Telegram Error Message
         if: failure()
         run: |
-          false && curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          true || curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="❌ Build failed for \`ase-project\` on branch \`${{ github.ref_name }}\`." \
           -d parse_mode="Markdownv2" \
