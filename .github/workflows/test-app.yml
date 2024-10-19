@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Build project
+name: Lint & Tests
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest httpx
-          if [ -f src/service/requirements.txt ]; then pip install -r src/service/requirements.txt; fi
+          if [ -f src/*/service/requirements.txt ]; then pip install -r src/*/service/requirements.txt; fi
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -35,12 +35,12 @@ jobs:
           # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          PYTHONPATH=src:src/service:src/service/routers pytest
+          PYTHONPATH=src:src/*/service:src/*/service/routers pytest
 
       - name: Send Telegram Success Message
         if: success()
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          false && curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="🎉 Build succeeded for \`ase-project\` on branch \`${{ github.ref_name }}\`\\!" \
           -d parse_mode="Markdownv2" \
@@ -49,7 +49,7 @@ jobs:
       - name: Send Telegram Error Message
         if: failure()
         run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          false && curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="❌ Build failed for \`ase-project\` on branch \`${{ github.ref_name }}\`." \
           -d parse_mode="Markdownv2" \
