@@ -49,20 +49,43 @@ def init():
 #[PLAYER]
 ##API
 # create auction
+@app.post("/create")
+def create():
+    pass
 # place bid on auction
+@app.post("/bid")
+def bid(): #as an argument the bid
+    pass
 # [ON HOLD] enable view of transaction history
 ##LOGIC
 # Deliver won gacha after auction
 # Deliver tux to auction creator after end
 # Give back tux if lost auction
+#---> service should always watch over currently on going auctions
+#---> if time elapsed behave as needed
 
 #[ADMIN]
 ##API
 # Enable seeing market history of a player
+@app.get("/auctionHistoryPlayer")
+def auctionHistoryPlayer():
+    pass
 # Enable to see market auction activity
+@app.get("/marketActivity")
+def auctionHistoryPlayer():
+    pass
 # Enable view details of auction
+@app.get("/auctionInfo")
+def auctionHistoryPlayer():
+    pass
 # Enable manipulation of auction
+@app.post("/auctionModify")
+def auctionHistoryPlayer():
+    pass
 # Enable to see all time history
+@app.post("/history")
+def auctionHistoryPlayer():
+    pass
 
 #[SECURITY]
 ##LOGIC
