@@ -1,0 +1,18 @@
+services:
+  user:
+    container_name: user
+    restart: always
+    build:
+      context: ./service
+    environment:
+      - RESOURCE_PATH=/code/service/resources
+    ports:
+      - 9091:9090
+    volumes:
+      - ${PWD}/service:/code/service
+    networks:
+      - gacha_network
+
+networks:
+  gacha_network:
+    driver: bridge

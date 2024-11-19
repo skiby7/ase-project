@@ -1,9 +1,15 @@
-from routers.login.models import LoginModel
+from authentication_service.service.routers.login.schemas import LoginModel
 from fastapi import APIRouter, HTTPException, Body, Header
 
-import routers.login.backend as lb
+import authentication_service.service.routers.login.services as lb
 
 router = APIRouter()
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+    responses={404: {"description": "Not found"}},
+)
 
 @router.post('/login')
 def login(login_info: LoginModel = Body()):

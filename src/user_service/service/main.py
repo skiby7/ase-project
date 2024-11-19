@@ -6,19 +6,17 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from authentication_service.service.routers import registration
-from authentication_service.service.routers import login
+from user_service.service.routers import user
+
 
 logger = getLogger("uvicorn.error")
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
 
-
 ### App init ###
 app = FastAPI()
-app.include_router(registration.router)
-app.include_router(login.router)
+app.include_router(user.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,11 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=[]
 )
-
-### Implementation ###
-@app.get("/")
-def home():
-    return { "status": "ok" }
 
 def init():
     global log_level
