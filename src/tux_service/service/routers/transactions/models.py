@@ -6,3 +6,4 @@ class TransactionModel(BaseModel):
     timestamp: int
     user_id: str
     filled: bool
+    transaction_id: str
