@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY app.py .
 COPY requirements.txt .
+COPY distros.txt .
 
 RUN pip install -r requirements.txt
 

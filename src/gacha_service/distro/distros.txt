@@ -1,0 +1,21 @@
+Ubuntu,1
+Debian,1
+Fedora,1
+Arch Linux,2
+openSUSE,2
+Mint,1
+Manjaro,2
+HannaMontana Linux,5
+Gentoo,3
+Raspberry Pi OS,1
+TempleOS,5
+Slackware,4
+Alpine Linux,3
+Tails,4
+Kali Linux,1
+Pop!_OS,2
+Zorin OS,2
+Bodhi Linux,4
+Solus,4
+NixOS,4
+Void Linux,4
