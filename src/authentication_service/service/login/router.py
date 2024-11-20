@@ -1,7 +1,6 @@
-from authentication_service.service.routers.login.schemas import LoginModel
 from fastapi import APIRouter, HTTPException, Body, Header
 
-import authentication_service.service.routers.login.services as lb
+from .schemas import LoginModel
 
 router = APIRouter()
 

@@ -1,3 +1,5 @@
-fastapi[standard]>=0.113.0,<=0.115.0
-pydantic>=2.7.0,<3.0.0
+fastapi[standard]
 PyYAML==6.0.1
+pymongo
+uuid
+passlib[bcrypt]

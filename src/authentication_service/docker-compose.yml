@@ -7,12 +7,25 @@ services:
     environment:
       - RESOURCE_PATH=/code/service/resources
     ports:
-      - 9091:9090
+      - 9090:9090
     volumes:
       - ${PWD}/service:/code/service
     networks:
       - gacha_network
+  db:
+    container_name: db_authentication
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+    command: mongod --quiet --logpath /dev/null 
+    networks:
+      - gacha_network
 
+volumes:
+  dbdata:
+  
 networks:
   gacha_network:
     driver: bridge

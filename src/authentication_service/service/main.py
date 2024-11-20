@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from authentication_service.service.routers import registration
-from authentication_service.service.routers import login
+from .login import router as login_router
+from .registration import router as registration_router
 
 logger = getLogger("uvicorn.error")
 
@@ -17,8 +17,8 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 
 ### App init ###
 app = FastAPI()
-app.include_router(registration.router)
-app.include_router(login.router)
+app.include_router(login_router.router)
+app.include_router(registration_router.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
