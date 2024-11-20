@@ -1,18 +1,18 @@
 services:
-  gacha-roll:
-    container_name: gacha-roll
-    restart: always
-    build:
-      context: ./service
-    environment:
-      - RESOURCE_PATH=/code/service/resources
+  distro:
+    build: ./distro
+    depends_on:
+      - db
     ports:
-      - 9092:9090
-    volumes:
-      - ${PWD}/service:/code/service
-    networks:
-      - gacha_network
+      - 5000:5000
 
-networks:
-  gacha_network:
-    driver: bridge
+  db:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+    command: mongod --quiet --logpath /dev/null 
+
+volumes:
+  dbdata:
