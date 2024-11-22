@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from .utils.mongo_connection import startup_db_client
 from .login import router as login_router
 from .registration import router as registration_router
 
@@ -27,10 +28,9 @@ app.add_middleware(
     expose_headers=[]
 )
 
-### Implementation ###
-@app.get("/")
-def home():
-    return { "status": "ok" }
+@app.on_event("startup")
+def startup_event():
+    startup_db_client()
 
 def init():
     global log_level

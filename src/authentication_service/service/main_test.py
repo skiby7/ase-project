@@ -6,8 +6,9 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .user import router
-
+from .utils.mongo_connection import startup_db_client
+from .login import router as login_router
+from .registration import router as registration_router
 
 logger = getLogger("uvicorn.error")
 
@@ -16,7 +17,8 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 
 ### App init ###
 app = FastAPI()
-app.include_router(router.router)
+app.include_router(login_router.router)
+app.include_router(registration_router.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -1,55 +1,48 @@
 from random import randint, choice
 from hashlib import sha256
-from datetime import datetime
-import json
-import os
-import string
+from datetime import datetime, timedelta, timezone
 from logging import getLogger
+import jwt
+from pymongo.collection import Collection
+from ..registration.schemas import Account
+from ..utils import mongo_connection
+from ..registration.models import AccountDB
+from ..utils import password_utils
 
 logger = getLogger("uvicorn.error")
 
-def validate_login(username: str, password: str) -> bool:
-    # Validation logic
-    return True
+with open("/run/secrets/jwt_private_key", "r") as f:
+    PRIVATE_KEY = f.read()
 
-def get_random_string(length: int) -> str:
-    # choose from all lowercase letter
-    letters = string.ascii_lowercase
-    return ''.join([choice(letters) for i in range(length)])
+def validate_login(username: str, password: str) -> Account | None:
+    accounts_collection = mongo_connection.get_accounts_collection()
+    account_dict = accounts_collection.find_one({"username": username})
+    if not account_dict:
+        return None
+    account_DB = AccountDB(**account_dict)
+    if password_utils.verify_password(password, account_DB.hashed_password):
+        return None
+    return Account(uid=account_DB.uid, email=account_DB.email, username=account_DB.username, role=account_DB.role)
 
-def generate_session_token(username) -> dict:
-    # maybe use JWT
-    token = sha256((get_random_string(10) + datetime.now().strftime('%c')).encode('utf-8')).hexdigest()
-    low = randint(0, (len(token) - 1)//2)
-    high = low + len(token)//2
-    return {
-        "username"        : username,
-        "token"           : token[low:high],
-        "last_connection" : datetime.now().strftime('%c')
-    }
+def get_account_info(uid_account: str) -> Account | None:
+    accounts_collection = mongo_connection.get_accounts_collection()
+    account_dict = accounts_collection.find_one({"uid": uid_account})
+    if not account_dict:
+        return None
+    account_DB = AccountDB(**account_dict)
+    return Account(uid=account_DB.uid, 
+                   email=account_DB.email, 
+                   username=account_DB.username, 
+                   role=account_DB.role)
 
-def save_session_token(username: str, token: dict):
-    pass
-    # Save session tokens to the db
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    to_encode.update({"exp": get_expires(expires_delta)})
+    encoded_jwt = jwt.encode(to_encode, PRIVATE_KEY, algorithm="RS256")
+    return encoded_jwt
 
-def get_session_token(username: str) -> dict:
-    # read session tokens from the db
-    return {}
-
-def update_last_connection(username: str):
-    session_token = get_session_token(username)
-    if username not in session_token:
-        return
-    session_token[username]['last_connection'] = datetime.now().strftime('%c')
-    save_session_token(username, session_token)
-
-def is_token_valid(username: str, auth_token: str) -> bool:
-    token = get_session_token(username)
-    if not token: return False
-    if token is None or not is_token_expired(token) or auth_token.lower().replace("Bearer ", "") != token['token']:
-        return False
-    update_last_connection(username)
-    return True
-
-def is_token_expired(token: dict) -> bool:
-    return (datetime.now() - datetime.strptime(token['last_connection'], "%c")).total_seconds() // 60 <= 15 # 15 minutes
+def get_expires(expires_delta: timedelta | None = None):
+    if expires_delta:
+        return datetime.now(timezone.utc) + expires_delta
+    else:
+        return datetime.now(timezone.utc) + timedelta(minutes=15)

@@ -3,3 +3,4 @@ PyYAML==6.0.1
 pymongo
 uuid
 passlib[bcrypt]
+pyjwt[crypto]
