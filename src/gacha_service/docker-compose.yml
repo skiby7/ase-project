@@ -1,6 +1,6 @@
 services:
   distro:
-    build: ./distro
+    build: ./service
     depends_on:
       - db
     ports:
