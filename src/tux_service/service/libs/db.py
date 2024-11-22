@@ -12,7 +12,8 @@ if not DATABASE_URL:
 
 Base = declarative_base()
 
-class Transaction(Base):
+
+class Transaction(Base):  # type: ignore
     __tablename__ = 'transactions'
 
     transaction_id = Column(String, primary_key=True)
@@ -22,12 +23,16 @@ class Transaction(Base):
     user_id = Column(String, nullable=False, index=True)
     filled = Column(Boolean, nullable=False)
 
-class Balance(Base):
+
+class Balance(Base):  # type: ignore
     __tablename__ = 'balances'
     user_id = Column(String, primary_key=True)
     tux_amount = Column(Float, nullable=False)
+
+
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
+
 
 def get_db():
     db = Session()
@@ -36,8 +41,10 @@ def get_db():
     finally:
         db.close()
 
+
 def create_tables():
     Base.metadata.create_all(engine)
+
 
 def create_transaction(session, amount_fiat, amount_tux, timestamp, user_id, filled):
     new_transaction = Transaction(
@@ -52,6 +59,7 @@ def create_transaction(session, amount_fiat, amount_tux, timestamp, user_id, fil
     session.commit()
     return new_transaction
 
+
 def get_transaction_by_id(session, transaction_id):
     transaction = session.query(Transaction).filter_by(transaction_id=transaction_id).first()
     return TransactionModel(
@@ -61,6 +69,7 @@ def get_transaction_by_id(session, transaction_id):
                 timestamp=transaction.timestamp,
                 user_id=transaction.user_id,
                 filled=transaction.filled)
+
 
 def get_user_transactions(session, user_id) -> list[TransactionModel]:
     transactions = []
