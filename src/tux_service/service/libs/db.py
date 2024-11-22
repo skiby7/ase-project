@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from routers.transactions.models import TransactionModel
+from tux_service.service.libs.db_mocks import use_mocks
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
@@ -45,7 +46,7 @@ def get_db():
 def create_tables():
     Base.metadata.create_all(engine)
 
-
+@use_mocks
 def create_transaction(session, amount_fiat, amount_tux, timestamp, user_id, filled):
     new_transaction = Transaction(
         transaction_id=str(uuid.uuid4()),
