@@ -97,6 +97,7 @@ def get_user_transactions(session, user_id) -> list[TransactionModel]:
 def get_fiat_balance(session, user_id) -> float:
     return session.query(Balance).filter_by(user_id=user_id).first()
 
+@use_mocks
 def save_tux_transfer(session, user_id, tux_amount, new_balance):
     row: Balance = session.query(Balance).filter_by(user_id=user_id).first()
     if row:
