@@ -1,17 +1,29 @@
 import sys
 import uuid
 import os
+from logging import getLogger
 from sqlalchemy import create_engine, Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from routers.transactions.models import TransactionModel
-from tux_service.service.libs.db_mocks import use_mocks
+from libs.mocks import MockSession, use_mocks
+
+logger = getLogger("uvicorn.error")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    sys.exit(-1)
+TEST_RUN = os.getenv("TEST_RUN", "false") == "true"
+logger.debug(f"Is test run: {TEST_RUN}")
 
 Base = declarative_base()
+if not DATABASE_URL and not TEST_RUN:
+    sys.exit(-1)
+
+if DATABASE_URL:
+    logger.info(f"Configured url {DATABASE_URL}")
+    engine = create_engine(DATABASE_URL)
+    Session = sessionmaker(bind=engine)
+else:
+    Session = MockSession
 
 
 class Transaction(Base):  # type: ignore
@@ -29,11 +41,7 @@ class Balance(Base):  # type: ignore
     __tablename__ = 'balances'
     user_id = Column(String, primary_key=True)
     tux_amount = Column(Float, nullable=False)
-
-
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
-
+    fiat_amount = Column(Float, nullable=False)
 
 def get_db():
     db = Session()
@@ -43,6 +51,7 @@ def get_db():
         db.close()
 
 
+@use_mocks
 def create_tables():
     Base.metadata.create_all(engine)
 
@@ -83,3 +92,13 @@ def get_user_transactions(session, user_id) -> list[TransactionModel]:
             user_id=t.user_id,
             filled=t.filled))
     return transactions
+@use_mocks
+def get_fiat_balance(session, user_id) -> float:
+    return session.query(Balance).filter_by(user_id=user_id).first()
+
+def save_tux_transfer(session, user_id, tux_amount, new_balance):
+    row: Balance = session.query(Balance).filter_by(user_id=user_id).first()
+    if row:
+        row.fiat_amount = new_balance
+        row.tux_amount = tux_amount
+        session.commit()

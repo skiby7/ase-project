@@ -1,7 +1,7 @@
 from libs.auth import verify
+from libs.db import Session, get_db
 from fastapi import APIRouter, HTTPException, Body, Header, Depends
-from tux_service.service.libs.db import Session, get_db
-from tux_service.service.routers.transactions.backend import get_transaction_history
+from routers.transactions.backend import get_transaction_history
 
 router = APIRouter()
 

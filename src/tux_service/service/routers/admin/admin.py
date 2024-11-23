@@ -2,7 +2,7 @@ from libs.auth import verify
 from routers.admin.backend import create_tux_account
 from fastapi import APIRouter, HTTPException, Body, Header
 
-from tux_service.service.routers.admin.models import TuxAccountModel
+from routers.admin.models import TuxAccountModel
 
 router = APIRouter()
 

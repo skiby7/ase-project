@@ -5,6 +5,12 @@ from logging import getLogger
 from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from routers.buy import buy
+from routers.transactions import transactions
+from routers.admin import admin
+from routers.payments import payments
+from libs.db import create_tables
+
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -19,11 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=[]
 )
-
+app.include_router(buy.router)
+app.include_router(transactions.router)
+app.include_router(admin.router)
+app.include_router(payments.router)
 ### Implementation ###
-@app.get("/")
-def home():
-    return { "status": "ok" }
 
 def init():
     global log_level
@@ -41,7 +47,7 @@ def init():
         logger.warning("Configuration file not found!")
         log_l = "debug"
     logger.info("Starting v1.0.0")
-
+    create_tables()
     uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
 
 
