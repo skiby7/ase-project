@@ -2,6 +2,7 @@ import sys
 import uuid
 import os
 import time
+from functools import wraps
 from logging import getLogger
 from sqlalchemy import create_engine, Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -70,6 +71,31 @@ class FreezedTux(Base):
     tux_amount = Column(Float, nullable=False)
     last_update = Column(Integer, nullable=False)
 
+
+
+def transactional(func):
+    @wraps(func)
+    def wrapper(session, *args, **kwargs):
+        if type(session) is MockSession:
+            return func(session, *args, **kwargs)
+        already_in_transaction = session.in_transaction()
+
+        try:
+            if not already_in_transaction:
+                with session.begin():
+                    return func(session, *args, **kwargs)
+            else:
+                return func(session, *args, **kwargs)
+
+        except SQLAlchemyError as e:
+            print(f"Error during transaction: {e}")
+            if not already_in_transaction:
+                session.rollback()
+            raise
+
+    return wrapper
+
+
 def get_db():
     db = Session()
     try:
@@ -84,6 +110,7 @@ def create_tables():
 
 
 @use_mocks
+@transactional
 def create_purchase_transaction(session, amount_fiat: float, amount_tux: float, user_id: str, filled: bool):
     new_transaction = TuxPurchaseTransaction(
         transaction_id=str(uuid.uuid4()),
@@ -94,22 +121,25 @@ def create_purchase_transaction(session, amount_fiat: float, amount_tux: float, 
         filled=filled
     )
     session.add(new_transaction)
-    session.commit()
     return new_transaction
 
 
 @use_mocks
-def create_user_transaction(session, amount_fiat: float, amount_tux: float, from_id: str, to_id: str):
+@transactional
+def create_user_transaction(session, amount_tux: float, from_id: str, to_id: str):
     new_transaction = InterUserTransaction(
         transaction_id=str(uuid.uuid4()),
-        amount_fiat=amount_fiat,
         amount_tux=amount_tux,
         timestamp=unix_time(),
         from_user_id=from_id,
         to_user_id=to_id
     )
     session.add(new_transaction)
-    session.commit()
+    # TODO:
+        # check balance before proceeding
+        # update from account
+        # update to account
+
     return new_transaction
 
 
@@ -150,27 +180,27 @@ def get_user_tux_balance(session, user_id: str) -> float:
 
 
 @use_mocks
+@transactional
 def update_user_tux_balance(session, user_id: str, tux_amount: Float, new_balance: float):
-    with session.begin()
-        row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
-        if row:
-            row.fiat_amount = new_balance  # type: ignore
-            row.tux_amount = tux_amount  # type: ignore
-            session.commit()
+    row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
+    if row:
+        row.fiat_amount = new_balance  # type: ignore
+        row.tux_amount = tux_amount  # type: ignore
+        session.commit()
 
 
 @use_mocks
+@transactional
 def update_game_balance(session, emitted_tux: float, fiat: float):
     try:
-        with session.begin():
-            balance: GameBalance = session.query(GameBalance).first()
+        balance: GameBalance = session.query(GameBalance).first()
 
-            if not balance:
-                balance = GameBalance(tux_emitted=emitted_tux, fiat_earned=fiat)
-                session.add(balance)
-            else:
-                balance.fiat_earned += fiat  # type: ignore
-                balance.tux_emitted += emitted_tux  # type: ignore
+        if not balance:
+            balance = GameBalance(tux_emitted=emitted_tux, fiat_earned=fiat)
+            session.add(balance)
+        else:
+            balance.fiat_earned += fiat  # type: ignore
+            balance.tux_emitted += emitted_tux  # type: ignore
 
     except SQLAlchemyError as e:
         logger.error(f"Cannot update game balance: {e}")
@@ -206,22 +236,25 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
     return True
 
 
-def _get_freezed_payments(freezed: list[FreezedTux], winner_id: str) -> list[dict]:
+def _get_freezed_payments(freezed: list[FreezedTux], winner_id: str) -> tuple[list[dict], float]:
     payments = []
+    winning_amount = 0.0
     for f in freezed:
         payments.append({
             "user_id" : f.user_id,
             "amount" : f.tux_amount,
             "is_winner" : winner_id == f.user_id
         })
-    return payments
+        if winner_id == f.user_id:
+            winning_amount = f.tux_amount
+    return payments, winning_amount #  type: ignore
 
 @use_mocks
 def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer_id: str):
     try:
         with session.begin():
             auction_freezed_tux = session.query(FreezedTux).filter_by(auction_id=auction_id)
-            payments = _get_freezed_payments(auction_freezed_tux, winner_id)
+            payments, winning_amount = _get_freezed_payments(auction_freezed_tux, winner_id)
 
             for p in payments:
                 row: UserBalance = session.query(UserBalance).filter_by(user_id=p["user_id"]).first()
@@ -231,7 +264,9 @@ def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer
                 if p["is_winner"] or p["is_auctioneer"]:  #
                     continue
                 else:
-                    row.tux_amount += p[""]
+                    row.tux_amount += p["amount"]
+                create_user_transaction(session, winning_amount, winner_id, auctioneer_id)
+
 
 
             freezed: FreezedTux = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()
