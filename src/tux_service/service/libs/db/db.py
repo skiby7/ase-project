@@ -146,6 +146,7 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
     else:
         raise Exception(f"{user_id} not found")
 
+
 @use_mocks
 @transactional
 def update_game_balance(session, emitted_tux: float, fiat: float):
@@ -162,31 +163,31 @@ def update_game_balance(session, emitted_tux: float, fiat: float):
     except SQLAlchemyError as e:
         logger.error(f"Cannot update game balance: {e}")
 
+
 @use_mocks
+@transactional
 def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: float) -> bool:
     try:
-        with session.begin():
-            user_current_balance = get_user_tux_balance(session, user_id)
-            if new_tux_amount > user_current_balance:
-                logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
-                return False
+        user_current_balance = get_user_tux_balance(session, user_id)
+        if new_tux_amount > user_current_balance:
+            logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+            return False
 
-            user_balance: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
-            if user_balance:
-                user_balance.fiat_amount = new_balance  # type: ignore
-                user_balance.tux_amount = tux_amount  # type: ignore
-            else:
-                logger.error(f"Cannot find user balance for user_id {user_id}")
-                return False
+        user_balance: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
+        if user_balance:
+            user_balance.fiat_amount = new_balance  # type: ignore
+            user_balance.tux_amount = tux_amount  # type: ignore
+        else:
+            logger.error(f"Cannot find user balance for user_id {user_id}")
+            return False
 
-
-            freezed: FreezedTux = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()
-            if freezed:
-                freezed = FreezedTux(auction_id=auction_id, user_id=user_id, tux_amount=new_tux_amount, last_update=unix_time())
-                session.add(freezed)
-            else:
-                freezed.tux_amount += new_tux_amount  # type: ignore
-                freezed.last_update += unix_time()  # type: ignore
+        freezed: FreezedTux = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()
+        if freezed:
+            freezed = FreezedTux(auction_id=auction_id, user_id=user_id, tux_amount=new_tux_amount, last_update=unix_time())
+            session.add(freezed)
+        else:
+            freezed.tux_amount += new_tux_amount  # type: ignore
+            freezed.last_update += unix_time()  # type: ignore
 
     except SQLAlchemyError as e:
         logger.error(f"Cannot update freezed tux amount ({new_tux_amount} tux) of auction_id::user_id {auction_id}::{user_id}: {e}")
@@ -206,6 +207,7 @@ def _get_freezed_payments(freezed: list[FreezedTux], winner_id: str) -> tuple[li
         if winner_id == f.user_id:
             winning_amount = f.tux_amount
     return payments, winning_amount #  type: ignore
+
 
 @use_mocks
 @transactional
