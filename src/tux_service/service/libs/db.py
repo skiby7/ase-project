@@ -92,6 +92,7 @@ def get_user_transactions(session, user_id) -> list[TransactionModel]:
             user_id=t.user_id,
             filled=t.filled))
     return transactions
+
 @use_mocks
 def get_fiat_balance(session, user_id) -> float:
     return session.query(Balance).filter_by(user_id=user_id).first()
