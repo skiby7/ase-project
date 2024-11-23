@@ -34,3 +34,6 @@ def verify_mock(token: str) -> bool:
 
 def get_fiat_balance_mock(session, user_id):
     return 10000.0
+
+def get_tux_balance_mock(session, user_id):
+    return 10000.0

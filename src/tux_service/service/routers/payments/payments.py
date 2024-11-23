@@ -1,16 +1,26 @@
 from libs.auth import verify
-from routers.payments.backend import get_tux_balance
-from fastapi import APIRouter, HTTPException, Body, Header
+from libs.db import get_db, get_tux_balance, get_fiat_balance
+from fastapi import APIRouter, HTTPException, Body, Header, Depends
+
+from libs.db import get_fiat_balance
 
 router = APIRouter()
 
-@router.post('/balance/{user_ud}')
-def buy(user_id: str, Authorization: str = Header()):
+@router.get('/balances/{user_id}')
+def balance(user_id: str, Authorization: str = Header(), session = Depends(get_db)):
     if not verify(Authorization):
         raise HTTPException(status_code=401, detail="Unauthorized")
-
     try:
-        balance = get_tux_balance(user_id)
+        tux_balance = get_tux_balance(session, user_id)
+        fiat_balance = get_fiat_balance(session, user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
-    return {"balance" : balance}
+    return {
+        "fiat_balance" : fiat_balance,
+        "tux_balance"  : tux_balance
+    }
+
+@router.post('/pay')
+def pay(user_id: str, Authorization: str = Header()):
+    if not verify(Authorization):
+        raise HTTPException(status_code=401, detail="Unauthorized")

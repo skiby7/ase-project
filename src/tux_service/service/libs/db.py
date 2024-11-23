@@ -95,7 +95,11 @@ def get_user_transactions(session, user_id) -> list[TransactionModel]:
 
 @use_mocks
 def get_fiat_balance(session, user_id) -> float:
-    return session.query(Balance).filter_by(user_id=user_id).first()
+    return session.query(Balance.fiat_amount).filter_by(user_id=user_id).first()
+
+@use_mocks
+def get_tux_balance(session, user_id) -> float:
+    return session.query(Balance.tux_amount).filter_by(user_id=user_id).first()
 
 @use_mocks
 def save_tux_transfer(session, user_id, tux_amount, new_balance):
