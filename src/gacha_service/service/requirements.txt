@@ -1,4 +1,3 @@
 fastapi[standard]
 requests
 pymongo
-service
