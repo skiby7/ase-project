@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 import json
 import uuid
+import random
+
 
 #TODO user on db
 class database:
@@ -30,7 +32,7 @@ class database:
 
         gachas.insert_many(data)
 
-    def get_all_distros_names(self):
+    def get_all_gachas_name(self):
         gachas = self.db["gachas"]
         all_distros = list(gachas.find())
         all = [{"name": gachas["name"]} for gachas in all_distros]
@@ -48,10 +50,11 @@ class database:
         user = users.find_one({"id": user_id})
 
         if not user:
+            print("\n\n USER NON PRESENTE \n\n")
             user = {
                 "id": user_id,
                 "gacha_list": [
-                                {gacha_id : 1}
+                                {"gacha_id": gacha_id, "value" : 1}
                 ]
             }
             users.insert_one(user)
@@ -73,9 +76,20 @@ class database:
         gachas = self.db["gachas"]
         users = self.db["users"]
         user = users.find_one({"id": user_id})
+        if not user: 
+            return {} #TODO: check this
         user_gachas = list(user["gacha_list"])
         return user_gachas 
-    
+
+    def get_random_gacha(self):
+        gachas = self.db["gachas"]
+        list_gachas = list(gachas.find())
+        n_gachas = len(list_gachas) 
+        rand = random.randint(1, n_gachas);
+        gacha_name = list_gachas[rand]["name"]
+        self.add_user_gacha(1,gacha_name) #TODO: uuid
+        return gacha_name
+
 
 
 

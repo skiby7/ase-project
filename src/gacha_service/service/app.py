@@ -8,7 +8,6 @@ import uuid
 #TODO: check user  
 #TODO: jwt sub (uuid), role
 
-
 # Inizializzazione DB
 app = FastAPI()
 db = database("utils/distros.json")
@@ -16,22 +15,25 @@ db = database("utils/distros.json")
 # View system gacha collection
 @app.get("/user/gacha/all", status_code=200)
 def user_gacha():
-    return JSONResponse(content=db.get_all_distros_names())
+    #TODO: jwt, uuid
+    return db.get_all_gachas_name()
 
-# TODO: View user personal gacha collection
+# View user personal gacha collection
 @app.get("/user/gacha/personal", status_code=200)
 def user_gacha():
-    return 
+    #TODO: jwt, uuid
+    return db.get_user_gacha(1);
 
 # TODO: View Specific Gacha Info
 @app.get("/user/gacha/specific", status_code=200)
 def user_gacha():
-    return 
+    #TODO: jwt, uuid
+    return  
 
-# TODO: Use In-Game Currency to Roll Gach
+# TODO: Use In-Game Currency to Roll Gach, TODO: userid, with tux
 @app.get("/user/gacha/roll", status_code=200)
 def user_gacha():
-    return
+    return JSONResponse(content={"name": db.get_random_gacha()})
 
 # TODO: Admin View Gacha Collection
 @app.get("/admin/gacha/collection", status_code=200)
