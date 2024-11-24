@@ -29,6 +29,7 @@ class UserBalance(Base):  # type: ignore
 
 class GameBalance(Base):
     __tablename__ = 'game_balance'
+    timestamp = Column(Integer, primary_key=True)
     tux_emitted = Column(Float, nullable=False)
     fiat_earned = Column(Float, nullable=False)
 

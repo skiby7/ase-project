@@ -1,8 +1,7 @@
 from libs.auth import verify
-from libs.db import get_db, get_tux_balance, get_fiat_balance
+from libs.db.db import get_db, get_user_fiat_balance, get_user_tux_balance
 from fastapi import APIRouter, HTTPException, Body, Header, Depends
 
-from libs.db import get_fiat_balance
 
 router = APIRouter()
 
@@ -11,8 +10,8 @@ def balance(user_id: str, Authorization: str = Header(), session = Depends(get_d
     if not verify(Authorization):
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
-        tux_balance = get_tux_balance(session, user_id)
-        fiat_balance = get_fiat_balance(session, user_id)
+        tux_balance = get_user_tux_balance(session, user_id)
+        fiat_balance = get_user_fiat_balance(session, user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
     return {

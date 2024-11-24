@@ -13,7 +13,6 @@ from libs.db.utils import transactional
 from libs.db.tables import Base, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
 from routers.transactions.models import PurchaseTransactionModel
 from libs.mocks import MockSession, use_mocks
-from tux_service.service.routers.payments import payments
 
 unix_time = lambda: int(time.time())
 
@@ -47,6 +46,25 @@ def get_db():
 def create_tables():
     Base.metadata.create_all(engine)
 
+@use_mocks
+@transactional
+def create_user_balance(session, starting_fiat_balance: float, user_id: str):
+    new_account = UserBalance(
+        user_id=user_id,
+        tux_amount=0.0,
+        fiat_amount=starting_fiat_balance
+    )
+    session.add(new_account)
+
+@use_mocks
+@transactional
+def delete_user_account(session, user_id: str):
+    to_delete = session.query(UserBalance).filter_by(user_id=user_id).first()
+    if not to_delete:
+        raise Exception(f"Cannot find {user_id}")
+
+    session.delete(to_delete)
+
 
 @use_mocks
 @transactional
@@ -60,7 +78,6 @@ def create_purchase_transaction(session, amount_fiat: float, amount_tux: float, 
         filled=filled
     )
     session.add(new_transaction)
-    return new_transaction
 
 
 @use_mocks
@@ -79,9 +96,7 @@ def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str
     update_user_tux_balance(session, from_id, "withdraw", tux_amount)
     update_user_tux_balance(session, to_id, "deposit", tux_amount)
     # TODO:
-        # try to raise an exception and check that the operation rollsback
-
-    return new_transaction
+        # try to raise an exception and check that the operation rolls back
 
 
 @use_mocks
@@ -151,15 +166,17 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
 @transactional
 def update_game_balance(session, emitted_tux: float, fiat: float):
     try:
-        balance: GameBalance = session.query(GameBalance).first()
-
+        balance: GameBalance = session.query(GameBalance).order_by(GameBalance.timestamp.desc()).first()
         if not balance:
-            balance = GameBalance(tux_emitted=emitted_tux, fiat_earned=fiat)
-            session.add(balance)
+            new_balance = GameBalance(timestamp=unix_time(), tux_emitted=emitted_tux, fiat_earned=fiat)
         else:
-            balance.fiat_earned += fiat  # type: ignore
-            balance.tux_emitted += emitted_tux  # type: ignore
+            new_balance = GameBalance(
+                timestamp=unix_time(),
+                tux_emitted=balance.emitted_tux + emitted_tux,
+                fiat_earned=balance.fiat_earned + fiat,
+            )
 
+        session.add(new_balance)
     except SQLAlchemyError as e:
         logger.error(f"Cannot update game balance: {e}")
 
