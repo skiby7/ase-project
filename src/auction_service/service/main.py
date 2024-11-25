@@ -5,6 +5,7 @@ from logging import getLogger
 from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import uuid 
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -21,6 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=[]
 )
+
+### DB init ###
+db = database("utils/distros.json")
 
 ### Implementation ###
 @app.get("/")
@@ -46,17 +50,41 @@ def init():
 
     uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
 
+
+#DB NOTES
+#bidded auction and owned auctions separated
+
+
 #[PLAYER]
 ##API
 # create auction
 @app.post("/create")
 def create():
+    #ask collection for list of owned gachas
+    #let the player choose between them
+    #ask collection to lock the gacha
+    #let the player decide a price
+    #let the player decide a time of start and stop
+    #NB may have to decide constraints on time
+    #add to currently ongoing auctions of the player
     pass
 # place bid on auction
 @app.post("/bid")
-def bid(): #as an argument the bid
+def bid(price): #as an argument the bid
+    #take for assumption client makes only higher bids?
+    #freeze the amount via tux service
+    #add to bidded auctions
     pass
-# [ON HOLD] enable view of transaction history
+# enable view of auction history
+@app.post("/auctionHistory")
+def auctionHistory(): 
+    pass
+
+
+
+
+
+
 ##LOGIC
 # Deliver won gacha after auction
 # Deliver tux to auction creator after end
@@ -72,19 +100,19 @@ def auctionHistoryPlayer():
     pass
 # Enable to see market auction activity
 @app.get("/marketActivity")
-def auctionHistoryPlayer():
+def marketActivity():
     pass
 # Enable view details of auction
 @app.get("/auctionInfo")
-def auctionHistoryPlayer():
+def auctionInfo():
     pass
 # Enable manipulation of auction
 @app.post("/auctionModify")
-def auctionHistoryPlayer():
+def auctionModify():
     pass
 # Enable to see all time history
 @app.post("/history")
-def auctionHistoryPlayer():
+def history():
     pass
 
 #[SECURITY]
