@@ -3,7 +3,7 @@
     {"name": "Debian", "rarity": 1},
     {"name": "Fedora", "rarity": 1},
     {"name": "Arch Linux", "rarity": 2},
-    {"name": "openSUSE", "rarity": 2},
+    {"name": "openSUSE", "rarity": 2}, 
     {"name": "Mint", "rarity": 1},
     {"name": "Manjaro", "rarity": 2},
     {"name": "HannaMontana Linux", "rarity": 5},

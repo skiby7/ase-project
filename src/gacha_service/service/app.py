@@ -8,6 +8,9 @@ import uuid
 #TODO: check user  
 #TODO: jwt sub (uuid), role
 
+def check_user():
+    return True
+
 # Inizializzazione DB
 app = FastAPI()
 db = database("utils/distros.json")
@@ -15,25 +18,37 @@ db = database("utils/distros.json")
 # View system gacha collection
 @app.get("/user/gacha/all", status_code=200)
 def user_gacha():
-    #TODO: jwt, uuid
-    return db.get_all_gachas_name()
+    if check_user():
+        return db.get_all_gachas_name()
+    else: 
+        raise HTTPException(status_code=400, detail="Invalid User")
 
 # View user personal gacha collection
 @app.get("/user/gacha/personal", status_code=200)
 def user_gacha():
-    #TODO: jwt, uuid
-    return db.get_user_gacha(1);
+    if check_user():
+        return db.get_user_gacha(1);
+    else: 
+        raise HTTPException(status_code=400, detail="Invalid User")
 
-# TODO: View Specific Gacha Info
+# View Specific Gacha Info
 @app.get("/user/gacha/specific", status_code=200)
-def user_gacha():
-    #TODO: jwt, uuid
-    return  
+def user_gacha(name : str):
+    if not check_user():
+        raise HTTPException(status_code=400, detail="Invalid User")
+    gacha = db.get_specific_gacha(name);
+    if not gacha: 
+        raise HTTPException(status_code=400, detail="Gacha not present")
+    else:
+        return gacha 
 
 # TODO: Use In-Game Currency to Roll Gach, TODO: userid, with tux
 @app.get("/user/gacha/roll", status_code=200)
 def user_gacha():
-    return JSONResponse(content={"name": db.get_random_gacha()})
+    if not check_user():
+        raise HTTPException(status_code=400, detail="Invalid User")
+    else: 
+        return JSONResponse(content={"name": db.get_random_gacha()})
 
 # TODO: Admin View Gacha Collection
 @app.get("/admin/gacha/collection", status_code=200)
@@ -47,6 +62,16 @@ def user_gacha():
 
 # TODO: Admin Modify Specific Gacha
 @app.get("/admin/gacha/modify/specific", status_code=200)
+def user_gacha():
+    return
+
+# TODO: Add user
+@app.get("user/notify/add", status_code=200)
+def user_gacha():
+    return
+
+# TODO: Delete user
+@app.get("user/notify/add", status_code=200)
 def user_gacha():
     return
 

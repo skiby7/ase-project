@@ -19,7 +19,6 @@ class database:
         else: 
             self.db.create_collection("users")
 
-    # convert to json distro.txt
     def db_inizialization(self):
         self.db.create_collection("gachas")
         gachas = self.db["gachas"]
@@ -37,6 +36,14 @@ class database:
         all_distros = list(gachas.find())
         all = [{"name": gachas["name"]} for gachas in all_distros]
         return all
+    
+    # convert to json distro.txt
+    def get_specific_gacha(self,gacha_name):
+        gachas = self.db["gachas"]
+        gacha = gachas.find_one({"name": gacha_name})
+        if not gacha: 
+            return
+        return gacha
 
     def add_user_gacha(self,user_id,gacha_name):
         gachas = self.db["gachas"]
