@@ -1,17 +1,18 @@
 services:
     authentication:
-        container_name: authentication
+        container_name: authentication_test
         restart: always
         build:
-            context: ./service
+            context: ../../service
         environment:
             - RESOURCE_PATH=/code/service/resources
+            - APP_MODULE=service.main_test:app
         ports:
-            - 9090:9090
+            - "9090:9090"
         volumes:
             - ${PWD}/service:/code/service
         networks:
-            - gacha_network
+            - test_network
         depends_on:
             - db
         secrets:
@@ -20,28 +21,22 @@ services:
             - admin_account
 
     db:
-        container_name: db_authentication
+        container_name: db_authentication_test
         image: mongo:latest
         ports:
             - '27017:27017'
-        volumes:
-            - dbdata:/data/db
         command: mongod --quiet --logpath /dev/null
         networks:
-            - gacha_network
-
-volumes:
-    dbdata:
+            - test_network
 
 secrets:
     jwt_private_key:
-        file: ./service/secrets/private.pem
+        file: ./test_secrets/private.pem
     jwt_public_key:
-        file: ./service/secrets/public.pem
+        file: ./test_secrets/public.pem
     admin_account:
-        file: ./service/secrets/admin_account.json
+        file: ./test_secrets/admin_account.json
 
 
 networks:
-    gacha_network:
-        driver: bridge
+    test_network:

@@ -1,14 +1,16 @@
+import json
 import os
-import json, yaml
-import uvicorn
+import yaml
 from logging import getLogger
-from pydantic import BaseModel
-from fastapi import Body, FastAPI, HTTPException
+
+import uvicorn
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .utils.mongo_connection import startup_db_client
+from .registration.services import initialize_admin
 from .login import router as login_router
 from .registration import router as registration_router
+from .utils.mongo_connection import startup_db_client
 
 logger = getLogger("uvicorn.error")
 
@@ -19,7 +21,9 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 ### App init ###
 app = FastAPI()
 app.include_router(login_router.router)
+app.include_router(login_router.admin_router)
 app.include_router(registration_router.router)
+app.include_router(registration_router.admin_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,6 +35,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     startup_db_client()
+    initialize_admin()
 
 def init():
     global log_level

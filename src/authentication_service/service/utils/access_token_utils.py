@@ -3,15 +3,14 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-import jwt
 
 from .schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-PUBLIC_KEY = None
 with open("/run/secrets/jwt_public_key", "r") as f:
     PUBLIC_KEY = f.read()
 
@@ -31,7 +30,7 @@ def extract_access_token(token: Annotated[str, Depends(oauth2_scheme)]) -> Token
         return TokenData(sub=uid, username=username, role=role)
     except jwt.InvalidTokenError:
         raise credentials_exception
-    
+
 def is_token_expired(payload: dict):
     exp = payload["exp"]
     # Validate token expiration

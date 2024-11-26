@@ -1,9 +1,6 @@
-from random import randint, choice
-from hashlib import sha256
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
 import jwt
-from pymongo.collection import Collection
 from ..registration.schemas import Account
 from ..utils import mongo_connection
 from ..registration.models import AccountDB
@@ -20,7 +17,7 @@ def validate_login(username: str, password: str) -> Account | None:
     if not account_dict:
         return None
     account_DB = AccountDB(**account_dict)
-    if password_utils.verify_password(password, account_DB.hashed_password):
+    if not password_utils.verify_password(password, account_DB.hashed_password):
         return None
     return Account(uid=account_DB.uid, email=account_DB.email, username=account_DB.username, role=account_DB.role)
 
@@ -30,9 +27,9 @@ def get_account_info(uid_account: str) -> Account | None:
     if not account_dict:
         return None
     account_DB = AccountDB(**account_dict)
-    return Account(uid=account_DB.uid, 
-                   email=account_DB.email, 
-                   username=account_DB.username, 
+    return Account(uid=account_DB.uid,
+                   email=account_DB.email,
+                   username=account_DB.username,
                    role=account_DB.role)
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
