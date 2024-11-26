@@ -6,6 +6,8 @@ from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uuid 
+import time
+unix_time = lambda: int(time.time())
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -59,25 +61,32 @@ def init():
 ##API
 # create auction
 @app.post("/create")
-def create():
-    #ask collection for list of owned gachas
-    #let the player choose between them
+def create(user_id,gacha_id,starting_price,end_time):
+    
+    #arguments check
+    if(starting_price<0){
+        #altra risposta bad
+    }
     #ask collection to lock the gacha
-    #let the player decide a price
-    #let the player decide a time of start and stop
-    #NB may have to decide constraints on time
+    if(unix_time()>=end_time){
+        #altra gestione bad
+    }
+    
     #add to currently ongoing auctions of the player
+    db.create_auction(user_id,gacha_id,starting_price,end_time)
     pass
 # place bid on auction
 @app.post("/bid")
-def bid(price): #as an argument the bid
-    #take for assumption client makes only higher bids?
+def bid(auction_id,bid):
+    
     #freeze the amount via tux service
     #add to bidded auctions
     pass
+
 # enable view of auction history
 @app.post("/auctionHistory")
-def auctionHistory(): 
+def auctionHistory():ù
+    
     pass
 
 
