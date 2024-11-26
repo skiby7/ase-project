@@ -2,21 +2,21 @@ from pymongo import MongoClient
 import json
 import uuid
 import random
+import base64
 
+def convert_image(image):
+        with open("utils/images/" + image + ".png", "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
 
 #TODO user on db
 class database:
-    def __init__(self,distrofile):
+    def __init__(self,distrofile : str):
         self.distrofile = distrofile
         self.client = MongoClient("db", 27017, maxPoolSize=50)
         self.db = self.client["mydatabase"]
-        if "gachas" in self.db.list_collection_names():
-            print(" \n\n SONO VIVO  \n\n")
-        else: 
+        if "gachas" not in self.db.list_collection_names():
             self.db_inizialization()
-        if "users" in self.db.list_collection_names():
-            print(" \n\n falso  \n\n")
-        else: 
+        if "users" not in self.db.list_collection_names():
             self.db.create_collection("users")
 
     def db_inizialization(self):
@@ -28,24 +28,31 @@ class database:
 
         for gacha in data:
             gacha["id"] = str(uuid.uuid4())
+            gacha["image"] = convert_image(gacha["name"])
 
         gachas.insert_many(data)
 
-    def get_all_gachas_name(self):
+    def get_all_gachas_user(self):
         gachas = self.db["gachas"]
         all_distros = list(gachas.find())
-        all = [{"name": gachas["name"]} for gachas in all_distros]
-        return all
+        res = [{"name": gachas["name"],"image" : gachas["image"]} for gachas in all_distros]
+        return res
     
-    # convert to json distro.txt
-    def get_specific_gacha(self,gacha_name):
+    def get_all_gachas_admin(self):
+        gachas = self.db["gachas"]
+        all_gachas = list(gachas.find())
+        res = [{"id": gachas["id"], "name": gachas["name"], "rarity" : gachas["rarity"], "image" : gachas["image"]} for gachas in all_gachas]
+        return res
+
+    def get_specific_gacha(self,gacha_name : str):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": gacha_name})
         if not gacha: 
             return
-        return gacha
+        res = {"name": gacha["name"], "image": gacha["image"]}
+        return res
 
-    def add_user_gacha(self,user_id,gacha_name):
+    def add_user_gacha(self,user_id : str,gacha_name : str):
         gachas = self.db["gachas"]
         users = self.db["users"]
         gacha = gachas.find_one({"name": gacha_name})
@@ -57,7 +64,6 @@ class database:
         user = users.find_one({"id": user_id})
 
         if not user:
-            print("\n\n USER NON PRESENTE \n\n")
             user = {
                 "id": user_id,
                 "gacha_list": [
@@ -79,27 +85,49 @@ class database:
                     {"$push": {"gacha_list": {"gacha_id": gacha_id, "value": 1}}}
                 )
 
-    def get_user_gacha(self,user_id):
+    def get_user_gacha(self,user_id : str):
         gachas = self.db["gachas"]
         users = self.db["users"]
         user = users.find_one({"id": user_id})
         if not user: 
             return {} #TODO: check this
         user_gachas = list(user["gacha_list"])
-        return user_gachas 
+        res = []
+        for gacha_u in user_gachas:
+            gacha = gachas.find_one({"id": gacha_u["gacha_id"]})
+            res.append({"value" : gacha_u["value"], "name" : gacha["name"], "image" : gacha["image"]})
+        return res 
 
-    def get_random_gacha(self):
+    def get_roll_gacha(self):
         gachas = self.db["gachas"]
         list_gachas = list(gachas.find())
         n_gachas = len(list_gachas) 
-        rand = random.randint(1, n_gachas);
+        rand = random.randint(0, n_gachas-1);
         gacha_name = list_gachas[rand]["name"]
         self.add_user_gacha(1,gacha_name) #TODO: uuid
         return gacha_name
 
+    def modify_gacha(self,name : str,rarity : str,image : str):
+        gachas = self.db["gachas"]
+        gacha = gachas.find_one({"name": name})
+        if not gacha:
+            return 
+        gacha.rarity = rarity
+        gacha.image = image
+        return gacha
 
-
-
-
-
-
+    def add_gacha(self,name : str,rarity : str,image: str):
+        gachas = self.db["gachas"]
+        gacha = gachas.find_one({"name": name})
+        if gacha:
+            return 
+        gachas.insert_one({"id": str(uuid.uuid4()),"name": name,"rarity": rarity,"image": image})
+        return {"id": str(uuid.uuid4()),"name": name,"rarity": rarity,"image": image}
+        
+    def remove_gacha(self,name: str):
+        gachas = self.db["gachas"]
+        gacha = gachas.find_one({"name": name})
+        if not gacha:
+            return 
+        gachas.delete_one({"name": name})
+        return {"name" : name}

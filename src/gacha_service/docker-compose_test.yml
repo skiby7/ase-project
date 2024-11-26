@@ -1,6 +1,8 @@
 services:
   distro:
-    build: ./service
+    build: 
+      context: service
+      dockerfile: Dockerfile_test
     depends_on:
       - db
     ports:
