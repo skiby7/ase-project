@@ -29,14 +29,15 @@ class UserBalance(Base):  # type: ignore
 
 class GameBalance(Base):
     __tablename__ = 'game_balance'
-    timestamp = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(Integer, nullable=False)
     tux_emitted = Column(Float, nullable=False)
     fiat_earned = Column(Float, nullable=False)
 
 class FreezedTux(Base):
     __tablename__ = 'freezed_tuxs'
     auction_id = Column(String, primary_key=True)
-    auctioneer_id = Column(String, nullable=False, index=True)
     user_id = Column(String, nullable=False, index=True)
     tux_amount = Column(Float, nullable=False)
     last_update = Column(Integer, nullable=False)
+    settled = Column(Boolean, nullable=False)
