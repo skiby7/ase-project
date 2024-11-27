@@ -7,61 +7,34 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uuid 
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
 unix_time = lambda: int(time.time())
-
-### Globals ###
-script_path = os.path.dirname(os.path.abspath(__file__))
-logger  = getLogger('uvicorn.error')
 
 
 ### App init ###
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=[]
-)
-
 ### DB init ###
 db = database("utils/distros.json")
 
+
+CHECK_EXPIRY_INTERVAL=1 #in minute
+
+def checkAuctionExpiry():
+    pass
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(checkAuctionExpiry,"interval",minutes=CHECK_EXPIRY_INTERVAL)
+scheduler.start()
+
+
 ### Implementation ###
-@app.get("/")
-def home():
-    return { "status": "ok" }
-
-def init():
-    global log_level
-    config_path = os.path.join(script_path, "config.yml")
-    http_port = 9090
-    if os.path.isfile(config_path):
-
-        with open(config_path, "r") as f:
-            config = yaml.load(f.read(), Loader=yaml.Loader)
-        http_port = config.get("http_port", 9090)
-        log_l = config.get("log_level", "info")
-
-        logger.debug(f"Configuration: {json.dumps(config, indent=4)}")
-    else:
-        logger.warning("Configuration file not found!")
-        log_l = "debug"
-    logger.info("Starting v1.0.0")
-
-    uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
-
-
-#DB NOTES
-#bidded auction and owned auctions separated
 
 def check_user(user): #0 USER, 1 ADMIN
     if True: #da cambiare
         return True
     else: 
         raise HTTPException(status_code=400, detail="Invalid Admin")
-
 
 #[PLAYER]
 ##API
