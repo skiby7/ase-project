@@ -4,10 +4,12 @@ WORKDIR /code
 
 RUN apt-get update -y && apt-get install -y build-essential
 
-COPY . .
+COPY . ./service
 
-RUN pip3 install --no-cache-dir --upgrade -r ./requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r ./service/requirements.txt
 
 EXPOSE 9090
 
-CMD uvicorn ${APP_MODULE:-service.main:app} --host 0.0.0.0 --port 9090
+CMD python3 -m ${MAIN_MODULE:-service.main}
+
+

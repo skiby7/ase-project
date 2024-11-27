@@ -6,11 +6,9 @@ services:
             context: ../../service
         environment:
             - RESOURCE_PATH=/code/service/resources
-            - APP_MODULE=service.main_test:app
+            - MAIN_MODULE=service.main_test
         ports:
             - "9090:9090"
-        volumes:
-            - ${PWD}/service:/code/service
         networks:
             - test_network
         depends_on:
@@ -19,6 +17,8 @@ services:
             - jwt_private_key
             - jwt_public_key
             - admin_account
+            - ssl_private_key
+            - ssl_cert
 
     db:
         container_name: db_authentication_test
@@ -36,7 +36,10 @@ secrets:
         file: ./test_secrets/public.pem
     admin_account:
         file: ./test_secrets/admin_account.json
-
+    ssl_private_key:
+        file: ../../service/secrets/key.pem
+    ssl_cert:
+        file: ../../service/secrets/cert.pem
 
 networks:
     test_network:

@@ -50,7 +50,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"username\": \"Pippo\",\r\n    \"password\": \"Ciaociao97??\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"raw": "{\r\n    \"username\": \"Pippo\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -78,7 +78,7 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"New acocunt is created\", () => {",
+											"pm.test(\"Access token successfully returned\", () => {",
 											"    pm.expect(pm.response.json()).to.have.property('access_token')",
 											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
 											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
@@ -2473,7 +2473,7 @@
 		},
 		{
 			"key": "user_password",
-			"value": "Ciaociao97"
+			"value": "Ciaociao97??"
 		},
 		{
 			"key": "user_uid",
@@ -2486,12 +2486,12 @@
 		},
 		{
 			"key": "base_url",
-			"value": "localhost:9090",
+			"value": "https://localhost:9090",
 			"type": "string"
 		},
 		{
 			"key": "admin_password",
-			"value": "TESTSecurepassword_TEST123"
+			"value": "TESTSecurepassword_TEST123?"
 		},
 		{
 			"key": "admin_username",
