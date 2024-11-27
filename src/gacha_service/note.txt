@@ -3,3 +3,27 @@
 http://127.0.0.1:5000/add?a=2&b=9
 
 docker compose -f .\docker-compose_test.yml up --build --abort-on-container-exit
+
+
+
+test: 
+add utente
+
+roll
+view collection
+remove gacha
+view collection
+add gacha 
+view collection
+
+add utente 
+remove utente
+
+
+add system gacha
+view all
+remove system gacha
+view all
+
+modify specific
+view specific

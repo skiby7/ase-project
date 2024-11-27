@@ -4,7 +4,7 @@ from database.db import database
 import uuid 
 
 #TODO: SANITIZE ALL INPUT
-
+ 
 def tux_check():
     return True 
 
@@ -14,9 +14,14 @@ def check_user():
 def check_admin():
     return True
 
+def get_admin():
+    return True
+
+
 # Inizializzazione DB
 app = FastAPI()
 db = database("utils/distros.json")
+token = get_admin()
 
 # View system gacha collection
 @app.get("/user/gacha/all", status_code=201)
@@ -28,11 +33,16 @@ def user_gacha_all():
 
 # View user personal gacha collection
 @app.get("/user/gacha/personal", status_code=200)
-def user_gacha_personal():
-    if check_user():
-        return db.get_user_gacha(1); #TODO: uuid
-    else: 
+def user_gacha_personal(id: str):
+    if not check_user():
         raise HTTPException(status_code=400, detail="Invalid User")
+    else: 
+        res = db.get_user_gacha(1); #TODO: uuid
+        if not res: 
+            raise HTTPException(status_code=400, detail="User Not present")
+        else: 
+            return res
+
 
 # View Specific Gacha Info
 @app.get("/user/gacha/specific", status_code=200)
@@ -98,11 +108,50 @@ def user_gacha(name: str,rarity: str, image: str):
         return res 
 
 # TODO: Add user
-@app.get("user/add", status_code=200)
-def user_gacha():
-    return
+@app.get("admin/add/user", status_code=200)
+def user_gacha(id: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        res = db.add_user()
+        if not res:
+            raise HTTPException(status_code=400, detail="User already Present")
+        else: 
+            return res
 
 # TODO: Delete user
-@app.get("user/remove", status_code=200)
-def user_gacha():
-    return
+@app.get("admin/remove/user", status_code=200)
+def user_gacha(id: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        res = db.remove_user()
+        if not res:
+            raise HTTPException(status_code=400, detail="User not Present")
+        else: 
+            return res
+
+# TODO: delete user gacha, from auction
+@app.get("admin/add/user/gacha", status_code=200)
+def user_gacha(id: str, name: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        res = db.add_user_gacha(id,name)
+        if not res:
+            raise HTTPException(status_code=400, detail="User or Gacha not Present")
+        else: 
+            return res
+
+# TODO: add user gacha, from auction
+@app.get("admin/remove/user/gacha", status_code=200)
+def user_gacha(id: str, name: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        res = db.remove_user_gacha(id,name)
+        if not res:
+            raise HTTPException(status_code=400, detail="User or Gacha not Present")
+        else: 
+            return res
+
