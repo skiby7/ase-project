@@ -106,7 +106,7 @@ def auction_modify(auction):
     db.auction_modify(db,auction)
 
 # Enable to see all time history
-@app.get("/auction-history-all")
+@app.get("/admin/auction/auction-history-all")
 def auction_history_all():
     #vedere se chi chiama e' un admin
     check_user(1)
