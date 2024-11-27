@@ -38,13 +38,16 @@ class database:
         res = [{"name": gachas["name"],"image" : gachas["image"]} for gachas in all_distros]
         return res
     
-    def get_all_gachas_admin(self):
+    def get_all_gachas_admin(self,mock_id):
         gachas = self.db["gachas"]
         all_gachas = list(gachas.find())
-        res = [{"id": gachas["id"], "name": gachas["name"], "rarity" : gachas["rarity"], "image" : gachas["image"]} for gachas in all_gachas]
+        if mock_id:
+            res = [{"name": gachas["name"], "rarity" : gachas["rarity"], "image" : gachas["image"]} for gachas in all_gachas]
+        else: 
+            res = [{"id": gachas["id"], "name": gachas["name"], "rarity" : gachas["rarity"], "image" : gachas["image"]} for gachas in all_gachas]
         return res
 
-    def get_specific_gacha(self,gacha_name : str):
+    def get_specific_gacha(self, gacha_name: str):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": gacha_name})
         if not gacha: 
@@ -52,27 +55,21 @@ class database:
         res = {"name": gacha["name"], "image": gacha["image"]}
         return res
 
-    def add_user_gacha(self,id : str,gacha_name : str):
+    def add_user_gacha(self, id: str, gacha_name: str):
+        id = str(id)
         gachas = self.db["gachas"]
         users = self.db["users"]
         gacha = gachas.find_one({"name": gacha_name})
 
         if not gacha:
-            return None
+            return 1
 
         gacha_id = gacha["id"]
         user = users.find_one({"id": id})
 
         if not user:
             return None
-            #user = {
-            #    "id": id,
-            #    "gacha_list": [
-            #                    {"gacha_id": gacha_id, "value" : 1}
-            #    ]
-            #}
-            #users.insert_one(user)
-        else : 
+        else: 
             existing_gacha = next((item for item in user["gacha_list"] if item["gacha_id"] == gacha_id), None)
     
             if existing_gacha:
@@ -85,8 +82,10 @@ class database:
                     {"id": id},
                     {"$push": {"gacha_list": {"gacha_id": gacha_id, "value": 1}}}
                 )
+        return {"name": gacha_name}
 
-    def remove_user_gacha(self,id : str,gacha_name : str):
+    def remove_user_gacha(self, id: str, gacha_name: str):
+        id = str(id)
         gachas = self.db["gachas"]
         users = self.db["users"]
         gacha = gachas.find_one({"name": gacha_name})
@@ -96,6 +95,9 @@ class database:
 
         gacha_id = gacha["id"]
         user = users.find_one({"id": id})
+
+        if not user:
+            return 2
 
         existing_gacha = next(
                 (item for item in user["gacha_list"] if item["gacha_id"] == gacha_id), None
@@ -108,21 +110,20 @@ class database:
                     {"id": id, "gacha_list.gacha_id": gacha_id},
                     {"$inc": {"gacha_list.$.value": -1}}
                 )
-                print(f"Valore del gacha {gacha_id} diminuito di 1.")
             else:
                 # delete if value = 0
                 users.update_one(
                     {"id": id},
                     {"$pull": {"gacha_list": {"gacha_id": gacha_id}}}
                 )
-                print(f"Gacha {gacha_id} rimosso dalla lista.")
         else:
-            return None
+            return 1
 
-    def get_user_gacha(self,user_id : str):
+    def get_user_gacha(self, id : str):
+        id = str(id)
         gachas = self.db["gachas"]
         users = self.db["users"]
-        user = users.find_one({"id": user_id})
+        user = users.find_one({"id": id})
         if not user: 
             return None 
         user_gachas = list(user["gacha_list"])
@@ -132,16 +133,20 @@ class database:
             res.append({"value" : gacha_u["value"], "name" : gacha["name"], "image" : gacha["image"]})
         return res 
 
-    def get_roll_gacha(self):
+    def get_roll_gacha(self, id: str, mock):
+        id = str(id)
         gachas = self.db["gachas"]
         list_gachas = list(gachas.find())
         n_gachas = len(list_gachas) 
         rand = random.randint(0, n_gachas-1);
         gacha_name = list_gachas[rand]["name"]
-        self.add_user_gacha(1,gacha_name) #TODO: uuid
-        return gacha_name
+        if mock:
+            res = self.add_user_gacha(id,"Ubuntu")
+        else: 
+            res = self.add_user_gacha(id,gacha_name)
+        return res
 
-    def modify_gacha(self,name : str,rarity : str,image : str):
+    def modify_gacha(self, name: str, rarity: str, image: str):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": name})
         if not gacha:
@@ -150,15 +155,19 @@ class database:
         gacha.image = image
         return gacha
 
-    def add_gacha(self,name : str,rarity : str,image: str):
+    def add_gacha(self, name: str, rarity: str, image: str,mock_id):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": name})
         if gacha:
             return None
-        gachas.insert_one({"id": str(uuid.uuid4()),"name": name,"rarity": rarity,"image": image})
-        return {"id": str(uuid.uuid4()),"name": name,"rarity": rarity,"image": image}
-        
-    def remove_gacha(self,name: str):
+        id = str(uuid.uuid4())
+        gachas.insert_one({"id": id,"name": name,"rarity": rarity,"image": image})
+        if mock_id:
+            return {"name": name,"rarity": rarity,"image": image}
+        else: 
+            return {"id": id,"name": name,"rarity": rarity,"image": image}
+
+    def remove_gacha(self, name: str):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": name})
         if not gacha:
@@ -166,7 +175,8 @@ class database:
         gachas.delete_one({"name": name})
         return {"name" : name}
     
-    def add_user(self,id):
+    def add_user(self, id: str):
+        id = str(id)
         users = self.db["users"] 
         if users.find_one({"id": id}):
             return None
@@ -175,11 +185,12 @@ class database:
                "gacha_list": []
            }
         users.insert_one(user)
-        return id
+        return {"id": id}
 
-    def remove_user(self,id):
+    def remove_user(self, id: str):
+        id = str(id)
         users = self.db["users"] 
-        if not users.find_one({"id": id}):
+        if not users.find_one({"id": str(id)}):
             return None
         users.delete_one({"id": id})
         return id

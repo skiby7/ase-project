@@ -4,27 +4,39 @@ from database.db import database
 import uuid 
 
 #TODO: SANITIZE ALL INPUT
- 
+
+mock_check = None
+
 def tux_check():
-    return True 
+    if mock_check:
+        return True 
+    else:
+        return True
 
 def check_user():
-    return True
+    if mock_check:
+        return True 
+    else:
+        return True
 
 def check_admin():
-    return True
+    if mock_check:
+        return True 
+    else:
+        return True
 
 def get_admin():
-    return True
+    if mock_check:
+        return True 
+    else:
+        return True
 
-
-# Inizializzazione DB
 app = FastAPI()
 db = database("utils/distros.json")
 token = get_admin()
 
 # View system gacha collection
-@app.get("/user/gacha/all", status_code=201)
+@app.get("/user/gacha/all", status_code=200)
 def user_gacha_all():
     if check_user():
         return db.get_all_gachas_user()
@@ -32,12 +44,16 @@ def user_gacha_all():
         raise HTTPException(status_code=400, detail="Invalid User")
 
 # View user personal gacha collection
+mock_gacha_personal = None
 @app.get("/user/gacha/personal", status_code=200)
 def user_gacha_personal(id: str):
     if not check_user():
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
-        res = db.get_user_gacha(1); #TODO: uuid
+        if mock_gacha_personal:
+            res = db.get_user_gacha(1); 
+        else: 
+            res = db.get_user_gacha(id);
         if not res: 
             raise HTTPException(status_code=400, detail="User Not present")
         else: 
@@ -56,23 +72,35 @@ def user_gacha_specific(name : str):
         return gacha 
 
 # Use In-Game Currency to Roll Gach
+mock_gacha_roll = None
 @app.get("/user/gacha/roll", status_code=200)
-def user_gacha_roll():
+def user_gacha_roll(id: str):
     if not check_user():
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         if tux_check():
-            return JSONResponse(content={"Name": db.get_roll_gacha()}) 
+            if mock_gacha_roll:
+                res = db.get_roll_gacha(1,mock_gacha_roll)
+                print("QUIIII")
+            else:
+                res = db.get_roll_gacha(id,mock_gacha_roll)
+            if not res: 
+                raise HTTPException(status_code=400, detail="User Not present")
+            elif res == 1: 
+                raise HTTPException(status_code=400, detail="System ERROR")
+            else:
+                return res
         else: 
             raise HTTPException(status_code=400, detail="ERROR")
 
 # Admin View Gacha Collection
+mock_id = None
 @app.get("/admin/gacha/collection", status_code=200)
 def user_gacha_collection():
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        return db.get_all_gachas_admin()
+        return db.get_all_gachas_admin(mock_id)
 
 # Admin add Gacha
 @app.get("/admin/gacha/add", status_code=200)
@@ -80,12 +108,12 @@ def user_gacha_modify(name: str, rarity: str, image: str):
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.add_gacha(name,rarity,image)
+        res = db.add_gacha(name,rarity,image,mock_id)
         if not res: 
             raise HTTPException(status_code=400, detail="Gacha already present")
         return res 
 
-#  Admin remove one Gacha 
+# Admin remove one Gacha 
 @app.get("/admin/gacha/remove", status_code=200)
 def user_gacha_modify(name: str):
     if not check_admin():
@@ -96,7 +124,7 @@ def user_gacha_modify(name: str):
             raise HTTPException(status_code=400, detail="Invalid Name")
         return res 
 
-# TODO: Admin Modify Specific Gacha by name 
+# Admin Modify Specific Gacha by name 
 @app.get("/admin/gacha/modify/specific", status_code=200)
 def user_gacha(name: str,rarity: str, image: str):
     if not check_admin():
@@ -107,51 +135,56 @@ def user_gacha(name: str,rarity: str, image: str):
             raise HTTPException(status_code=400, detail="Invalid Name")
         return res 
 
-# TODO: Add user
-@app.get("admin/add/user", status_code=200)
+# Add user
+@app.get("/admin/add/user", status_code=200)
 def user_gacha(id: str):
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.add_user()
+        res = db.add_user(id)
         if not res:
             raise HTTPException(status_code=400, detail="User already Present")
         else: 
             return res
 
-# TODO: Delete user
-@app.get("admin/remove/user", status_code=200)
+# Delete user
+@app.get("/admin/remove/user", status_code=200)
 def user_gacha(id: str):
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.remove_user()
+        res = db.remove_user(id)
         if not res:
             raise HTTPException(status_code=400, detail="User not Present")
         else: 
             return res
 
-# TODO: delete user gacha, from auction
-@app.get("admin/add/user/gacha", status_code=200)
+# Delete user gacha
+@app.get("/admin/add/user/gacha", status_code=200)
 def user_gacha(id: str, name: str):
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
         res = db.add_user_gacha(id,name)
         if not res:
-            raise HTTPException(status_code=400, detail="User or Gacha not Present")
+            raise HTTPException(status_code=400, detail="User not Present")
+        elif res == 1: 
+            raise HTTPException(status_code=400, detail="Gacha not Present")
         else: 
             return res
 
-# TODO: add user gacha, from auction
-@app.get("admin/remove/user/gacha", status_code=200)
+# Add user gacha
+@app.get("/admin/remove/user/gacha", status_code=200)
 def user_gacha(id: str, name: str):
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
         res = db.remove_user_gacha(id,name)
         if not res:
-            raise HTTPException(status_code=400, detail="User or Gacha not Present")
-        else: 
+            raise HTTPException(status_code=400, detail="Gacha not Present")
+        elif res == 1: 
+            raise HTTPException(status_code=400, detail="User doesn't have this gacha")
+        elif res == 2: 
+            raise HTTPException(status_code=400, detail="User not present")
+        else:
             return res
-
