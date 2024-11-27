@@ -1,11 +1,9 @@
 from typing import Annotated
-
 from fastapi import APIRouter, Depends, HTTPException, status
-
 from . import services
 from .schemas import Account, ChangePasswordReq, ModifyAccountReq, RegistrationModel
-from ..utils.access_token_utils import extract_access_token
-from ..utils.schemas import TokenData
+from ..shared_libs.access_token_utils import extract_access_token
+from ..shared_libs.access_token_utils import TokenData
 
 router = APIRouter(
     prefix="/auth",

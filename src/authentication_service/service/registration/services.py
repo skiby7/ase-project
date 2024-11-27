@@ -9,7 +9,7 @@ from .models import AccountDB
 from .schemas import Account
 from ..utils import mongo_connection
 from ..utils import password_utils
-from ..utils.schemas import TokenData
+from ..shared_libs.access_token_utils import TokenData
 
 urls_services_to_notify = [
     ""
