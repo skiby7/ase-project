@@ -59,6 +59,7 @@ def init():
 
 #[PLAYER]
 ##API
+
 # create auction
 @app.post("/create")
 def create(user_id,gacha_id,starting_price,end_time):
@@ -74,25 +75,17 @@ def create(user_id,gacha_id,starting_price,end_time):
     
     #add to currently ongoing auctions of the player
     db.create_auction(user_id,gacha_id,starting_price,end_time)
-    pass
+
 # place bid on auction
 @app.post("/bid")
-def bid(auction_id,bid):
-    
-    #freeze the amount via tux service
-    #add to bidded auctions
-    pass
+def bid(auction_id,player_id,bid):
+    db.bid(auction_id,player_id,bid)
 
 # enable view of auction history
 @app.post("/auctionHistory")
-def auctionHistory():ù
-    
+def auctionHistory(player_id):
+    db.auctionHistory()
     pass
-
-
-
-
-
 
 ##LOGIC
 # Deliver won gacha after auction
@@ -103,25 +96,40 @@ def auctionHistory():ù
 
 #[ADMIN]
 ##API
+
+def authAdmin():
+    pass
+
 # Enable seeing market history of a player
 @app.get("/auctionHistoryPlayer")
 def auctionHistoryPlayer():
+    #vedere se chi chiama e' un admin
+    authAdmin()
+
     pass
 # Enable to see market auction activity
 @app.get("/marketActivity")
 def marketActivity():
+    #vedere se chi chiama e' un admin
+    authAdmin()
     pass
 # Enable view details of auction
 @app.get("/auctionInfo")
+#vedere se chi chiama e' un admin
 def auctionInfo():
+    authAdmin()
     pass
 # Enable manipulation of auction
 @app.post("/auctionModify")
 def auctionModify():
+    #vedere se chi chiama e' un admin
+    authAdmin()
     pass
 # Enable to see all time history
 @app.post("/history")
 def history():
+    #vedere se chi chiama e' un admin
+    authAdmin()
     pass
 
 #[SECURITY]

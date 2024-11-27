@@ -72,6 +72,10 @@ class database:
 
         self.db["bids"].insert_one({"player_id":player_id,"auction_id":auction_id,"bid":bid})
 
+    def auctionHistory(player_id):
+        supp = list(self.db["auctions"].find({"player_id":}))
+        
+    
     #SUPPORT
     #every gacha is unique so controlling if it has a current auction on it is sufficient
     def gacha_available(gacha_id):
