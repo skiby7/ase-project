@@ -5,11 +5,9 @@ from logging import getLogger
 from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import uuid 
 import time
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler import BackgroundScheduler
 unix_time = lambda: int(time.time())
-
 
 ### App init ###
 app = FastAPI()
@@ -45,13 +43,10 @@ def create(gacha_id,starting_price,end_time):
     check_user(0)
 
     #arguments check
-    if(starting_price<0){
-        raise HTTPException(status_code=400, detail="Invalid User")
-    }
+    if(starting_price<0):raise HTTPException(status_code=400, detail="Invalid User")
+    
 
-    if(unix_time()>=end_time){
-        raise HTTPException(status_code=400, detail="Invalid User")
-    }
+    if(unix_time()>=end_time):raise HTTPException(status_code=400, detail="Invalid User")
 
     #extract player id
     #add to currently ongoing auctions of the player
