@@ -1,9 +1,9 @@
 from libs.auth import verify
 from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds
-from libs.db.db import get_db, update_freezed_tux, get_user_tux_balance, get_user_fiat_balance
+from libs.db.db import get_db, settle_auction_payments, update_freezed_tux, get_user_tux_balance, get_user_fiat_balance
 from fastapi import APIRouter, HTTPException, Body, Header, Depends
 
-from routers.balances.models import FreezeTuxModel
+from routers.balances.models import FreezeTuxModel, SettleAuctionModel
 
 
 router = APIRouter()
@@ -37,3 +37,14 @@ def freeze(user_id: str, Authorization: str = Header(), request: FreezeTuxModel 
         raise HTTPException(status_code=500, detail=f"{e}")
 
     return {"details" : "success"}
+
+@router.post("/balances/settle-auction")
+def settle(Authorization: str = Header(), request: SettleAuctionModel = Body(), db_session = Depends(get_db)):
+    if not verify(Authorization):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    try:
+        settle_auction_payments(db_session, request.auction_id, request.winner_id, request.auctioneer_id)
+    except (InsufficientFunds, AlreadySettled, UserNotFound) as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
