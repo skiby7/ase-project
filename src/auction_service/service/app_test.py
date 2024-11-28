@@ -6,3 +6,4 @@ tested_app = main_app.app
 main_app.mock_authentication = True 
 main_app.mock_distro = True
 main_app.mock_tux = True
+main_app.mock_player = True

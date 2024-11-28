@@ -1,5 +1,5 @@
 services:
-  distro:
+  auction:
     build: 
       context: service
       dockerfile: Dockerfile_test
