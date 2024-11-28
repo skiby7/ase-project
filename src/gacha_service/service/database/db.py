@@ -12,7 +12,18 @@ def convert_image(image):
 class database:
     def __init__(self,distrofile : str):
         self.distrofile = distrofile
-        self.client = MongoClient("db", 27017, maxPoolSize=50)
+        username = "root"
+        host = "db"
+        port = "27017"
+        db = "admin"
+        database = "mydatabase"
+        #tsl_certificate_file = "/run/secrets/cert" 
+        with open('/run/secrets/pw', 'r') as file:
+            password = file.read().strip()
+        uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
+        print("SONOVIVO")
+        self.client = MongoClient(uri)
+        #self.client = MongoClient("db", 27017, maxPoolSize=50)
         self.db = self.client["mydatabase"]
         if "gachas" not in self.db.list_collection_names():
             self.db_inizialization()

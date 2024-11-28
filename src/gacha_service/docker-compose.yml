@@ -1,18 +1,18 @@
-services:
-  distro:
-    build: ./service
-    depends_on:
-      - db
-    ports:
-      - 5000:5000
-
-  db:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    volumes:
-      - dbdata:/data/db
-    command: mongod --quiet --logpath /dev/null 
-
-volumes:
-  dbdata:
+#services:
+#  distro:
+#    build: ./service
+#    depends_on:
+#      - db
+#    ports:
+#      - 5000:5000
+#
+#  db:
+#    image: mongo:latest
+#    ports:
+#      - '27017:27017'
+#    volumes:
+#      - dbdata:/data/db
+#    command: mongod --quiet --logpath /dev/null 
+#
+#volumes:
+#  dbdata:

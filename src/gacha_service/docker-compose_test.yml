@@ -7,11 +7,37 @@ services:
       - db
     ports:
       - 5000:5000
+    secrets:
+      - cert
+      - key
+      - pw
 
   db:
     image: mongo:latest
     ports:
       - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+    #  MONGO_INITDB_ROOT_PASSWORD: 13579
+      MONGO_INITDB_DATABASE: admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
     command: mongod --quiet --logpath /dev/null 
+      --tlsAllowConnectionsWithoutCertificates
+      --tlsMode preferTLS
+      --tlsCertificateKeyFile /run/secrets/cert_db
+      --tlsCAFile /run/secrets/cert_db
+    secrets:
+      - cert_db
+      - pw
     tmpfs:
       - /data/db 
+   
+secrets: 
+  pw: 
+    file: ./service/secrets/pw.txt
+  cert: 
+    file: ./service/secrets/cert.pem
+  key: 
+    file: ./service/secrets/key.pem
+  cert_db: 
+    file: ./service/secrets/server.pem
