@@ -173,12 +173,9 @@ def validate_password(password):
 
 def delete_account(uid: str):
     accounts_collection = mongo_connection.get_accounts_collection()
-    account = accounts_collection.find_one({"uid": uid})
-    if not account:
-        raise HTTPException(status_code=404, detail="No account found with that identifier")
     result = accounts_collection.delete_one({"uid": uid})
-    if result.deleted_count != 1:
-        raise HTTPException(status_code=500, detail="Error in deleting account")
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Account not found")
 
 
 def can_delete_account(uid_account: str, token_data: TokenData) -> bool:

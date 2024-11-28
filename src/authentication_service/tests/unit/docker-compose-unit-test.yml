@@ -55,7 +55,7 @@ secrets:
     ssl_cert:
         file: ../../service/secrets/app_cert.pem
     ssl_mongo_cert_key:
-        file: ../../service/secrets/mongo_cert_key.pem
+        file: ../../service/secrets/ssl_mongo_cert_key.pem
     mongodb_password:
         file: ./test_secrets/mongo_root_password
 

@@ -36,7 +36,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
 
 @router.get('/userinfo')
-@admin_router.post('/userinfo')
+@admin_router.get('/userinfo')
 def verify(token_data: Annotated[TokenData, Depends(extract_access_token)]):
     account = services.get_account_info(uid_account=token_data.sub)
     if not account:
