@@ -5,4 +5,4 @@ logger = getLogger("uvicorn.error")
 @use_mocks
 def verify(token: str) -> bool:
     logger.debug(f"Verifying token {token}")
-    return False
+    return True

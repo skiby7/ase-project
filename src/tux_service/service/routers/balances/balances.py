@@ -2,9 +2,10 @@ from libs.auth import verify
 from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds
 from libs.db.db import get_db, settle_auction_payments, update_freezed_tux, get_user_tux_balance, get_user_fiat_balance
 from fastapi import APIRouter, HTTPException, Body, Header, Depends
-
+from logging import getLogger
 from routers.balances.models import FreezeTuxModel, SettleAuctionModel
 
+logger = getLogger("uvicorn.error")
 
 router = APIRouter()
 
@@ -16,6 +17,7 @@ def balance(user_id: str, Authorization: str = Header(), session = Depends(get_d
     try:
         tux_balance = get_user_tux_balance(session, user_id)
         fiat_balance = get_user_fiat_balance(session, user_id)
+        logger.debug(f"fiat: {fiat_balance} - tux: {tux_balance}")
     except UserNotFound as e:
         raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:

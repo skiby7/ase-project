@@ -2,14 +2,14 @@ import os
 import json, yaml
 import uvicorn
 from logging import getLogger
-from pydantic import BaseModel
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.buy import buy
 from routers.transactions import transactions
 from routers.admin import admin
-from routers.payments import payments
-from libs.db import create_tables
+from routers.roll import roll
+from routers.balances import balances
+from libs.db.db import create_tables
 
 
 ### Globals ###
@@ -28,7 +28,9 @@ app.add_middleware(
 app.include_router(buy.router)
 app.include_router(transactions.router)
 app.include_router(admin.router)
-app.include_router(payments.router)
+app.include_router(roll.router)
+app.include_router(balances.router)
+
 ### Implementation ###
 
 def init():

@@ -4,9 +4,10 @@ import uuid
 import os
 import time
 from logging import getLogger
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
+from routers.transactions.models import AuctionTransactionModel, PurchaseTransactionModel
 from libs.db.utils import transactional
 from libs.db.tables import Base, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
 from libs.mocks import MockSession, use_mocks
@@ -67,6 +68,7 @@ def delete_user_balance(session, user_id: str):
 @use_mocks
 @transactional
 def create_purchase_transaction(session, purchased_tux: float, amount_fiat: float, amount_tux: float, user_id: str, filled: bool):
+    logger.debug(f"Inserting purchase transaction {purchased_tux} {amount_fiat} {amount_tux} {user_id} {filled}")
     new_transaction = TuxPurchaseTransaction(
         transaction_id=str(uuid.uuid4()),
         purchased_tux=purchased_tux,
@@ -94,16 +96,47 @@ def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str
     session.add(new_transaction)
     update_user_tux_balance(session, from_id, "withdraw", tux_amount)
     update_user_tux_balance(session, to_id, "deposit", tux_amount)
-    # TODO:
-        # try to raise an exception and check that the operation rolls back
 
+@use_mocks
+def user_exists(session, user_id:str):
+    return session.query(UserBalance).filter_by(user_id=user_id).first() is not None
+
+@use_mocks
+def get_user_purchase_transactions(session,user_id: str) -> list[PurchaseTransactionModel]:
+    transactions = []
+    for t in session.query(TuxPurchaseTransaction).filter_by(user_id=user_id).all():
+        transactions.append(PurchaseTransactionModel(
+            purchased_tux=t.purchased_tux,
+            transaction_id=t.transaction_id,
+            amount_fiat=t.amount_fiat,
+            amount_tux=t.amount_tux,
+            timestamp=t.timestamp,
+            user_id=t.user_id,
+            filled=t.filled))
+    return transactions
+
+
+@use_mocks
+def get_user_auction_transactions(session,user_id: str) -> list[AuctionTransactionModel]:
+    transactions = []
+    for t in session.query(InterUserTransaction).filter(or_(
+        InterUserTransaction.from_user_id==user_id,
+        InterUserTransaction.to_user_id==user_id)).all():
+        transactions.append(AuctionTransactionModel(
+            transaction_id=t.transaction_id,
+            auction_id=t.auction_id,
+            amount_tux=t.amount_tux,
+            timestamp=t.timestamp,
+            from_user_id=t.from_user_id,
+            to_user_id=t.to_user_id))
+    return transactions
 
 @use_mocks
 def get_user_fiat_balance(session, user_id: str) -> float:
     balance = session.query(UserBalance.fiat_amount).filter_by(user_id=user_id).first()
     if balance is None:
         raise UserNotFound(f"{user_id} not found")
-    return balance
+    return balance[0]
 
 
 @use_mocks
@@ -111,7 +144,7 @@ def get_user_tux_balance(session, user_id: str) -> float:
     balance = session.query(UserBalance.tux_amount).filter_by(user_id=user_id).first()
     if balance is None:
         raise UserNotFound(f"{user_id} not found")
-    return balance
+    return balance[0]
 
 
 @use_mocks
@@ -120,8 +153,7 @@ def buy_tux(session, user_id: str, tux_amount: float, fiat_amount: float):
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
     if row:
         if row.fiat_amount < fiat_amount:  # type: ignore
-            create_purchase_transaction(session, tux_amount, row.tux_amount, row.fiat_amount, user_id, False)  # type: ignore
-            raise InsufficientFunds(f"{user_id} cannot buy tux for {fiat_amount} fiat")
+            raise InsufficientFunds(f"{user_id} cannot afford to pay {fiat_amount} fiat value")
         row.fiat_amount -= fiat_amount  # type: ignore
         row.tux_amount += tux_amount  # type: ignore
     else:
@@ -165,7 +197,7 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
 
 @use_mocks
 @transactional
-def update_game_balance(session, emitted_tux: float, used_tux: float, fiat: float):
+def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: float):
     try:
         balance: GameBalance = session.query(GameBalance).order_by(GameBalance.timestamp.desc()).first()
         if not balance:
@@ -173,8 +205,8 @@ def update_game_balance(session, emitted_tux: float, used_tux: float, fiat: floa
         else:
             new_balance = GameBalance(
                 timestamp=unix_time(),
-                tux_emitted=balance.emitted_tux + emitted_tux,
-                tux_used=balance.tux_used + used_tux,
+                tux_emitted=balance.tux_emitted + emitted_tux,
+                tux_spent=balance.tux_spent + tux_spent if balance.tux_spent is not None else tux_spent,
                 fiat_earned=balance.fiat_earned + fiat,
             )
 

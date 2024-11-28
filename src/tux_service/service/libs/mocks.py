@@ -4,10 +4,10 @@ import random
 import sys
 from functools import wraps
 from routers.transactions.models import PurchaseTransactionModel
-from libs.db.db import unix_time
 from uuid import uuid4
+from time import time
 logger = getLogger("uvicorn.error")
-
+unix_time = lambda: int(time())
 class MockSession:
     def open(self):
         pass
