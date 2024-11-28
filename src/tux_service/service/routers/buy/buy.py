@@ -1,11 +1,15 @@
 from libs.auth import verify
-from libs.db import get_db
+from libs.db.db import get_db, buy_tux
 from routers.buy.models import BuyModel
-from routers.buy.backend import InsufficientFunds, buy_tux
 from fastapi import APIRouter, HTTPException, Body, Header, Depends
 from logging import getLogger
+
+from libs.exceptions import InsufficientFunds
 logger = getLogger("uvicorn.error")
 router = APIRouter()
+
+FIAT_TO_TUX = 1.2
+
 
 @router.post('/buy')
 def buy(Authorization: str = Header(), buy_request: BuyModel = Body(), session = Depends(get_db)):
@@ -13,7 +17,7 @@ def buy(Authorization: str = Header(), buy_request: BuyModel = Body(), session =
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
-        buy_tux(session, buy_request.user_id, buy_request.amount)
+        buy_tux(session, buy_request.user_id, buy_request.amount, buy_request.amount/FIAT_TO_TUX)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=f"{ve}")
     except InsufficientFunds as ins:
