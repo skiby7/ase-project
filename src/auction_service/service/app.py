@@ -6,7 +6,7 @@ import requests
 from logging import getLogger
 from pydantic import BaseModel
 from fastapi import Body, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -19,7 +19,7 @@ mock_tux = None
 mock_distro = None
 
 mock_player = None
-dummy_player_id = 1
+dummy_player_id = "1"
 
 app = FastAPI()
 db = database("utils/auctions.json","utils/bids.json")
@@ -57,7 +57,7 @@ def check_user(user): #0 USER, 1 ADMIN
 
 # AUCTION_CREATE_PLAYER
 @app.post("/user/auction/auction-create-player", status_code=201)
-def auction_create_player(gacha_id,starting_price,end_time):
+def auction_create_player(gacha_id:str, starting_price:int, end_time:int):
     check_user(0)
 
     #arguments check
@@ -114,7 +114,7 @@ def auction_history_player():
     if mock_player:player_id = dummy_player_id
 
     #extract player id
-    db.auction_history(player_id)
+    return db.auction_history_player(player_id)
 
 
 
@@ -123,12 +123,12 @@ def auction_history_player():
 
 # AUCTION_HISTORY
 @app.get("/admin/auction/auction-history", status_code=200)
-def auction_history(player_id):
+def auction_history(player_id:str):
     check_user(1)
     
     #must control presence because db.find() possibly returns []
     if not db.auction_user_presence(player_id):raise HTTPException(status_code=400, detail="Player not present")
-    return db.auction_history_player(player_id)
+    return jsonable_encoder(db.auction_history(player_id))
 
 
 # AUCTION_MODIFY
@@ -165,7 +165,7 @@ def auction_info(auction_id):
 def auction_history_all():
     check_user(1)
     
-    return db.auction_history_all()
+    return jsonable_encoder(db.auction_history_all())
 
 
 # MARKET_ACTIVITY
@@ -173,8 +173,11 @@ def auction_history_all():
 def market_activity():
     check_user(1)
 
-    return db.market_activity()
+    return jsonable_encoder(db.market_activity())
 '''
 if __name__ == "__main__":
     app.run(ssl_context=('cert.pem', 'key.pem'))
     '''
+
+## TODO revise endpoint types to and database consistency with such
+## see if I have to implement more endpoints

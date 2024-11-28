@@ -3,6 +3,7 @@ import json
 import uuid
 import random
 import time
+from bson import binary
 unix_time = lambda: int(time.time())
 
 
@@ -67,7 +68,7 @@ class database:
         # if(not self.gacha_available(self,player_id,gacha_id)):return 1
 
         while(True):
-            id=uuid.uuid4()
+            id=str(uuid.uuid4())
             if(not self.db["auctions"].find_one({"auction_id":id})):break
         
         auction={
@@ -111,9 +112,7 @@ class database:
 
 
     def auction_history_player(self,player_id):
-        #supp = list(self.db["auctions"].find({"player_id":player_id}))
-        #return [{"auction_id": auction["auction_id"],"player_id": auction["player_id"],"gacha_id": auction["auction_id"]} for auction in supp]
-        return list(self.db["auctions"].find({"player_id":player_id}))
+        return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
 
 
@@ -122,7 +121,8 @@ class database:
     #NB - because these are used by admins they contain _id
 
     def auction_history(self,player_id):
-        return list(self.db["auctions"].find({"player_id":player_id}))
+        
+        return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
 
     def auction_modify(self,auction):
@@ -143,12 +143,12 @@ class database:
     
     
     def auction_history_all(self):
-        return list(self.db["auctions"].find())
+        return list(self.db["auctions"].find({},{"_id":0}))
     
 
     def market_activity(self):
         twenty_four_hours_ago = unix_time() - 86400
-        auctions = self.db["bids"].find({"time": {"$gte": twenty_four_hours_ago}})
+        auctions = self.db["bids"].find({"time": {"$gte": twenty_four_hours_ago}},{"_id":0})
         pipelineAvg = [
             {
                 "$match": {
@@ -193,12 +193,12 @@ class database:
 
     #SUPPORT
     
-    def auction_user_presence(self,player_id):
-        return False if self.db["auction"].find_one({"player_id":player_id}) is None else True 
+    def auction_user_presence(self,player_id:str):
+        return False if (self.db["auctions"].find_one({"player_id":player_id}) is None) else True 
     
 
-    def auction_presence(self,auction_id):
-        return False if self.db["auction"].find_one({"player_id":auction_id}) is None else True 
+    def auction_presence(self,auction_id:str):
+        return False if (self.db["auctions"].find_one({"player_id":auction_id}) is None) else True 
 
     
         
