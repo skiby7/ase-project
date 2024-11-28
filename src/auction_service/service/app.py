@@ -10,102 +10,118 @@ import time
 from apscheduler import BackgroundScheduler
 unix_time = lambda: int(time.time())
 
-### App init ###
-app = FastAPI()
+### INIT ###
 
-### DB init ###
+mock_authentication = None
+mock_tux = None
+mock_distro = None
+app = FastAPI()
 db = database("utils/auctions.json","utils/bids.json")
 
-##LOGIC
-# Deliver won gacha after auction
-# Deliver tux to auction creator after end
-# Give back tux if lost auction
-#---> service should always watch over currently on going auctions
-#---> if time elapsed behave as needed
+
+
+### CHECKS ###
 
 CHECK_EXPIRY_INTERVAL=1 #in minute
-
 def checkAuctionExpiration():
     finishedAuctions = db.checkAuctionExpiry()
     for auction in finishedAuctions:
-        #notify
-        pass
+        if not mock_distro:break
+        #give gacha to winning player
+        
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(checkAuctionExpiration,"interval",minutes=CHECK_EXPIRY_INTERVAL)
 scheduler.start()
 
-
-### Implementation ###
-
 def check_user(user): #0 USER, 1 ADMIN
+    if mock_authentication==True:return True
     if True: #da cambiare
         return True
     else: 
         raise HTTPException(status_code=400, detail="Invalid Admin")
 
-#[PLAYER]
-##API
 
-# create auction
+
+
+### PLAYER ###
+
+# AUCTION_CREATE
 @app.post("/user/auction/auction-create", status_code=201)
 def auction_create(gacha_id,starting_price,end_time):
     check_user(0)
 
     #arguments check
-    if(starting_price<0):raise HTTPException(status_code=400, detail="Invalid User")
-    
+    if(starting_price<0):raise HTTPException(status_code=400, detail="Invalid price")
 
-    if(unix_time()>=end_time):raise HTTPException(status_code=400, detail="Invalid User")
+    if(unix_time()>=end_time):raise HTTPException(status_code=400, detail="Invalid time")
 
     #extract player id
-    #add to currently ongoing auctions of the player
-    db.auction_create(db,player_id,gacha_id,starting_price,end_time)
+    #remove gacha from player
+    if not mock_distro:pass
 
-# place bid on auction
+    #add to currently ongoing auctions of the player
+    res = db.auction_create(db,player_id,gacha_id,starting_price,end_time)
+    if res == 0: return res
+    elif res == 1: raise HTTPException(status_code=400, detail="Invalid User")
+    
+
+# AUCTION_BID
 @app.post("/user/auction/auction-bid", status_code=201)
 def auction_bid(auction_id,bid):
     check_user(0)
 
     #extract player id
-    db.auction_bid(db,auction_id,player_id,bid)
+    res = db.auction_bid(db,auction_id,player_id,bid,mock_tux)
+    if res == 0: return res
+    elif res == 1: raise HTTPException(status_code=400, detail="Auction does not exist")
+    elif res == 2: raise HTTPException(status_code=400, detail="Player is owner of auction")
+    elif res == 3: raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
 
-# enable view of auction history
+
+# AUCTION_HISTORY
 @app.get("/user/auction/auction-history", status_code=200)
 def auction_history():
     check_user(0)
 
     #extract player id
-    db.auction_history(player_id)    
+    db.auction_history(player_id)
 
-#[ADMIN]
-##API
 
-# Enable seeing market history of a player
+
+
+### ADMIN ###
+
+# AUCTION_HISTORY_PLAYER
 @app.get("/admin/auction/auction-history-player", status_code=200)
 def auction_history_player(player_id):
     #vedere se chi chiama e' un admin
     check_user(1)
-        
-    db.auction_history_player(db,player_id)
+    
+    if not db.auction_user_presence(db,player_id):raise HTTPException(status_code=400, detail="Player not present")
+    return db.auction_history_player(db,player_id)
 
-# Enable view details of auction
+
+# AUCTION_INFO
 @app.get("/admin/auction/auction-info", status_code=200)
-#vedere se chi chiama e' un admin
 def auction_info(auction_id):
     check_user(1)
         
+    if not db.auction_presence(db,auction_id):raise HTTPException(status_code=400, detail="Auction not present")
     db.auction_info(db,auction_id)
     
-# Enable manipulation of auction
+
+# AUCTION_MODIFY
 @app.put("/admin/auction/auction-modify", status_code=200)
 def auction_modify(auction):
     #vedere se chi chiama e' un admin
     check_user(1)
     
+    if not db.auction_presence(db,auction["auction_id"]):raise HTTPException(status_code=400, detail="Auction not present")
     db.auction_modify(db,auction)
 
-# Enable to see all time history
+
+# AUCTION_HISTORY_ALL
 @app.get("/admin/auction/auction-history-all")
 def auction_history_all():
     #vedere se chi chiama e' un admin
@@ -113,17 +129,15 @@ def auction_history_all():
     
     return db.auction_history_all(db)
 
-# Enable to see market auction activity in the last 24h
+
+# MARKET_ACTIVITY
 @app.get("/admin/auction/market-activity", status_code=200)
 def market_activity():
     #vedere se chi chiama e' un admin
     check_user(1)
 
-    db.market_activity(db)
-
-#[SECURITY]
-##LOGIC
-# Security - no auction listing manipulations
-
+    return db.market_activity(db)
+'''
 if __name__ == "__main__":
-    init()
+    app.run(ssl_context=('cert.pem', 'key.pem'))
+    '''

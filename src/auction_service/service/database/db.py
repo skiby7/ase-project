@@ -61,7 +61,9 @@ class database:
     
     def auction_create(self,player_id,gacha_id,starting_price,end_time):
         #control if gacha is already in bid
-        if(not self.gacha_available(self,player_id,gacha_id)):return 1
+        #da fare con simo
+        # if(not self.gacha_available(self,player_id,gacha_id)):return 1
+
         while(True):
             id=uuid.uuid4()
             if(not self.db["auctions"].find_one({"auction_id":id})):break
@@ -81,16 +83,17 @@ class database:
 
     def auction_bid(self,auction_id,player_id,bid):
         auction = self.db["auctions"].find_one({"auction_id":id,"active":True})
-        if auction is None:return -1
-        if player_id == auction["player_id"]: return -1
-        if bid <= auction["current_winning_bid"]:return -1
+        if auction is None:return 1
+        if player_id == auction["player_id"]: return 2
+        if bid <= auction["current_winning_bid"]:return 3
 
         auction["time"]=unix_time()
         auction["current_winning_player_id"]=player_id
         auction["current_winning_bid"]=bid
 
         self.db["bids"].insert_one({"player_id":player_id,"auction_id":auction_id,"bid":bid})
-    
+        return 0
+
     def auction_history(self,player_id):
         supp = list(self.db["auctions"].find({"player_id":player_id}))
         return [{"auction_id": auction["auction_id"],"player_id": auction["player_id"],"gacha_id": auction["auction_id"]} for auction in supp]
@@ -99,7 +102,8 @@ class database:
     #ADMIN
     #NB - because these are used by admins they contain _id
     def auction_history_player(self,player_id):
-        return self.db["auctions"].find({"player_id":player_id})
+        return list(self.db["auctions"].find({"player_id":player_id}))
+
 
     def auction_info(self,auction_id):
         return self.db["auctions"].find_one({"auction_id":auction_id})
@@ -147,7 +151,7 @@ class database:
         count = list(count_result)  # Convert to list to extract result
 
         # Check if results are available
-        avg_bid = avg[0]["average_bid"] if avg else None
+        avg_bid = avg[0]["average_bid"] if avg else 0
         total_bids = count[0]["total_bids"] if count else 0
 
         # Return the results
@@ -155,6 +159,13 @@ class database:
 
     #SUPPORT
     #every gacha is unique so controlling if it has a current auction on it is sufficient
+    def auction_user_presence(self,player_id):
+        return False if self.db["auction"].find_one({"player_id":player_id}) is None else True 
+    
+    def auction_presence(self,auction_id):
+        return False if self.db["auction"].find_one({"player_id":auction_id}) is None else True 
+    
+
     def gacha_available(self,player_id,gacha_id):
         return True if self.db["auctions"].find_one[{"player_id":player_id,"gacha_id":gacha_id,"active":True}] else False 
 
