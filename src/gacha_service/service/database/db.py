@@ -47,13 +47,16 @@ class database:
             res = [{"id": gachas["id"], "name": gachas["name"], "rarity" : gachas["rarity"], "image" : gachas["image"]} for gachas in all_gachas]
         return res
 
-    def get_specific_gacha(self, gacha_name: str):
+    def get_specific_gacha(self, gacha_name: str, mock_id):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": gacha_name})
         if not gacha: 
             return
-        res = {"name": gacha["name"], "image": gacha["image"]}
-        return res
+        if mock_id:
+            return {"name": gacha["name"], "rarity": gacha["rarity"], "image": gacha["image"]}
+        else: 
+            return {"id": gacha["id"], "name": gacha["name"], "rarity": gacha["rarity"], "image": gacha["image"]}
+
 
     def add_user_gacha(self, id: str, gacha_name: str):
         id = str(id)
@@ -105,13 +108,11 @@ class database:
 
         if existing_gacha:
             if existing_gacha["value"] > 1:
-                # value--
                 users.update_one(
                     {"id": id, "gacha_list.gacha_id": gacha_id},
                     {"$inc": {"gacha_list.$.value": -1}}
                 )
             else:
-                # delete if value = 0
                 users.update_one(
                     {"id": id},
                     {"$pull": {"gacha_list": {"gacha_id": gacha_id}}}
@@ -119,13 +120,13 @@ class database:
         else:
             return 1
 
-    def get_user_gacha(self, id : str):
+    def get_user_gacha(self, id: str):
         id = str(id)
         gachas = self.db["gachas"]
         users = self.db["users"]
         user = users.find_one({"id": id})
         if not user: 
-            return None 
+            return 1 
         user_gachas = list(user["gacha_list"])
         res = []
         for gacha_u in user_gachas:
@@ -136,24 +137,30 @@ class database:
     def get_roll_gacha(self, id: str, mock):
         id = str(id)
         gachas = self.db["gachas"]
-        list_gachas = list(gachas.find())
-        n_gachas = len(list_gachas) 
-        rand = random.randint(0, n_gachas-1);
-        gacha_name = list_gachas[rand]["name"]
+        gacha_list = list(gachas.find())
+
+        weights = [6 - gacha["rarity"] for gacha in gacha_list]
+        rand = random.choices(gacha_list, weights=weights, k=1)[0]
+
         if mock:
             res = self.add_user_gacha(id,"Ubuntu")
         else: 
-            res = self.add_user_gacha(id,gacha_name)
+            res = self.add_user_gacha(id,rand["name"])
         return res
 
     def modify_gacha(self, name: str, rarity: str, image: str):
         gachas = self.db["gachas"]
         gacha = gachas.find_one({"name": name})
+
         if not gacha:
             return None
-        gacha.rarity = rarity
-        gacha.image = image
-        return gacha
+
+        gachas.update_one(
+            {"name": name},
+            {"$set": {"rarity": rarity, "image": image}}
+        )
+
+        return {"name": name, "rarity": rarity, "image": image}
 
     def add_gacha(self, name: str, rarity: str, image: str,mock_id):
         gachas = self.db["gachas"]

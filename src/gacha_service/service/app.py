@@ -6,6 +6,7 @@ import uuid
 #TODO: SANITIZE ALL INPUT
 
 mock_check = None
+mock_id = None
 
 def tux_check():
     if mock_check:
@@ -45,7 +46,7 @@ def user_gacha_all():
 
 # View user personal gacha collection
 mock_gacha_personal = None
-@app.get("/user/gacha/personal", status_code=200)
+@app.get("/user/gacha/collection", status_code=200)
 def user_gacha_personal(id: str):
     if not check_user():
         raise HTTPException(status_code=400, detail="Invalid User")
@@ -54,18 +55,17 @@ def user_gacha_personal(id: str):
             res = db.get_user_gacha(1); 
         else: 
             res = db.get_user_gacha(id);
-        if not res: 
+        if res == 1: 
             raise HTTPException(status_code=400, detail="User Not present")
         else: 
             return res
-
 
 # View Specific Gacha Info
 @app.get("/user/gacha/specific", status_code=200)
 def user_gacha_specific(name : str):
     if not check_user():
         raise HTTPException(status_code=400, detail="Invalid User")
-    gacha = db.get_specific_gacha(name);
+    gacha = db.get_specific_gacha(name,mock_id);
     if not gacha: 
         raise HTTPException(status_code=400, detail="Gacha not present")
     else:
@@ -81,7 +81,6 @@ def user_gacha_roll(id: str):
         if tux_check():
             if mock_gacha_roll:
                 res = db.get_roll_gacha(1,mock_gacha_roll)
-                print("QUIIII")
             else:
                 res = db.get_roll_gacha(id,mock_gacha_roll)
             if not res: 
@@ -94,13 +93,20 @@ def user_gacha_roll(id: str):
             raise HTTPException(status_code=400, detail="ERROR")
 
 # Admin View Gacha Collection
-mock_id = None
-@app.get("/admin/gacha/collection", status_code=200)
+@app.get("/admin/gacha/all", status_code=200)
 def user_gacha_collection():
     if not check_admin():
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
         return db.get_all_gachas_admin(mock_id)
+
+# Admin View Specific Gacha
+@app.get("/admin/gacha/specific", status_code=200)
+def user_gacha_collection(name: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        return db.get_specific_gacha(name,mock_id)
 
 # Admin add Gacha
 @app.get("/admin/gacha/add", status_code=200)
@@ -159,7 +165,22 @@ def user_gacha(id: str):
         else: 
             return res
 
-# Delete user gacha
+# get collection of a user
+@app.get("/admin/get/user/collection", status_code=200)
+def user_gacha(id: str):
+    if not check_admin():
+        raise HTTPException(status_code=400, detail="Invalid Admin")
+    else: 
+        if mock_gacha_personal:
+            res = db.get_user_gacha(1); 
+        else: 
+            res = db.get_user_gacha(id);
+        if not res: 
+            raise HTTPException(status_code=400, detail="User Not present")
+        else: 
+            return res
+
+# add user gacha
 @app.get("/admin/add/user/gacha", status_code=200)
 def user_gacha(id: str, name: str):
     if not check_admin():
@@ -173,7 +194,7 @@ def user_gacha(id: str, name: str):
         else: 
             return res
 
-# Add user gacha
+# delete user gacha
 @app.get("/admin/remove/user/gacha", status_code=200)
 def user_gacha(id: str, name: str):
     if not check_admin():
