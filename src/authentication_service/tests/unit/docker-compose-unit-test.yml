@@ -1,18 +1,19 @@
 services:
     authentication:
-        container_name: authentication
+        container_name: authentication_test
         restart: always
         build:
-            context: ./service
+            context: ../../service
         environment:
             - RESOURCE_PATH=/code/service/resources
-        ports:
-            - 9090:9090
+            - MAIN_MODULE=service.main_test
         volumes:
-            #monto la libreria condivisa
-            - ../shared_libs:/code/service/shared_libs
+            # monto la libreria condivisa
+            - ../../../shared_libs:/code/service/shared_libs
+        ports:
+            - "9090:9090"
         networks:
-            - gacha_network
+            - test_network
         depends_on:
             - db
         secrets:
@@ -22,14 +23,11 @@ services:
             - ssl_private_key
             - ssl_cert
             - mongodb_password
-
     db:
-        container_name: db_authentication
+        container_name: db_authentication_test
         image: mongo:latest
         ports:
             - '27017:27017'
-        volumes:
-            - db_data:/data/db
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_DATABASE: admin
@@ -43,28 +41,23 @@ services:
             - mongodb_password
             - ssl_mongo_cert_key
         networks:
-            - gacha_network
-
-volumes:
-    db_data:
+            - test_network
 
 secrets:
     jwt_private_key:
-        file: ./service/secrets/private.pem
+        file: ./test_secrets/private.pem
     jwt_public_key:
-        file: ./service/secrets/public.pem
+        file: ./test_secrets/public.pem
     admin_account:
-        file: ./service/secrets/admin_account.json
+        file: ./test_secrets/admin_account.json
     ssl_private_key:
-        file: ./service/secrets/app_key.pem
+        file: ../../service/secrets/app_key.pem
     ssl_cert:
-        file: ./service/secrets/app_cert.pem
+        file: ../../service/secrets/app_cert.pem
     ssl_mongo_cert_key:
-        file: ./service/secrets/mongo_cert_key.pem
+        file: ../../service/secrets/mongo_cert_key.pem
     mongodb_password:
-        file: ./service/secrets/mongo_root_password
-
+        file: ./test_secrets/mongo_root_password
 
 networks:
-    gacha_network:
-        driver: bridge
+    test_network:
