@@ -12,7 +12,7 @@ def buy_tux(session, user_id: str, tux_amount: float):
     fiat_balance = get_fiat_balance(session, user_id)
     change = _get_change()
     if tux_amount <= 0:
-        raise ValueError(f"Tux amount cannot be lower than or equal to 0!")
+        raise ValueError("Tux amount cannot be lower than or equal to 0!")
     if change*fiat_balance < tux_amount:
         raise InsufficientFunds(f"Your balance is {fiat_balance}, you cannot buy {tux_amount} tux!")
     new_balance = fiat_balance - tux_amount/change

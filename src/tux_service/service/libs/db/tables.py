@@ -6,6 +6,7 @@ Base = declarative_base()
 class TuxPurchaseTransaction(Base):  # type: ignore
     __tablename__ = 'tux_purchase_transactions'
     transaction_id = Column(String, primary_key=True)
+    tux_purchased = Column(Float, nullable=False)
     amount_fiat = Column(Float, nullable=False)
     amount_tux = Column(Float, nullable=False)
     timestamp = Column(Integer, nullable=False)
@@ -32,6 +33,7 @@ class GameBalance(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(Integer, nullable=False)
     tux_emitted = Column(Float, nullable=False)
+    tux_used = Column(Float, nullable=False)
     fiat_earned = Column(Float, nullable=False)
 
 class FreezedTux(Base):

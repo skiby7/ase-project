@@ -1,5 +1,4 @@
 from pydantic import BaseModel
 
-class BuyModel(BaseModel):
-    amount: float
+class RollModel(BaseModel):
     user_id: str
