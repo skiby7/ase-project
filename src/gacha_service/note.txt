@@ -7,23 +7,12 @@ docker compose -f .\docker-compose_test.yml up --build --abort-on-container-exit
 
 
 test: 
-add utente
 
-roll
-view collection
-remove gacha
-view collection
-add gacha 
-view collection
+user_gacha_all
+     invalid user
 
-add utente 
-remove utente
+gacha collection:
+    user not present
+    collection vuota
+    
 
-
-add system gacha
-view all
-remove system gacha
-view all
-
-modify specific
-view specific

@@ -8,7 +8,6 @@ def convert_image(image):
         with open("utils/images/" + image + ".png", "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
 
-#TODO user on db
 class database:
     def __init__(self,distrofile : str):
         self.distrofile = distrofile

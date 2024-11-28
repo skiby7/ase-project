@@ -11,6 +11,8 @@ services:
       - cert
       - key
       - pw
+      - jwt_private_key
+      - jwt_public_key
 
   db:
     image: mongo:latest
@@ -18,7 +20,6 @@ services:
       - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-    #  MONGO_INITDB_ROOT_PASSWORD: 13579
       MONGO_INITDB_DATABASE: admin
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
     command: mongod --quiet --logpath /dev/null 
@@ -41,3 +42,7 @@ secrets:
     file: ./service/secrets/key.pem
   cert_db: 
     file: ./service/secrets/server.pem
+  jwt_private_key:
+    file: ./service/secrets/private.pem
+  jwt_public_key:
+    file: ./service/secrets/public.pem
