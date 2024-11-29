@@ -11,7 +11,7 @@ from .login import router as login_router
 from .registration import router as registration_router
 from .registration.services import initialize_admin
 from .utils import logger
-from .utils.app_config_utils import get_config_from_file
+from .utils.app_config_utils import get_config_from_file, get_log_config
 from .utils.mongo_connection import startup_db_client, delete_accounts_collection
 
 logger = getLogger("uvicorn.error")
@@ -52,6 +52,7 @@ mocked_delete_notify = patch("service.registration.services.notify_other_service
 def init():
     http_port, log_l = get_config_from_file(script_path, logger)
     uvicorn.run("service.main_test:app", host="0.0.0.0", port=int(http_port), log_level=log_l,
+                log_config=get_log_config(),
                 ssl_keyfile="/run/secrets/ssl_private_key", ssl_certfile="/run/secrets/ssl_cert")
 
 

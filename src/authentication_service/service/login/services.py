@@ -46,6 +46,7 @@ def create_access_token(account: Account, exp: timedelta | None = None):
         "exp": get_expires(exp)
     }
     encoded_jwt = jwt.encode(to_encode, PRIVATE_KEY, algorithm="RS256")
+    logger.info(f"Access token created for user {account.username}")
     return encoded_jwt
 
 def create_admin_access_token(exp: timedelta | None = None) -> str:
@@ -61,6 +62,7 @@ def create_admin_access_token(exp: timedelta | None = None) -> str:
         "exp": get_expires(timedelta(minutes=60))
     }
     encoded_jwt = jwt.encode(to_encode, PRIVATE_KEY, algorithm="RS256")
+    logger.info(f"Admin access token created for user {account.username}")
     return encoded_jwt
 
 def get_account_by_username(username: str) -> Account | None:
@@ -81,6 +83,7 @@ def create_jwt_token(account: Account, exp: timedelta | None = None, aud: str | 
         "exp": get_expires(exp)
     }
     encoded_jwt = jwt.encode(to_encode, PRIVATE_KEY, algorithm="RS256")
+    logger.info(f"ID-token created for user {account.username}")
     return encoded_jwt
 
 def get_expires(expires_delta: timedelta | None = None):

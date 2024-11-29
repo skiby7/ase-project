@@ -49,8 +49,10 @@ def notify_other_services_new_user(account: Account) -> None:
             if response.status_code == 200:
                 logger.info(f"Success: Notified creation of user {account.uid} to {url}")
             else:
+                #eventual consistency
                 start_retry_create(url, account.model_dump(), access_token)
         except (requests.RequestException, ConnectionError):
+            # eventual consistency
             start_retry_create(url, account.model_dump(), access_token)
 
 
@@ -61,19 +63,20 @@ def start_retry_create(url, account_dict, access_token: str):
 def create_account(email: str, username: str, password: str, role: str) -> Account:
     validate_input_credentials(email=email, username=username, password=password)
     hashed_password = password_utils.hash_password(password)
-    account_data = AccountDB(email=email, uid=str(uuid4()), username=username,
+    account_db = AccountDB(email=email, uid=str(uuid4()), username=username,
                              hashed_password=hashed_password,
                              role=role)
     accounts_collection = mongo_connection.get_accounts_collection()
     try:
-        accounts_collection.insert_one(account_data.model_dump())
+        accounts_collection.insert_one(account_db.model_dump())
     except DuplicateKeyError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email or username already in use"
         )
-    return Account(uid=account_data.uid, username=account_data.username,
-                   email=account_data.email, role=role)
+    account = Account(uid=account_db.uid, username=account_db.username, email=account_db.email, role=role)
+    logger.info(f"Account created: {account}")
+    return account
 
 
 def change_password(uid_account: str, old_pass: str, new_pass: str):
@@ -101,7 +104,7 @@ def save_password_to_db(uid_account, new_pass):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal error in saving updates. Try later"
         )
-
+    logger.info(f"Password for user {uid_account} changed")
 
 def update_account(uid_account: str, email: str | None, username: str | None) -> Account:
     account_DB: Account | None = get_account_db_by_uid(uid_account)
@@ -128,7 +131,9 @@ def save_update_to_db(account_DB, new_email, new_username) -> Account:
             status_code=status.HTTP_409_CONFLICT,
             detail="Email or username already in use"
         )
-    return Account.from_dict(updated_account)
+    account = Account.from_dict(updated_account)
+    logger.info(f"Account updated: {account}")
+    return account
 
 
 def create_update_parm(new_email, new_username):
@@ -210,6 +215,7 @@ def delete_account(uid: str):
     result = accounts_collection.delete_one({"uid": uid})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Account not found")
+    logger.info(f"Account {uid} deleted")
 
 
 def notify_other_services_delete_user(uid: str) -> None:
@@ -222,8 +228,10 @@ def notify_other_services_delete_user(uid: str) -> None:
             if response.status_code in [200, 404]:
                 logger.info(f"Success: Notified deletion of user {uid} to {url}")
             else:
+                #eventual consistency
                 start_retry_delete(uid, url, access_token)
         except (requests.RequestException, ConnectionError):
+            # eventual consistency
             start_retry_delete(uid, url, access_token)
 
 
