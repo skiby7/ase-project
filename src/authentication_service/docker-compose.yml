@@ -64,7 +64,6 @@ secrets:
     mongodb_password:
         file: ./service/secrets/mongo_root_password
 
-
 networks:
     gacha_network:
         driver: bridge
