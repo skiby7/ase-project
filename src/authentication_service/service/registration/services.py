@@ -5,6 +5,7 @@ from typing import List
 from uuid import uuid4
 
 from .retry_worker import retry_delete_operation, retry_create_operation
+from ..login.services import create_admin_access_token
 from ..utils.logger import logger
 import requests
 from fastapi import HTTPException, status
@@ -40,20 +41,22 @@ def create_account_workflow(email: str, username: str, password: str, role: str)
 
 
 def notify_other_services_new_user(account: Account) -> None:
+    access_token = create_admin_access_token()
     for url in urls_services_to_notify:
         try:
-            response = requests.post(url, json=account.model_dump(), timeout=5, verify=False)
+            response = requests.post(url, headers= {"Authorization": f"Bearer {access_token}"},
+                                     json=account.model_dump(), timeout=5, verify=False)
             if response.status_code == 200:
                 logger.info(f"Success: Notified creation of user {account.uid} to {url}")
             else:
-                start_retry_create(url, account.model_dump())
+                start_retry_create(url, account.model_dump(), access_token)
         except (requests.RequestException, ConnectionError):
-            start_retry_create(url, account.model_dump())
+            start_retry_create(url, account.model_dump(), access_token)
 
 
-def start_retry_create(url, account_dict):
+def start_retry_create(url, account_dict, access_token: str):
     logger.warning(f"Unexpected error from {url} for user {account_dict}. Retrying...")
-    threading.Thread(target=retry_create_operation, args=(url, account_dict), daemon=True).start()
+    threading.Thread(target=retry_create_operation, args=(url, account_dict, access_token), daemon=True).start()
 
 def create_account(email: str, username: str, password: str, role: str) -> Account:
     validate_input_credentials(email=email, username=username, password=password)
@@ -210,20 +213,23 @@ def delete_account(uid: str):
 
 
 def notify_other_services_delete_user(uid: str) -> None:
+    access_token = create_admin_access_token()
     for url in urls_services_to_notify:
         try:
-            response = requests.delete(f"{url}/{uid}", timeout=5, verify=False)
+            response = requests.delete(f"{url}/{uid}",
+                                       headers= {"Authorization": f"Bearer {access_token}"},
+                                       timeout=5, verify=False)
             if response.status_code in [200, 404]:
                 logger.info(f"Success: Notified deletion of user {uid} to {url}")
             else:
-                start_retry_delete(uid, url)
+                start_retry_delete(uid, url, access_token)
         except (requests.RequestException, ConnectionError):
-            start_retry_delete(uid, url)
+            start_retry_delete(uid, url, access_token)
 
 
-def start_retry_delete(uid, url):
+def start_retry_delete(uid, url, access_token: str):
     logger.warning(f"Unexpected error from {url} when deleting user {uid}. Retrying...")
-    threading.Thread(target=retry_delete_operation, args=(url, uid), daemon=True).start()
+    threading.Thread(target=retry_delete_operation, args=(url, uid, access_token), daemon=True).start()
 
 
 def can_delete_account(uid_account: str, token_data: TokenData) -> bool:

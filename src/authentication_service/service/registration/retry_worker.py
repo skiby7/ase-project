@@ -2,9 +2,9 @@ import time
 import requests
 from ..utils.logger import logger
 
-def retry_delete_operation(url: str, uid: str, max_retry=5, attempt=1):
+def retry_delete_operation(url: str, uid: str, access_token: str, max_retry=5, attempt=1):
     try:
-        response = requests.delete(f"{url}/{uid}", timeout=5, verify=False)
+        response = requests.delete(f"{url}/{uid}", headers= {"Authorization": f"Bearer {access_token}"}, timeout=5, verify=False)
         if response.status_code in [200, 404]:
             logger.info(f"Retry success: Notified {url} for deletion user {uid} on attempt {attempt}")
             return
@@ -17,11 +17,11 @@ def retry_delete_operation(url: str, uid: str, max_retry=5, attempt=1):
         return
 
     time.sleep(2**attempt)
-    retry_delete_operation(url, uid, attempt=attempt + 1)
+    retry_delete_operation(url, uid, access_token, attempt=attempt + 1)
 
-def retry_create_operation(url: str, account_dict: dict, max_retry=5, attempt=1):
+def retry_create_operation(url: str, account_dict: dict, access_token: str, max_retry=5, attempt=1):
     try:
-        response = requests.post(url, json=account_dict, timeout=5, verify=False)
+        response = requests.post(url, headers= {"Authorization": f"Bearer {access_token}"},json=account_dict, timeout=5, verify=False)
         if response.status_code == 200:
             logger.info(f"Create retry success: notified {url} for creation user {account_dict} on attempt {attempt}")
             return
@@ -34,4 +34,4 @@ def retry_create_operation(url: str, account_dict: dict, max_retry=5, attempt=1)
         return
 
     time.sleep(2**attempt)
-    retry_create_operation(url, account_dict, attempt=attempt + 1)
+    retry_create_operation(url, account_dict, access_token, attempt=attempt + 1)
