@@ -4,7 +4,8 @@ from typing import List
 from uuid import uuid4
 
 from fastapi import HTTPException, status
-
+from pymongo.errors import DuplicateKeyError
+from pymongo import ReturnDocument
 from .models import AccountDB
 from .schemas import Account
 from ..utils import mongo_connection
@@ -14,6 +15,7 @@ from ..shared_libs.access_token_utils import TokenData
 urls_services_to_notify = [
     ""
 ]
+
 
 def initialize_admin():
     with open("/run/secrets/admin_account", "r") as config_file:
@@ -31,24 +33,31 @@ def create_account_workflow(email: str, username: str, password: str, role: str)
     notify_other_services_new_user()
     return account
 
+
 def notify_other_services_new_user():
     return
 
 
 def create_account(email: str, username: str, password: str, role: str) -> Account:
     validate_input_credentials(email=email, username=username, password=password)
-    check_if_param_already_in_use(email, username)
     hashed_password = password_utils.hash_password(password)
-    account_data = AccountDB(email=email, uid=str(uuid4()), username=username, hashed_password=hashed_password,
+    account_data = AccountDB(email=email, uid=str(uuid4()), username=username,
+                             hashed_password=hashed_password,
                              role=role)
     accounts_collection = mongo_connection.get_accounts_collection()
-    accounts_collection.insert_one(account_data.model_dump())
+    try:
+        accounts_collection.insert_one(account_data.model_dump())
+    except DuplicateKeyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username already in use"
+        )
     return Account(uid=account_data.uid, username=account_data.username,
                    email=account_data.email, role=role)
 
 
 def change_password(uid_account: str, old_pass: str, new_pass: str):
-    validate_password(new_pass)
+    validate_new_password(new_pass)
     account_DB: Account | None = get_account_db_by_uid(uid_account)
     error_exception = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
@@ -74,13 +83,6 @@ def save_password_to_db(uid_account, new_pass):
         )
 
 
-def check_if_param_already_in_use(email, username):
-    if get_account_by_username(username):
-        raise HTTPException(status_code=409, detail="Username already in use")
-    if get_account_by_email(email):
-        raise HTTPException(status_code=409, detail="Email already in use")
-
-
 def update_account(uid_account: str, email: str | None, username: str | None) -> Account:
     account_DB: Account | None = get_account_db_by_uid(uid_account)
     if not account_DB:
@@ -89,25 +91,33 @@ def update_account(uid_account: str, email: str | None, username: str | None) ->
             detail="Account not found"
         )
     check_update_param(email, username)
-    check_if_param_already_in_use(email, username)
-    save_update_to_db(account_DB, email, username)
-    return get_account_by_uid(uid_account)
+    return save_update_to_db(account_DB, email, username)
 
 
-def save_update_to_db(account_DB, new_email, new_username):
+def save_update_to_db(account_DB, new_email, new_username) -> Account:
     accounts_collection = mongo_connection.get_accounts_collection()
-    update_res = accounts_collection.update_one(
-        {"uid": account_DB.uid},
-        {"$set": {
-            "email": new_email or account_DB.email,
-            "username": new_username or account_DB.username}
-        }
-    )
-    if update_res.modified_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal error in saving updates. Try later"
+    update_param = create_update_parm(new_email, new_username)
+    try:
+        updated_account = accounts_collection.find_one_and_update(
+            filter={"uid": account_DB.uid},
+            update={"$set": update_param},
+            return_document = ReturnDocument.AFTER
         )
+    except DuplicateKeyError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username already in use"
+        )
+    return Account.from_dict(updated_account)
+
+
+def create_update_parm(new_email, new_username):
+    update_param = {}
+    if new_email:
+        update_param["email"] = new_email
+    if new_username:
+        update_param["username"] = new_username
+    return update_param
 
 
 def check_update_param(email, username):
@@ -128,6 +138,7 @@ def get_account_by_uid(uid_account: str) -> Account:
         raise HTTPException(status_code=404, detail="Account not found")
     return Account(uid=account_data.uid, username=account_data.username,
                    email=account_data.email, role=account_data.role)
+
 
 def get_account_by_username(username: str) -> Account | None:
     accounts_collection = mongo_connection.get_accounts_collection()
@@ -150,7 +161,7 @@ def get_all_accounts() -> List[Account]:
 def validate_input_credentials(email: str, username: str, password: str):
     validate_email(email)
     validate_username(username)
-    validate_password(password)
+    validate_new_password(password)
 
 
 def validate_username(username):
@@ -164,7 +175,7 @@ def validate_email(email):
         raise HTTPException(status_code=400, detail="Invalid email format.")
 
 
-def validate_password(password):
+def validate_new_password(password):
     if len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[a-z]", password) or not re.search(
         r"[0-9]", password) or not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
         raise HTTPException(status_code=400,
@@ -189,8 +200,10 @@ def can_update_account(uid_account: str, token_data: TokenData) -> bool:
 def can_change_password_account(uid_account: str, token_data: TokenData) -> bool:
     return admin_or_sub_account(uid_account, token_data)
 
+
 def can_see_account_info(uid_account: str, token_data: TokenData) -> bool:
     return admin_or_sub_account(uid_account, token_data)
+
 
 def can_see_all_accounts(token_data: TokenData) -> bool:
     return token_data.role == 'admin'

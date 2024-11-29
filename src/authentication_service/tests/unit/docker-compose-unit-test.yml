@@ -23,6 +23,7 @@ services:
             - ssl_private_key
             - ssl_cert
             - mongodb_password
+
     db:
         container_name: db_authentication_test
         image: mongo:latest

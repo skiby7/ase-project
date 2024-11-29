@@ -7,7 +7,7 @@ cd "$SCRIPT_DIR"
 docker-compose -f ./docker-compose-unit-test.yml up --build -d
 
 echo "Waiting for containers to initialize..."
-sleep 7
+sleep 5
 
 newman run ./unit_test.postman_collection.json --insecure
 
