@@ -52,11 +52,11 @@ secrets:
     admin_account:
         file: ./test_secrets/admin_account.json
     ssl_private_key:
-        file: ../../service/secrets/app_key.pem
+        file: ../../secrets/app_key.pem
     ssl_cert:
-        file: ../../service/secrets/app_cert.pem
+        file: ../../secrets/app_cert.pem
     ssl_mongo_cert_key:
-        file: ../../service/secrets/ssl_mongo_cert_key.pem
+        file: ../../secrets/ssl_mongo_cert_key.pem
     mongodb_password:
         file: ./test_secrets/mongo_root_password
 

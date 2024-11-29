@@ -1,18 +1,17 @@
-import json
 import os
 from contextlib import asynccontextmanager
-
-import yaml
 from logging import getLogger
+from unittest.mock import patch
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .utils.app_config_utils import get_config_from_file
 from .login import router as login_router
 from .registration import router as registration_router
 from .registration.services import initialize_admin
+from .utils import logger
+from .utils.app_config_utils import get_config_from_file
 from .utils.mongo_connection import startup_db_client, delete_accounts_collection
 
 logger = getLogger("uvicorn.error")
@@ -44,6 +43,11 @@ app.add_middleware(
     expose_headers=[]
 )
 
+mocked_create_notify = patch("service.registration.services.notify_other_services_new_user",
+                             return_value=None).start()
+
+mocked_delete_notify = patch("service.registration.services.notify_other_services_delete_user",
+                             return_value=None).start()
 
 def init():
     http_port, log_l = get_config_from_file(script_path, logger)

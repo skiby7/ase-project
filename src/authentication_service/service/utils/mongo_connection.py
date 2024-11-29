@@ -32,6 +32,10 @@ def get_accounts_collection() -> Collection:
     db = mongo_client[database]
     return db["accounts"]
 
+def get_failed_notification() -> Collection:
+    db = mongo_client[database]
+    return db["failed_notifications"]
+
 def delete_accounts_collection():
     res = get_accounts_collection().delete_many({})
     print(res)

@@ -50,19 +50,19 @@ volumes:
 
 secrets:
     jwt_private_key:
-        file: ./service/secrets/private.pem
+        file: secrets/private.pem
     jwt_public_key:
-        file: ./service/secrets/public.pem
+        file: secrets/public.pem
     admin_account:
-        file: ./service/secrets/admin_account.json
+        file: secrets/admin_account.json
     ssl_private_key:
-        file: ./service/secrets/app_key.pem
+        file: secrets/app_key.pem
     ssl_cert:
-        file: ./service/secrets/app_cert.pem
+        file: secrets/app_cert.pem
     ssl_mongo_cert_key:
-        file: ./service/secrets/ssl_mongo_cert_key.pem
+        file: secrets/ssl_mongo_cert_key.pem
     mongodb_password:
-        file: ./service/secrets/mongo_root_password
+        file: secrets/mongo_root_password
 
 
 networks:

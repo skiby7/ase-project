@@ -1,20 +1,16 @@
-import json
 import os
 from contextlib import asynccontextmanager
-from logging import getLogger
 
 import uvicorn
-import yaml
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .utils.app_config_utils import get_config_from_file
 from .login import router as login_router
 from .registration import router as registration_router
 from .registration.services import initialize_admin
+from .utils.logger import logger
+from .utils.app_config_utils import get_config_from_file, get_log_config
 from .utils.mongo_connection import startup_db_client
-
-logger = getLogger("uvicorn.error")
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -44,6 +40,7 @@ app.add_middleware(
 def init():
     http_port, log_l = get_config_from_file(script_path, logger)
     uvicorn.run("service.main:app", host="0.0.0.0", port=int(http_port), log_level=log_l,
+                log_config=get_log_config(),
                 ssl_keyfile="/run/secrets/ssl_private_key", ssl_certfile="/run/secrets/ssl_cert")
 
 if __name__ == "__main__":

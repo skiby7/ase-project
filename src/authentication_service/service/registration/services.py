@@ -1,8 +1,12 @@
 import json
 import re
+import threading
 from typing import List
 from uuid import uuid4
 
+from .retry_worker import retry_delete_operation, retry_create_operation
+from ..utils.logger import logger
+import requests
 from fastapi import HTTPException, status
 from pymongo.errors import DuplicateKeyError
 from pymongo import ReturnDocument
@@ -13,9 +17,10 @@ from ..utils import password_utils
 from ..shared_libs.access_token_utils import TokenData
 
 urls_services_to_notify = [
-    ""
+    "https://gacha-roll:9090/notify/user",
+    "https://auction:9090/notify/user",
+    "https://payment:9090/admin/balances"
 ]
-
 
 def initialize_admin():
     with open("/run/secrets/admin_account", "r") as config_file:
@@ -30,13 +35,25 @@ def initialize_admin():
 
 def create_account_workflow(email: str, username: str, password: str, role: str) -> Account | None:
     account = create_account(email, username, password, role)
-    notify_other_services_new_user()
+    notify_other_services_new_user(account)
     return account
 
 
-def notify_other_services_new_user():
-    return
+def notify_other_services_new_user(account: Account) -> None:
+    for url in urls_services_to_notify:
+        try:
+            response = requests.post(url, json=account.model_dump(), timeout=5, verify=False)
+            if response.status_code == 200:
+                logger.info(f"Success: Notified creation of user {account.uid} to {url}")
+            else:
+                start_retry_create(url, account.model_dump())
+        except (requests.RequestException, ConnectionError):
+            start_retry_create(url, account.model_dump())
 
+
+def start_retry_create(url, account_dict):
+    logger.warning(f"Unexpected error from {url} for user {account_dict}. Retrying...")
+    threading.Thread(target=retry_create_operation, args=(url, account_dict), daemon=True).start()
 
 def create_account(email: str, username: str, password: str, role: str) -> Account:
     validate_input_credentials(email=email, username=username, password=password)
@@ -181,12 +198,32 @@ def validate_new_password(password):
         raise HTTPException(status_code=400,
                             detail="Invalid password. Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.")
 
+def delete_account_workflow(uid: str):
+    delete_account(uid)
+    notify_other_services_delete_user(uid)
 
 def delete_account(uid: str):
     accounts_collection = mongo_connection.get_accounts_collection()
     result = accounts_collection.delete_one({"uid": uid})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Account not found")
+
+
+def notify_other_services_delete_user(uid: str) -> None:
+    for url in urls_services_to_notify:
+        try:
+            response = requests.delete(f"{url}/{uid}", timeout=5, verify=False)
+            if response.status_code in [200, 404]:
+                logger.info(f"Success: Notified deletion of user {uid} to {url}")
+            else:
+                start_retry_delete(uid, url)
+        except (requests.RequestException, ConnectionError):
+            start_retry_delete(uid, url)
+
+
+def start_retry_delete(uid, url):
+    logger.warning(f"Unexpected error from {url} when deleting user {uid}. Retrying...")
+    threading.Thread(target=retry_delete_operation, args=(url, uid), daemon=True).start()
 
 
 def can_delete_account(uid_account: str, token_data: TokenData) -> bool:
