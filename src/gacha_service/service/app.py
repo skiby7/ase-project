@@ -15,7 +15,6 @@ mock_id = None
 # token_data: Annotated[TokenData, Depends(extract_access_token)]
 # prendere cert
 
-
 app = FastAPI()
 db = database("utils/distros.json")
 check = Checker(mock_check)
@@ -160,7 +159,7 @@ def user_gacha(id: str):
             res = db.get_user_gacha(1); 
         else: 
             res = db.get_user_gacha(id);
-        if not res: 
+        if not res: #TODO: check [] 
             raise HTTPException(status_code=400, detail="User Not present")
         else: 
             return res

@@ -20,7 +20,6 @@ class database:
         with open('/run/secrets/pw', 'r') as file:
             password = file.read().strip()
         uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
-        print("SONOVIVO")
         self.client = MongoClient(uri)
         #self.client = MongoClient("db", 27017, maxPoolSize=50)
         self.db = self.client["mydatabase"]
