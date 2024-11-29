@@ -9,3 +9,6 @@ class UserNotFound(Exception):
 
 class WrongOperation(Exception):
     pass
+
+class AuctionNotFound(Exception):
+    pass

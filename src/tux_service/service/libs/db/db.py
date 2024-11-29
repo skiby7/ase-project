@@ -4,14 +4,13 @@ import uuid
 import os
 import time
 from logging import getLogger
-from sqlalchemy import create_engine, or_
+from sqlalchemy import create_engine, or_, desc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from routers.transactions.models import AuctionTransactionModel, PurchaseTransactionModel
 from libs.db.utils import transactional
 from libs.db.tables import Base, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
-from libs.mocks import MockSession, use_mocks
-from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation
+from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation, AuctionNotFound
 
 unix_time = lambda: int(time.time())
 
@@ -20,17 +19,19 @@ logger = getLogger("uvicorn.error")
 ROLL_COST = 10
 DATABASE_URL = os.getenv("DATABASE_URL")
 TEST_RUN = os.getenv("TEST_RUN", "false") == "true"
+if TEST_RUN:
+    import subprocess
+    temp_dir = subprocess.run(["mktemp -d"], shell=True, text=True, capture_output=True).stdout
+    DATABASE_URL = f"sqlite:///{temp_dir}"
+
 logger.debug(f"Is test run: {TEST_RUN}")
 
-if not DATABASE_URL and not TEST_RUN:
+if not DATABASE_URL:
     sys.exit(-1)
 
-if DATABASE_URL:
-    logger.info(f"Configured url {DATABASE_URL}")
-    engine = create_engine(DATABASE_URL)
-    Session = sessionmaker(bind=engine)
-else:
-    Session = MockSession
+logger.info(f"Configured url {DATABASE_URL}")
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
 
 
 def get_db():
@@ -41,11 +42,11 @@ def get_db():
         db.close()
 
 
-@use_mocks
+
 def create_tables():
     Base.metadata.create_all(engine)
 
-@use_mocks
+
 @transactional
 def create_user_balance(session, starting_fiat_balance: float, user_id: str):
     new_account = UserBalance(
@@ -55,7 +56,7 @@ def create_user_balance(session, starting_fiat_balance: float, user_id: str):
     )
     session.add(new_account)
 
-@use_mocks
+
 @transactional
 def delete_user_balance(session, user_id: str):
     to_delete = session.query(UserBalance).filter_by(user_id=user_id).first()
@@ -65,7 +66,7 @@ def delete_user_balance(session, user_id: str):
     session.delete(to_delete)
 
 
-@use_mocks
+
 @transactional
 def create_purchase_transaction(session, purchased_tux: float, amount_fiat: float, amount_tux: float, user_id: str, filled: bool):
     logger.debug(f"Inserting purchase transaction {purchased_tux} {amount_fiat} {amount_tux} {user_id} {filled}")
@@ -81,7 +82,7 @@ def create_purchase_transaction(session, purchased_tux: float, amount_fiat: floa
     session.add(new_transaction)
 
 
-@use_mocks
+
 @transactional
 def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str):
     if get_user_tux_balance(session, from_id) < tux_amount:
@@ -97,11 +98,11 @@ def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str
     update_user_tux_balance(session, from_id, "withdraw", tux_amount)
     update_user_tux_balance(session, to_id, "deposit", tux_amount)
 
-@use_mocks
+
 def user_exists(session, user_id:str):
     return session.query(UserBalance).filter_by(user_id=user_id).first() is not None
 
-@use_mocks
+
 def get_user_purchase_transactions(session,user_id: str) -> list[PurchaseTransactionModel]:
     transactions = []
     for t in session.query(TuxPurchaseTransaction).filter_by(user_id=user_id).all():
@@ -116,7 +117,7 @@ def get_user_purchase_transactions(session,user_id: str) -> list[PurchaseTransac
     return transactions
 
 
-@use_mocks
+
 def get_user_auction_transactions(session,user_id: str) -> list[AuctionTransactionModel]:
     transactions = []
     for t in session.query(InterUserTransaction).filter(or_(
@@ -131,7 +132,7 @@ def get_user_auction_transactions(session,user_id: str) -> list[AuctionTransacti
             to_user_id=t.to_user_id))
     return transactions
 
-@use_mocks
+
 def get_user_fiat_balance(session, user_id: str) -> float:
     balance = session.query(UserBalance.fiat_amount).filter_by(user_id=user_id).first()
     if balance is None:
@@ -139,7 +140,7 @@ def get_user_fiat_balance(session, user_id: str) -> float:
     return balance[0]
 
 
-@use_mocks
+
 def get_user_tux_balance(session, user_id: str) -> float:
     balance = session.query(UserBalance.tux_amount).filter_by(user_id=user_id).first()
     if balance is None:
@@ -147,7 +148,7 @@ def get_user_tux_balance(session, user_id: str) -> float:
     return balance[0]
 
 
-@use_mocks
+
 @transactional
 def buy_tux(session, user_id: str, tux_amount: float, fiat_amount: float):
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
@@ -162,14 +163,14 @@ def buy_tux(session, user_id: str, tux_amount: float, fiat_amount: float):
     update_game_balance(session, tux_amount, 0, fiat_amount)
 
 
-@use_mocks
+
 @transactional
 def roll_gacha(session, user_id: str):
     update_user_tux_balance(session, user_id, "withdraw", ROLL_COST)
     update_game_balance(session, 0, ROLL_COST, 0)
 
 
-@use_mocks
+
 @transactional
 def increase_user_fiat_balance(session, user_id: str, amount: float):
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
@@ -178,7 +179,7 @@ def increase_user_fiat_balance(session, user_id: str, amount: float):
     else:
         raise UserNotFound(f"{user_id} not found")
 
-@use_mocks
+
 @transactional
 def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw", "deposit"], tux_amount: float):
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
@@ -195,7 +196,7 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
         raise UserNotFound(f"{user_id} not found")
 
 
-@use_mocks
+
 @transactional
 def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: float):
     try:
@@ -215,7 +216,7 @@ def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: flo
         logger.error(f"Cannot update game balance: {e}")
 
 
-@use_mocks
+
 @transactional
 def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: float):
     """
@@ -229,8 +230,6 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
             if bidder.settled:
                 raise AlreadySettled(f"Already settled {auction_id} for user {user_id}")
             user_current_balance += bidder.tux_amount
-        else:
-            raise UserNotFound(f"User {user_id} is not bidding in auction {auction_id}")
         if new_tux_amount > user_current_balance: # Here you exit without changing anything
             logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
             raise InsufficientFunds(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
@@ -247,7 +246,13 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
         raise
 
 
-@use_mocks
+def get_highest_bidder(session, auction_id: str):
+    highest_bidder = session.query(FreezedTux).filter(FreezedTux.auction_id == auction_id).order_by(desc(FreezedTux.user_id)).first()
+    if highest_bidder is None:
+        raise AuctionNotFound(f"Cannot find auction {auction_id}")
+    return highest_bidder.user_id, highest_bidder.tux_amount
+
+
 @transactional
 def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer_id: str):
     try:

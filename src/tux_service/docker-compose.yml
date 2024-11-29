@@ -5,12 +5,16 @@ services:
         build:
             context: ./service
         environment:
-            - TEST_RUN=${TEST_RUN:-false}
             - DATABASE_URL=postgresql://postgres@tux_db:5432/
         ports:
             - 9090:9090
         volumes:
             - ${PWD}/service:/code/service
+        secrets:
+            - jwt_private_key
+            - jwt_public_key
+            - ssl_private_key
+            - ssl_cert
         depends_on:
             tux_db:
                 condition: service_healthy
@@ -25,13 +29,14 @@ services:
         volumes:
             - ./postgres-data:/var/lib/postgresql/data
         environment:
-            POSTGRES_HOST_AUTH_METHOD: trust
-        #   POSTGRES_PASSWORD: postgres
+            POSTGRES_PASSWORD_file: /run/secrets/db_password
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U postgres"]
             interval: 5s
             timeout: 5s
             retries: 5
+        secrets:
+            - db_password
         networks:
             - gacha_network
 
@@ -49,6 +54,24 @@ services:
         networks:
             - gacha_network
         restart: unless-stopped
+
+secrets:
+    jwt_private_key:
+        file: ./service/secrets/private.pem
+    jwt_public_key:
+        file: ./service/secrets/public.pem
+    pgadmin_password:
+        file: ./service/secrets/pgadmin_password
+    db_password:
+        file: ./service/secrets/db_password
+    ssl_private_key:
+        file: ./service/secrets/key.pem
+    ssl_cert:
+        file: ./service/secrets/cert.pem
+    # ssl_mongo_cert_key:
+    #     file: ./service/secrets/mongo_cert_key.pem
+    # mongodb_password:
+    #     file: ./service/secrets/mongo_root_password
 
 networks:
     gacha_network:

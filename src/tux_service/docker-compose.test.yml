@@ -1,0 +1,27 @@
+services:
+    tux_service:
+        container_name: tux_service
+        restart: unless-stopped
+        build:
+            context: ./service
+        environment:
+            - TEST_RUN=true
+        ports:
+            - 9090:9090
+        volumes:
+            - ${PWD}/service:/code/service
+        secrets:
+            - ssl_private_key
+            - ssl_cert
+        networks:
+            - gacha_network
+
+secrets:
+    ssl_private_key:
+        file: ./service/secrets/key.pem
+    ssl_cert:
+        file: ./service/secrets/cert.pem
+
+networks:
+    gacha_network:
+        driver: bridge

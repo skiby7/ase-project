@@ -37,20 +37,30 @@ def init():
     global log_level
     config_path = os.path.join(script_path, "config.yml")
     http_port = 9090
+    cert_file = None
+    key_file = None
     if os.path.isfile(config_path):
 
         with open(config_path, "r") as f:
             config = yaml.load(f.read(), Loader=yaml.Loader)
+
         http_port = config.get("http_port", 9090)
         log_l = config.get("log_level", "info")
-
+        cert_file = config.get("cert_file")
+        key_file = config.get("key_file")
         logger.debug(f"Configuration: {json.dumps(config, indent=4)}")
     else:
         logger.warning("Configuration file not found!")
         log_l = "debug"
     logger.info("Starting v1.0.0")
     create_tables()
-    uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
+    uvicorn.run("main:app",
+        host="0.0.0.0",
+        port=int(http_port),
+        log_level=log_l,
+        ssl_keyfile=key_file,
+        ssl_certfile=cert_file
+    )
 
 
 
