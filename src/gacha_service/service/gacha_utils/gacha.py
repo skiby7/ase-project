@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 class Gacha(BaseModel):
-    name: int
+    name: str
     rarity: str
     image: str

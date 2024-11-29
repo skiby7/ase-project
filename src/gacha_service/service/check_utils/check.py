@@ -11,13 +11,13 @@ class Checker:
         else:
             return True
     
-    def user(self):
+    def user(self,token_data):
         if self.mock_check:
             return True 
         else:
             return True
     
-    def admin(self):
+    def admin(self,token_data):
         if self.mock_check:
             return True 
         else:

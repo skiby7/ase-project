@@ -66,7 +66,6 @@ class database:
         else: 
             return {"id": gacha["id"], "name": gacha["name"], "rarity": gacha["rarity"], "image": gacha["image"]}
 
-
     def add_user_gacha(self, id: str, gacha_name: str):
         id = str(id)
         gachas = self.db["gachas"]
@@ -94,6 +93,7 @@ class database:
                     {"id": id},
                     {"$push": {"gacha_list": {"gacha_id": gacha_id, "value": 1}}}
                 )
+
         return {"name": gacha_name}
 
     def remove_user_gacha(self, id: str, gacha_name: str):
