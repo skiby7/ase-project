@@ -49,6 +49,8 @@ def create_tables():
 
 @transactional
 def create_user_balance(session, starting_fiat_balance: float, user_id: str):
+    if starting_fiat_balance < 0:
+        raise ValueError("The starting balance cannot be a negative number!")
     new_account = UserBalance(
         user_id=user_id,
         tux_amount=0.0,
@@ -69,6 +71,8 @@ def delete_user_balance(session, user_id: str):
 
 @transactional
 def create_purchase_transaction(session, purchased_tux: float, amount_fiat: float, amount_tux: float, user_id: str, filled: bool):
+    if purchased_tux < 0:
+        raise ValueError("The purchased tux amount cannot be a negative number!")
     logger.debug(f"Inserting purchase transaction {purchased_tux} {amount_fiat} {amount_tux} {user_id} {filled}")
     new_transaction = TuxPurchaseTransaction(
         transaction_id=str(uuid.uuid4()),
@@ -85,8 +89,10 @@ def create_purchase_transaction(session, purchased_tux: float, amount_fiat: floa
 
 @transactional
 def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str):
+    if tux_amount < 0:
+        raise ValueError("The tux amount cannot be a negative number!")
     if get_user_tux_balance(session, from_id) < tux_amount:
-        raise Exception(f"Cannot transfer {tux_amount} from {from_id} to {to_id}, insufficient funds")
+        raise InsufficientFunds(f"Cannot transfer {tux_amount} from {from_id} to {to_id}, insufficient funds")
     new_transaction = InterUserTransaction(
         transaction_id=str(uuid.uuid4()),
         amount_tux=tux_amount,
@@ -151,6 +157,8 @@ def get_user_tux_balance(session, user_id: str) -> float:
 
 @transactional
 def buy_tux(session, user_id: str, tux_amount: float, fiat_amount: float):
+    if tux_amount < 0 or fiat_amount < 0:
+        raise ValueError("The tux amount and the fiat amount cannot be a negative number!")
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
     if row:
         if row.fiat_amount < fiat_amount:  # type: ignore
@@ -173,6 +181,8 @@ def roll_gacha(session, user_id: str):
 
 @transactional
 def increase_user_fiat_balance(session, user_id: str, amount: float):
+    if amount < 0:
+        raise ValueError("The amount cannot be a negative number!")
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
     if row:
             row.fiat_amount += amount  # type: ignore
@@ -182,6 +192,9 @@ def increase_user_fiat_balance(session, user_id: str, amount: float):
 
 @transactional
 def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw", "deposit"], tux_amount: float):
+
+    if tux_amount < 0:
+        raise ValueError("The tux amount cannot be a negative number!")
     row: UserBalance = session.query(UserBalance).filter_by(user_id=user_id).first()
     if row:
         if operation == "withdraw":
@@ -199,6 +212,8 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
 
 @transactional
 def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: float):
+    if emitted_tux < 0 or tux_spent < 0 or fiat < 0:
+        raise ValueError("The tux amount, the fiat amount and the emitted_tux cannot be a negative number!")
     try:
         balance: GameBalance = session.query(GameBalance).order_by(GameBalance.timestamp.desc()).first()
         if not balance:
@@ -223,6 +238,8 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
         Only the higher betting player should be freezed, so every time I receive a
         freeze request, I unfreeze all the other players
     """
+    if new_tux_amount < 0:
+        raise ValueError("The new tux amount cannot be a negative number!")
     try:
         user_current_balance = get_user_tux_balance(session, user_id)
         bidder = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()

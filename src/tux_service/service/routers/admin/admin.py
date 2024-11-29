@@ -14,6 +14,8 @@ def create( Authorization: str = Header(), tux_account: TuxAccountModel = Body()
 
     try:
         create_user_balance(db_session, tux_account.initial_fiat_amount, tux_account.user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -37,7 +39,7 @@ def freeze(auction_id: str, Authorization: str = Header(), request: FreezeTuxMod
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         update_freezed_tux(db_session, auction_id, request.user_id, request.tux_amount)
-    except (InsufficientFunds, AlreadySettled, UserNotFound) as e:
+    except (InsufficientFunds, AlreadySettled, UserNotFound, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
