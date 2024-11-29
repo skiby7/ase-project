@@ -103,7 +103,7 @@ class database:
             #restituire i soldi al player che stava vincendo 
             # e prendere quello che ha biddato
             pass
-
+        
         auction["current_winning_player_id"]=player_id
         auction["current_winning_bid"]=bid
 
@@ -115,6 +115,10 @@ class database:
         return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
 
+    def bid_history_player(self,player_id):
+        return list(self.db["bids"].find({"player_id":player_id},{"_id":0}))
+
+
 
 
     #ADMIN
@@ -124,9 +128,13 @@ class database:
         
         return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
-
+    
     def auction_modify(self,auction):
         self.db["auctions"].update_one({"auction_id":auction["auction_id"]},{"$set":auction})
+
+
+    def bid_modify(self,bid):
+        self.db["bid"].update_one({"auction_id":bid["auction_id"],"player_id":bid["player_id"]},{"$set":bid})
 
 
     def auction_delete(self,auction_id,mock_distro):
@@ -198,8 +206,10 @@ class database:
     
 
     def auction_presence(self,auction_id:str):
-        return False if (self.db["auctions"].find_one({"player_id":auction_id}) is None) else True 
+        return False if (self.db["auctions"].find_one({"auction_id":auction_id}) is None) else True 
 
+    def bid_user_presence(self,bid_id:):
+        return False if (self.db["bids"].find_one({"bid_id":bid_id}) is None) else True 
     
         
 
