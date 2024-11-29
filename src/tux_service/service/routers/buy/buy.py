@@ -31,3 +31,9 @@ def buy(Authorization: str = Header(), buy_request: BuyModel = Body(), session =
         raise HTTPException(status_code=500, detail=f"{e}")
 
     return {"detail" : f"Successully bought {buy_request.amount} tux!"}
+
+
+@router.get("/tux-price")
+def tux_price():
+
+    return {"price" : FIAT_TO_TUX}

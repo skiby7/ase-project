@@ -7,16 +7,15 @@ from logging import getLogger
 from sqlalchemy import create_engine, or_, desc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from routers.transactions.models import AuctionTransactionModel, PurchaseTransactionModel
+from routers.transactions.models import AuctionTransactionModel, PurchaseTransactionModel, RollTransactionModel
 from libs.db.utils import transactional
-from libs.db.tables import Base, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
-from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation, AuctionNotFound
+from libs.db.tables import Base, RollTransaction, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
+from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation, AuctionNotFound, LowerBidException
 
 unix_time = lambda: int(time.time())
 
 logger = getLogger("uvicorn.error")
 
-ROLL_COST = 10
 DATABASE_URL = os.getenv("DATABASE_URL")
 TEST_RUN = os.getenv("TEST_RUN", "false") == "true"
 if TEST_RUN:
@@ -86,15 +85,29 @@ def create_purchase_transaction(session, purchased_tux: float, amount_fiat: floa
     session.add(new_transaction)
 
 
+@transactional
+def create_roll_transaction(session, amount_tux: float, user_id: str, filled: bool):
+    if amount_tux < 0:
+        raise ValueError("The tux amount cannot be a negative number!")
+    new_transaction = RollTransaction(
+        transaction_id=str(uuid.uuid4()),
+        amount_tux=amount_tux,
+        timestamp=unix_time(),
+        user_id=user_id,
+        filled=filled
+    )
+    session.add(new_transaction)
+
 
 @transactional
-def create_user_transaction(session, tux_amount: float, from_id: str, to_id: str):
+def create_user_transaction(session, auction_id: str, tux_amount: float, from_id: str, to_id: str):
     if tux_amount < 0:
         raise ValueError("The tux amount cannot be a negative number!")
     if get_user_tux_balance(session, from_id) < tux_amount:
         raise InsufficientFunds(f"Cannot transfer {tux_amount} from {from_id} to {to_id}, insufficient funds")
     new_transaction = InterUserTransaction(
         transaction_id=str(uuid.uuid4()),
+        auction_id=auction_id,
         amount_tux=tux_amount,
         timestamp=unix_time(),
         from_user_id=from_id,
@@ -123,8 +136,7 @@ def get_user_purchase_transactions(session,user_id: str) -> list[PurchaseTransac
     return transactions
 
 
-
-def get_user_auction_transactions(session,user_id: str) -> list[AuctionTransactionModel]:
+def get_user_auction_transactions(session, user_id: str) -> list[AuctionTransactionModel]:
     transactions = []
     for t in session.query(InterUserTransaction).filter(or_(
         InterUserTransaction.from_user_id==user_id,
@@ -136,6 +148,18 @@ def get_user_auction_transactions(session,user_id: str) -> list[AuctionTransacti
             timestamp=t.timestamp,
             from_user_id=t.from_user_id,
             to_user_id=t.to_user_id))
+    return transactions
+
+
+def get_user_roll_transactions(session, user_id: str) -> list[RollTransactionModel]:
+    transactions = []
+    for t in session.query(RollTransaction).filter_by(user_id=user_id).all():
+        transactions.append(RollTransactionModel(
+            transaction_id=t.transaction_id,
+            amount_tux=t.amount_tux,
+            timestamp=t.timestamp,
+            user_id=t.user_id,
+            filled=t.filled))
     return transactions
 
 
@@ -173,9 +197,10 @@ def buy_tux(session, user_id: str, tux_amount: float, fiat_amount: float):
 
 
 @transactional
-def roll_gacha(session, user_id: str):
-    update_user_tux_balance(session, user_id, "withdraw", ROLL_COST)
-    update_game_balance(session, 0, ROLL_COST, 0)
+def roll_gacha(session, user_id: str, roll_price: float):
+    update_user_tux_balance(session, user_id, "withdraw", roll_price)
+    update_game_balance(session, 0, roll_price, 0)
+    create_roll_transaction(session, roll_price, user_id, True)
 
 
 
@@ -231,6 +256,12 @@ def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: flo
         logger.error(f"Cannot update game balance: {e}")
 
 
+def get_highest_bidder(session, auction_id: str):
+    highest_bidder = session.query(FreezedTux).filter_by(auction_id=auction_id).order_by(desc(FreezedTux.user_id)).first()
+    if highest_bidder is None:
+        raise AuctionNotFound(f"Cannot find auction {auction_id}")
+    return highest_bidder.user_id, highest_bidder.tux_amount
+
 
 @transactional
 def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: float):
@@ -247,27 +278,35 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
             if bidder.settled:
                 raise AlreadySettled(f"Already settled {auction_id} for user {user_id}")
             user_current_balance += bidder.tux_amount
-        if new_tux_amount > user_current_balance: # Here you exit without changing anything
-            logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
-            raise InsufficientFunds(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+            highest_bid, _ = get_highest_bidder(session, auction_id)
+
+            if highest_bid >= new_tux_amount:
+                raise LowerBidException(f"Current bid is {highest_bid}, cannot bid {new_tux_amount}")
+
+            if new_tux_amount > user_current_balance: # Here you exit without changing anything
+                logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+                raise InsufficientFunds(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+        else:
+            new_freezed_row = FreezedTux(
+                auction_id=auction_id,
+                user_id=user_id,
+                tux_amount=new_tux_amount,
+                last_update=unix_time(),
+                settled=False
+            )
+            session.add(new_freezed_row)
 
         bidding_users: list[FreezedTux] = session.query(FreezedTux).filter_by(auction_id=auction_id)
-        for bidder in bidding_users:
-            if bidder.tux_amount != 0:  # type: ignore
-                update_user_tux_balance(session, bidder.user_id, "deposit", bidder.tux_amount)  # type: ignore
-            if bidder.user_id == user_id:  # type: ignore
-                update_user_tux_balance(session, bidder.user_id, "withdraw", new_tux_amount)  # type: ignore
+        for b in bidding_users:
+            if b.tux_amount != 0:  # type: ignore
+                update_user_tux_balance(session, b.user_id, "deposit", b.tux_amount)  # type: ignore
+            if b.user_id == user_id:  # type: ignore
+                update_user_tux_balance(session, b.user_id, "withdraw", new_tux_amount)  # type: ignore
 
     except SQLAlchemyError as e:
         logger.error(f"Cannot update freezed tux amount ({new_tux_amount} tux) of auction_id::user_id {auction_id}::{user_id}: {e}")
         raise
 
-
-def get_highest_bidder(session, auction_id: str):
-    highest_bidder = session.query(FreezedTux).filter(FreezedTux.auction_id == auction_id).order_by(desc(FreezedTux.user_id)).first()
-    if highest_bidder is None:
-        raise AuctionNotFound(f"Cannot find auction {auction_id}")
-    return highest_bidder.user_id, highest_bidder.tux_amount
 
 
 @transactional
@@ -280,7 +319,7 @@ def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer
             raise AlreadySettled(f"Already settled {auction_id} for user {winner_id}")
 
         update_user_tux_balance(session, bidder.user_id, "deposit", bidder.tux_amount)
-        create_user_transaction(session, bidder.tux_amount, winner_id, auctioneer_id)
+        create_user_transaction(session, auction_id, bidder.tux_amount, winner_id, auctioneer_id)
         bidder.settled = True
 
         other_bidders = session.query(FreezedTux).filter_by(auction_id=auction_id)

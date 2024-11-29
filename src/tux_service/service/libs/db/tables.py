@@ -22,6 +22,14 @@ class InterUserTransaction(Base):  # type: ignore
     from_user_id = Column(String, nullable=False, index=True)
     to_user_id = Column(String, nullable=False, index=True)
 
+class RollTransaction(Base):  # type: ignore
+    __tablename__ = 'roll_transactions'
+    transaction_id = Column(String, primary_key=True)
+    amount_tux = Column(Float, nullable=False)
+    timestamp = Column(Integer, nullable=False)
+    user_id = Column(String, nullable=False, index=True)
+    filled = Column(Boolean, nullable=False)
+
 class UserBalance(Base):  # type: ignore
     __tablename__ = 'user_balances'
     user_id = Column(String, primary_key=True)

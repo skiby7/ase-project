@@ -13,6 +13,13 @@ class AuctionTransactionModel(BaseModel):
     transaction_id: str
     auction_id: str
     amount_tux: float
-    timestamp: str
+    timestamp: int
     from_user_id: str
     to_user_id: str
+
+class RollTransactionModel(BaseModel):
+    transaction_id: str
+    amount_tux: float
+    timestamp: int
+    user_id: str
+    filled: bool

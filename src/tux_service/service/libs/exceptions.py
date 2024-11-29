@@ -12,3 +12,6 @@ class WrongOperation(Exception):
 
 class AuctionNotFound(Exception):
     pass
+
+class LowerBidException(Exception):
+    pass

@@ -44,7 +44,7 @@ def freeze(auction_id: str, Authorization: str = Header(), request: FreezeTuxMod
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
-    return {"details" : "success"}
+    return {"detail" : "Success!"}
 
 
 @router.post("/admin/auctions/{auction_id}/settle-auction")
@@ -58,15 +58,21 @@ def settle(auction_id: str, Authorization: str = Header(), request: SettleAuctio
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
+    return {"detail" : "Success!"}
 
 
-@router.get("/admin/auctions/{auction_id}")
+@router.get("/admin/auctions/{auction_id}/highest-bidder")
 def highest_bidder(auction_id: str, Authorization: str = Header(), db_session = Depends(get_db)):
     if not verify(Authorization):
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
-        get_highest_bidder(db_session, auction_id)
+        user_id, amount = get_highest_bidder(db_session, auction_id)
     except (AuctionNotFound) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
+
+    return {
+        "user_id" : user_id,
+        "tux_amount" : amount
+    }
