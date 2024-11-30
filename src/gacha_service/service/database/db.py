@@ -103,6 +103,7 @@ class database:
         gacha = gachas.find_one({"name": gacha_name})
 
         if not gacha:
+            print("NON ESISTE")
             return None
 
         gacha_id = gacha["id"]
@@ -126,6 +127,7 @@ class database:
                     {"id": id},
                     {"$pull": {"gacha_list": {"gacha_id": gacha_id}}}
                 )
+            return {"name": gacha_name}
         else:
             return 1
 
@@ -148,7 +150,7 @@ class database:
         gachas = self.db["gachas"]
         gacha_list = list(gachas.find())
 
-        weights = [6 - gacha["rarity"] for gacha in gacha_list]
+        weights = [6 - int(gacha["rarity"]) for gacha in gacha_list]
         rand = random.choices(gacha_list, weights=weights, k=1)[0]
 
         if mock:

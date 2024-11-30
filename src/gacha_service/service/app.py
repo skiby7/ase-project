@@ -6,7 +6,7 @@ from auth.access_token_utils import extract_access_token
 from auth.access_token_utils import TokenData
 from gacha_utils.gacha import Gacha
 from check_utils.check import Checker
-#from user_utils.user import User
+from user_utils.user import User
 
 #TODO: SANITIZE ALL INPUT
 
@@ -21,7 +21,7 @@ db = database("utils/distros.json")
 check = Checker(mock_check)
 
 # View system gacha collection
-@app.get("/{id}/gacha/all", status_code=200)
+@app.get("/user/gacha/all", status_code=200)
 def user_gacha_all(token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if check.user(token_data):
         return db.get_all_gachas_user()
@@ -152,14 +152,14 @@ def user_gacha(id: str, token_data: Annotated[TokenData, Depends(extract_access_
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
         res = db.get_user_gacha(id);
-        if not res: #TODO: check [] 
+        if res == 1:
             raise HTTPException(status_code=400, detail="User Not present")
         else: 
             return res
 
 # add user gacha
 @app.post("/admin/add/user/gacha", status_code=200)
-def user_gacha(user, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def user_gacha(user: User, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check.admin(token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
@@ -173,11 +173,11 @@ def user_gacha(user, token_data: Annotated[TokenData, Depends(extract_access_tok
 
 # delete user gacha
 @app.delete("/admin/remove/user/gacha", status_code=200)
-def user_gacha(id, name):
+def user_gacha(user: User, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check.admin(TokenData):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.remove_user_gacha(id,name)
+        res = db.remove_user_gacha(user.id,user.gacha_name)
         if not res:
             raise HTTPException(status_code=400, detail="Gacha not Present")
         elif res == 1: 
