@@ -62,7 +62,7 @@ class database:
 
     ### PLAYER ###
     
-    def auction_create_player(self,player_id,gacha_id,starting_price,end_time):
+    def auction_create(self,player_id,gacha_id,starting_price,end_time):
         #control if gacha is already in bid
         #da fare con simo
         # if(not self.gacha_available(self,player_id,gacha_id)):return 1
@@ -85,7 +85,7 @@ class database:
         return 0
 
 
-    def auction_delete_player(self,player_id,auction_id,mock_distro):
+    def auction_delete(self,player_id,auction_id,mock_distro):
         #return the bidded gacha
         if not mock_distro:
             pass
@@ -93,7 +93,7 @@ class database:
         return self.db["auctions"].delete_one({"player_id":player_id,"auction_id":auction_id})
         
 
-    def auction_bid_player(self,auction_id,player_id,bid,mock_tux):
+    def auction_bid(self,auction_id,player_id,bid,mock_tux):
         auction = self.db["auctions"].find_one({"auction_id":auction_id,"active":True})
         if auction is None:return 1
         if player_id == auction["player_id"]: return 2
@@ -110,25 +110,36 @@ class database:
         self.db["bids"].insert_one({"player_id":player_id,"auction_id":auction_id,"bid":bid,"time":unix_time()})
         return 0
 
+    def auction_active(self,player_id):
+        return list(self.db["auctions"].find({"player_id":player_id,"active":True},{"_id":0}))
 
-    def auction_history_player(self,player_id):
+
+    def auction_active_all(self):
+        return list(self.db["auctions"].find({"active":True},{"_id":0}))
+
+
+    def auction_history(self,player_id):
         return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
 
-    def bid_history_player(self,player_id):
+    def bid_history(self,player_id):
         return list(self.db["bids"].find({"player_id":player_id},{"_id":0}))
 
 
-
-
-    #ADMIN
-    #NB - because these are used by admins they contain _id
-
-    def auction_history(self,player_id):
-        
-        return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
-
+    def bid_history_auction(self,player_id,auction_id):
+        return list(self.db["bids"].find({"player_id":player_id,"auction_id":auction_id},{"_id":0}))
     
+
+
+
+    ######### ADMIN #########
+
+
+    ##### AUCTION #####
+
+    #auction_history same as player
+
+
     def auction_modify(self,auction):
         self.db["auctions"].update_one({"auction_id":auction["auction_id"]},{"$set":auction})
 
@@ -137,13 +148,7 @@ class database:
         self.db["bid"].update_one({"auction_id":bid["auction_id"],"player_id":bid["player_id"]},{"$set":bid})
 
 
-    def auction_delete(self,auction_id,mock_distro):
-        #return the bidded gacha
-        if not mock_distro:
-            pass
-
-        self.db["auctions"].delete_one({"auction_id":auction_id})
-        return 0
+    #auction_delete same as player
 
 
     def auction_info(self,auction_id):
@@ -153,6 +158,10 @@ class database:
     def auction_history_all(self):
         return list(self.db["auctions"].find({},{"_id":0}))
     
+    ##### BID #####
+
+    #TODO bid_delete  (ricordarsi di fare il fallback sul bet minore),e tutto il resto
+
 
     def market_activity(self):
         twenty_four_hours_ago = unix_time() - 86400
@@ -208,7 +217,7 @@ class database:
     def auction_presence(self,auction_id:str):
         return False if (self.db["auctions"].find_one({"auction_id":auction_id}) is None) else True 
 
-    def bid_user_presence(self,bid_id:):
+    def bid_user_presence(self,bid_id:str):
         return False if (self.db["bids"].find_one({"bid_id":bid_id}) is None) else True 
     
         
