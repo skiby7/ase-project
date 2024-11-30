@@ -1,13 +1,10 @@
 import requests
+from auth.access_token_utils import TokenData
 
 class Checker:
-    mock_check = None
 
-    def __init__(self,mock_check):
-        self.mock_check = mock_check
-
-    def tux(self,token_data):
-        if self.mock_check:
+    def tux(mock_check: bool,token_data: TokenData):
+        if mock_check:
             return True 
         else:
             headers = {
@@ -23,8 +20,8 @@ class Checker:
             else: 
                 return True
     
-    def user(self,token_data):
-        if self.mock_check:
+    def user(mock_check: bool,token_data: TokenData):
+        if mock_check:
             return True 
         else:
             if token_data.role  == "user":
@@ -32,8 +29,8 @@ class Checker:
             else: 
                 return False
 
-    def admin(self,token_data):
-        if self.mock_check:
+    def admin(mock_check: bool,token_data: TokenData):
+        if mock_check:
             return True 
         else:
             if token_data.role  == "admin":
