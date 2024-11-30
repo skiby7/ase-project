@@ -118,9 +118,11 @@ def create_user_transaction(session, auction_id: str, tux_amount: float, from_id
     update_user_tux_balance(session, to_id, "deposit", tux_amount)
 
 
-def user_exists(session, user_id:str):
+def user_exists(session, user_id: str):
     return session.query(UserBalance).filter_by(user_id=user_id).first() is not None
 
+def auction_exists(session, auction_id: str):
+    return session.query(FreezedTux).filter_by(auction_id=auction_id).first() is not None
 
 def get_user_purchase_transactions(session,user_id: str) -> list[PurchaseTransactionModel]:
     transactions = []
@@ -230,6 +232,7 @@ def update_user_tux_balance(session, user_id: str, operation: Literal["withdraw"
             row.tux_amount += tux_amount  # type: ignore
         else:
             raise WrongOperation(f"Operation {operation} not supported!")
+        logger.debug(f"{operation} -> ({user_id}, {tux_amount} tux)")
     else:
         raise UserNotFound(f"{user_id} not found")
 
@@ -257,9 +260,10 @@ def update_game_balance(session, emitted_tux: float, tux_spent: float, fiat: flo
 
 
 def get_highest_bidder(session, auction_id: str):
-    highest_bidder = session.query(FreezedTux).filter_by(auction_id=auction_id).order_by(desc(FreezedTux.user_id)).first()
+    highest_bidder = session.query(FreezedTux).filter_by(auction_id=auction_id).order_by(desc(FreezedTux.tux_amount)).first()
     if highest_bidder is None:
         raise AuctionNotFound(f"Cannot find auction {auction_id}")
+    logger.debug(f"Highest bidder: {highest_bidder.user_id} - Bid: {highest_bidder.tux_amount}")
     return highest_bidder.user_id, highest_bidder.tux_amount
 
 
@@ -269,39 +273,50 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
         Only the higher betting player should be freezed, so every time I receive a
         freeze request, I unfreeze all the other players
     """
+    logger.debug(f"updating bid of auction {auction_id} -> ({user_id}, {new_tux_amount} tux)")
     if new_tux_amount < 0:
         raise ValueError("The new tux amount cannot be a negative number!")
     try:
-        user_current_balance = get_user_tux_balance(session, user_id)
+        try:
+            highest_bidder_id, highest_bid = get_highest_bidder(session, auction_id)
+        except:
+            highest_bidder_id, highest_bid = (None, 0)
+        if highest_bid >= new_tux_amount:
+            raise LowerBidException(f"Current bid is {highest_bid}, cannot bid {new_tux_amount}")
+
         bidder = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()
         if bidder:
             if bidder.settled:
                 raise AlreadySettled(f"Already settled {auction_id} for user {user_id}")
-            user_current_balance += bidder.tux_amount
-            highest_bid, _ = get_highest_bidder(session, auction_id)
 
-            if highest_bid >= new_tux_amount:
-                raise LowerBidException(f"Current bid is {highest_bid}, cannot bid {new_tux_amount}")
+            user_current_balance = get_user_tux_balance(session, user_id)
+            user_current_balance += bidder.tux_amount
 
             if new_tux_amount > user_current_balance: # Here you exit without changing anything
                 logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
                 raise InsufficientFunds(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+
         else:
-            new_freezed_row = FreezedTux(
+            user_current_balance = get_user_tux_balance(session, user_id)
+            if new_tux_amount > user_current_balance: # Here you exit without changing anything
+                logger.error(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+                raise InsufficientFunds(f"Trying to freeze {new_tux_amount} tux with {user_current_balance} tux available")
+
+            bidder = FreezedTux(
                 auction_id=auction_id,
                 user_id=user_id,
-                tux_amount=new_tux_amount,
+                tux_amount=0,
                 last_update=unix_time(),
                 settled=False
             )
-            session.add(new_freezed_row)
+            session.add(bidder)
 
-        bidding_users: list[FreezedTux] = session.query(FreezedTux).filter_by(auction_id=auction_id)
-        for b in bidding_users:
-            if b.tux_amount != 0:  # type: ignore
-                update_user_tux_balance(session, b.user_id, "deposit", b.tux_amount)  # type: ignore
-            if b.user_id == user_id:  # type: ignore
-                update_user_tux_balance(session, b.user_id, "withdraw", new_tux_amount)  # type: ignore
+        if highest_bid > 0 and highest_bidder_id is not None:
+            update_user_tux_balance(session, highest_bidder_id, "deposit", highest_bid)
+        update_user_tux_balance(session, user_id, "withdraw", new_tux_amount)
+        bidder.tux_amount = new_tux_amount  # type: ignore
+        bidder.last_update = unix_time()  # type: ignore
+
 
     except SQLAlchemyError as e:
         logger.error(f"Cannot update freezed tux amount ({new_tux_amount} tux) of auction_id::user_id {auction_id}::{user_id}: {e}")

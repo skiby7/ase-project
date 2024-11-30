@@ -1,6 +1,5 @@
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
-from libs.mocks import MockSession
 from logging import getLogger
 
 logger = getLogger("uvicorn.error")
@@ -8,8 +7,6 @@ logger = getLogger("uvicorn.error")
 def transactional(func):
     @wraps(func)
     def wrapper(session, *args, **kwargs):
-        if type(session) is MockSession:
-            return func(session, *args, **kwargs)
         already_in_transaction = session.in_transaction()
 
         try:

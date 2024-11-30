@@ -47,7 +47,7 @@ class GameBalance(Base):
 class FreezedTux(Base):
     __tablename__ = 'freezed_tuxs'
     auction_id = Column(String, primary_key=True)
-    user_id = Column(String, nullable=False, index=True)
+    user_id = Column(String, primary_key=True)
     tux_amount = Column(Float, nullable=False)
     last_update = Column(Integer, nullable=False)
     settled = Column(Boolean, nullable=False)

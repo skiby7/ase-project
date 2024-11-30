@@ -1,7 +1,7 @@
 services:
     tux_service:
         container_name: tux_service
-        restart: unless-stopped
+        restart: no
         build:
             context: ./service
         environment:
@@ -16,6 +16,29 @@ services:
         networks:
             - gacha_network
 
+    newman:
+        image: postman/newman:latest
+        container_name: tux_service_tests
+        restart: no
+        depends_on:
+            - tux_service
+        entrypoint:
+            [
+                "newman",
+                "run",
+                "/etc/postman/TuxServiceTests.postman_collection.json",
+                "--environment",
+                "/etc/postman/TuxServiceEnv.postman_environment.json",
+                "--delay-request",
+                "100",
+                "--insecure",
+                "--reporters",
+                "cli",
+            ]
+        volumes:
+            - ./tests/unit:/etc/postman
+        networks:
+            - gacha_network
 secrets:
     ssl_private_key:
         file: ./service/secrets/key.pem
