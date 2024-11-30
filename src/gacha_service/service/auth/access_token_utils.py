@@ -9,6 +9,7 @@ class TokenData(BaseModel):
     sub: str
     username: str
     role: str
+    jwt: str
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -26,9 +27,10 @@ def extract_access_token(token: Annotated[str, Depends(oauth2_scheme)]) -> Token
         uid: str = payload.get("sub")
         username: str = payload.get("username")
         role: str = payload.get("role")
+        jwt: str = token
         if uid is None or role is None or is_token_expired(payload):
             raise credentials_exception
-        return TokenData(sub=uid, username=username, role=role)
+        return TokenData(sub=uid, username=username, role=role, jwt=jwt)
     except jwt.InvalidTokenError:
         raise credentials_exception
 

@@ -103,7 +103,6 @@ class database:
         gacha = gachas.find_one({"name": gacha_name})
 
         if not gacha:
-            print("NON ESISTE")
             return None
 
         gacha_id = gacha["id"]

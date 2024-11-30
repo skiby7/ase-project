@@ -58,7 +58,7 @@ def user_gacha_roll(id: str, token_data: Annotated[TokenData, Depends(extract_ac
     if not check.user(token_data):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
-        if check.tux():
+        if check.tux(token_data):
             if mock_gacha_roll:
                 res = db.get_roll_gacha(id,mock_gacha_roll)
             else:

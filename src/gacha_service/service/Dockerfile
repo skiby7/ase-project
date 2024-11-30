@@ -6,6 +6,6 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-EXPOSE 5000
+EXPOSE 9190
 
 CMD ["uvicorn", "app:test", "--host", "0.0.0.0", "--port", "5000","--ssl-keyfile=/run/secrets/key","--ssl-certfile=/run/secrets/cert"]
