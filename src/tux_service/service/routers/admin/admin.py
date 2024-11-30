@@ -1,15 +1,17 @@
+from typing import Annotated
 from libs.auth import verify
-from fastapi import APIRouter, HTTPException, Body, Header, Depends
+from fastapi import APIRouter, HTTPException, Body, Depends
 from routers.admin.models import TuxAccountModel
 from libs.db.db import create_user_balance, delete_user_balance, get_db, get_highest_bidder, update_freezed_tux, settle_auction_payments
+from libs.access_token_utils import TokenData, extract_access_token
 from routers.admin.models import FreezeTuxModel, SettleAuctionModel
 from libs.exceptions import AlreadySettled, AuctionNotFound, UserNotFound, InsufficientFunds
 
 router = APIRouter()
 
 @router.post('/admin/balances/create')
-def create( Authorization: str = Header(), tux_account: TuxAccountModel = Body(), db_session = Depends(get_db)):
-    if not verify(Authorization):
+def create(token_data: Annotated[TokenData, Depends(extract_access_token)], tux_account: TuxAccountModel = Body(), db_session = Depends(get_db)):
+    if not verify(token_data, None, True):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
@@ -22,8 +24,8 @@ def create( Authorization: str = Header(), tux_account: TuxAccountModel = Body()
     return {"detail" : "Success!"}
 
 @router.delete('/admin/balances/{user_id}/delete')
-def delete(user_id: str, Authorization: str = Header(), db_session = Depends(get_db)):
-    if not verify(Authorization):
+def delete(user_id: str, token_data: Annotated[TokenData, Depends(extract_access_token)], db_session = Depends(get_db)):
+    if not verify(token_data, None, True):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
@@ -34,8 +36,8 @@ def delete(user_id: str, Authorization: str = Header(), db_session = Depends(get
 
 
 @router.post("/admin/auctions/{auction_id}/freeze")
-def freeze(auction_id: str, Authorization: str = Header(), request: FreezeTuxModel = Body(), db_session = Depends(get_db)):
-    if not verify(Authorization):
+def freeze(auction_id: str, token_data: Annotated[TokenData, Depends(extract_access_token)], request: FreezeTuxModel = Body(), db_session = Depends(get_db)):
+    if not verify(token_data, None, True):
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         update_freezed_tux(db_session, auction_id, request.user_id, request.tux_amount)
@@ -48,8 +50,8 @@ def freeze(auction_id: str, Authorization: str = Header(), request: FreezeTuxMod
 
 
 @router.post("/admin/auctions/{auction_id}/settle-auction")
-def settle(auction_id: str, Authorization: str = Header(), request: SettleAuctionModel = Body(), db_session = Depends(get_db)):
-    if not verify(Authorization):
+def settle(auction_id: str, token_data: Annotated[TokenData, Depends(extract_access_token)], request: SettleAuctionModel = Body(), db_session = Depends(get_db)):
+    if not verify(token_data, None, False):
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         settle_auction_payments(db_session, auction_id, request.winner_id, request.auctioneer_id)
@@ -62,9 +64,10 @@ def settle(auction_id: str, Authorization: str = Header(), request: SettleAuctio
 
 
 @router.get("/admin/auctions/{auction_id}/highest-bidder")
-def highest_bidder(auction_id: str, Authorization: str = Header(), db_session = Depends(get_db)):
-    if not verify(Authorization):
+def highest_bidder(auction_id: str, token_data: Annotated[TokenData, Depends(extract_access_token)], db_session = Depends(get_db)):
+    if not verify(token_data, None, False):
         raise HTTPException(status_code=401, detail="Unauthorized")
+
     try:
         user_id, amount = get_highest_bidder(db_session, auction_id)
     except (AuctionNotFound) as e:

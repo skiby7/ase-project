@@ -5,6 +5,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
+from libs.mocks import use_mocks
+
 class TokenData(BaseModel):
     sub: str
     username: str
@@ -15,6 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 with open("/run/secrets/jwt_public_key", "r") as f:
     PUBLIC_KEY = f.read()
 
+@use_mocks
 def extract_access_token(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenData:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

@@ -21,6 +21,6 @@ def default_mock(*args, **kwargs):
     pass
 
 
-def verify_mock(token: str) -> bool:
-    logger.debug(f"MOCK -> Verifying token {token}")
+def verify_mock(*args, **kwargs) -> bool:
+    logger.debug("MOCKING AUTH")
     return True

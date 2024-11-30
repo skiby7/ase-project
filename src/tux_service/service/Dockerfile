@@ -4,5 +4,5 @@ WORKDIR /code/service
 COPY ./requirements.txt /code/requirements.txt
 # COPY libs routers config.yml main.py ./
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-EXPOSE 9090
+EXPOSE 9390
 CMD ["python3", "-u", "main.py"]

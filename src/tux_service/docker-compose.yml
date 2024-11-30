@@ -7,7 +7,7 @@ services:
         environment:
             - DATABASE_URL=postgresql://postgres@tux_db:5432/
         ports:
-            - 9090:9090
+            - 9390:9090
         volumes:
             - ${PWD}/service:/code/service
         secrets:

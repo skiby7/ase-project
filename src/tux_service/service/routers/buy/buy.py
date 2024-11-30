@@ -1,8 +1,10 @@
 from libs.auth import verify
+from typing import Annotated
 from libs.db.db import get_db, buy_tux, create_purchase_transaction, get_user_tux_balance, get_user_fiat_balance
 from routers.buy.models import BuyModel
-from fastapi import APIRouter, HTTPException, Body, Header, Depends
+from fastapi import APIRouter, HTTPException, Body, Depends
 from logging import getLogger
+from libs.access_token_utils import TokenData, extract_access_token
 
 from libs.exceptions import InsufficientFunds
 logger = getLogger("uvicorn.error")
@@ -12,9 +14,10 @@ FIAT_TO_TUX = 1.2
 
 
 @router.post('/buy')
-def buy(Authorization: str = Header(), buy_request: BuyModel = Body(), session = Depends(get_db)):
-    if not verify(Authorization):
+def buy(token_data: Annotated[TokenData, Depends(extract_access_token)], buy_request: BuyModel = Body(), session = Depends(get_db)):
+    if not verify(token_data, buy_request.user_id, False):
         raise HTTPException(status_code=401, detail="Unauthorized")
+
 
     tux_amount = buy_request.amount/FIAT_TO_TUX
     try:
