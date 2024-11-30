@@ -1,3 +1,7 @@
 fastapi[standard]>=0.113.0,<=0.115.0
 pydantic>=2.7.0,<3.0.0
 PyYAML==6.0.1
+sqlalchemy
+psycopg2-binary
+passlib[bcrypt]
+pyjwt[crypto]

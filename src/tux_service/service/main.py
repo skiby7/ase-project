@@ -2,9 +2,14 @@ import os
 import json, yaml
 import uvicorn
 from logging import getLogger
-from pydantic import BaseModel
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers.buy import buy
+from routers.transactions import transactions
+from routers.admin import admin
+from routers.roll import roll
+from routers.balances import balances
+from libs.db.db import create_tables
 
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -19,30 +24,42 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=[]
 )
+app.include_router(buy.router)
+app.include_router(transactions.router)
+app.include_router(admin.router)
+app.include_router(roll.router)
+app.include_router(balances.router)
 
 ### Implementation ###
-@app.get("/")
-def home():
-    return { "status": "ok" }
 
 def init():
     global log_level
     config_path = os.path.join(script_path, "config.yml")
     http_port = 9090
+    cert_file = None
+    key_file = None
     if os.path.isfile(config_path):
 
         with open(config_path, "r") as f:
             config = yaml.load(f.read(), Loader=yaml.Loader)
+
         http_port = config.get("http_port", 9090)
         log_l = config.get("log_level", "info")
-
+        cert_file = config.get("cert_file")
+        key_file = config.get("key_file")
         logger.debug(f"Configuration: {json.dumps(config, indent=4)}")
     else:
         logger.warning("Configuration file not found!")
         log_l = "debug"
     logger.info("Starting v1.0.0")
-
-    uvicorn.run("main:app", host="0.0.0.0", port=int(http_port), log_level=log_l)
+    create_tables()
+    uvicorn.run("main:app",
+        host="0.0.0.0",
+        port=int(http_port),
+        log_level=log_l,
+        ssl_keyfile=key_file,
+        ssl_certfile=cert_file
+    )
 
 
 

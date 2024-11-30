@@ -1,3 +1,5 @@
+import os
+print(os.getenv("PYTHONPATH"))
 import pytest
 from service.main import app
 
