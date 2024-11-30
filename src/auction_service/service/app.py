@@ -94,9 +94,7 @@ def player_endpoint(auction_id):
     if mock_player:player_id = dummy_player_id
     is_valid_id(player_id,IdStrings.PLAYER_ID)
 
-
-    #add to currently ongoing auctions of the player
-    res = db.auction_delete(player_id,auction_id,mock_distro)
+    res = db.auction_delete_player(player_id,auction_id,mock_distro)
     if res == 1: return 0
     elif res == 0: raise HTTPException(status_code=400, detail="No auction found with specified criteria")
 
