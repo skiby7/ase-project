@@ -11,7 +11,6 @@ from routers.roll import roll
 from routers.balances import balances
 from libs.db.db import create_tables
 
-
 ### Globals ###
 script_path = os.path.dirname(os.path.abspath(__file__))
 logger = getLogger("uvicorn.error")
