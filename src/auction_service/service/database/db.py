@@ -85,7 +85,7 @@ class database:
         return 0
 
 
-    def auction_delete(self,player_id,auction_id,mock_distro):
+    def auction_delete_player(self,player_id,auction_id,mock_distro):
         #return the bidded gacha
         if not mock_distro:
             pass
@@ -118,15 +118,15 @@ class database:
         return list(self.db["auctions"].find({"active":True},{"_id":0}))
 
 
-    def auction_history(self,player_id):
+    def auction_history_player(self,player_id):
         return list(self.db["auctions"].find({"player_id":player_id},{"_id":0}))
 
 
-    def bid_history(self,player_id):
+    def bid_history_player(self,player_id):
         return list(self.db["bids"].find({"player_id":player_id},{"_id":0}))
 
 
-    def bid_history_auction(self,player_id,auction_id):
+    def bid_history_player_auction(self,player_id,auction_id):
         return list(self.db["bids"].find({"player_id":player_id,"auction_id":auction_id},{"_id":0}))
     
 
@@ -140,29 +140,58 @@ class database:
     #auction_history same as player
 
 
-    def auction_modify(self,auction):
+    def auction_modify(self,auction_id,auction_modifier):
+        #scoprire come rimuovere campi a None dal modifier
         self.db["auctions"].update_one({"auction_id":auction["auction_id"]},{"$set":auction})
 
 
-    def bid_modify(self,bid):
-        self.db["bid"].update_one({"auction_id":bid["auction_id"],"player_id":bid["player_id"]},{"$set":bid})
+    def auction_delete(self,auction_id,mock_distro):
+        #return the bidded gacha
+        if not mock_distro:
+            pass
 
-
-    #auction_delete same as player
+        return self.db["auctions"].delete_one({"auction_id":auction_id})
+        
 
 
     def auction_info(self,auction_id):
             return self.db["auctions"].find_one({"auction_id":auction_id})
     
     
-    def auction_history_all(self):
+    def auction_history(self):
         return list(self.db["auctions"].find({},{"_id":0}))
     
+
     ##### BID #####
 
     #TODO bid_delete  (ricordarsi di fare il fallback sul bet minore),e tutto il resto
 
+    def bid_create():
+        #time less than ending
+        #if finished amount must be lower
+        #if ongoing amount cant be higher, if higher set winner to that, remove tux
+        pass
 
+    
+    # BID_MODIFY
+    def bid_modify(self,bid):
+        #self.db["bid"].update_one({"auction_id":bid["auction_id"],"player_id":bid["player_id"]},{"$set":bid})
+
+
+    # BID_DELETE
+    def bid_delete(self,bid_id):
+        return self.db["bids"].delete_one({"bid_id":bid["bid_id"]})
+        
+    
+    def bid_history_auction(self,auction_id):
+        return self.db["bids"].find({"auction_id":auction_id},{"_id":0})
+    
+
+    def bid_history(self):
+        return self.db["bids"].find({},{"_id":0})
+    
+
+    # MARKET_ACTIVITY
     def market_activity(self):
         twenty_four_hours_ago = unix_time() - 86400
         auctions = self.db["bids"].find({"time": {"$gte": twenty_four_hours_ago}},{"_id":0})

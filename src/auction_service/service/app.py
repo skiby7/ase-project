@@ -85,7 +85,7 @@ def player_endpoint(gacha_id:str, starting_price:int, end_time:int):
     elif res == 1: raise HTTPException(status_code=400, detail="Invalid User")
     
 
-# AUCTION_DELETE_PLAYER
+# AUCTION_DELETE
 @app.delete("/{player_id}/auction/auction-delete", status_code=201)
 def player_endpoint(auction_id):
     check_user(0)
@@ -143,7 +143,7 @@ def player_endpoint(player_id:str):
 
 
 # AUCTION_HISTORY
-@app.get("/{player_id}/auction/auction-history", status_code=200)
+@app.get("/{player_id}/auction/auction-history-player", status_code=200)
 def player_endpoint(player_id:str):
     check_user(0)
 
@@ -151,7 +151,7 @@ def player_endpoint(player_id:str):
     is_valid_id(player_id,IdStrings.PLAYER_ID)
 
     if not is_valid_uuid(player_id):raise HTTPException(status_code=400, detail="Invalid player_id")
-    return db.auction_history(player_id)
+    return db.auction_history_player(player_id)
 
 
 # BID_HISTORY
@@ -176,7 +176,7 @@ def player_endpoint(player_id:str,auction_id:str):
     is_valid_id(auction_id,IdStrings.AUCTION_ID)
     
     #extract player id
-    return db.bid_history_auction(player_id,auction_id)
+    return db.bid_history_player_auction(player_id,auction_id)
 
 
 
@@ -228,7 +228,10 @@ def admin_endpoint(auction_id:str,auction_modifier:AuctionModifier):
     check_user(1)
     
     is_valid_id(auction_id,IdStrings.AUCTION_ID)
-    # TODO validate auction
+    if auction_modifier.starting_price<0:raise HTTPException(status_code=400, detail="starting_price must be >=0")
+    if auction_modifier.current_winning_bid<0:raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
+    if auction_modifier.end_time<0:raise HTTPException(status_code=400, detail="end_time must be >=0")
+
     #must control presence because db.find() possibly returns []
     if not db.auction_presence(auction_id):raise HTTPException(status_code=400, detail="Auction not present")
     db.auction_modify(auction_id,auction_modifier)
@@ -265,39 +268,42 @@ def player_endpoint():
     return db.auction_active_all()
 
 
-# AUCTION_HISTORY
-@app.get("/admin/auction/auction-history", status_code=200)
+# AUCTION_HISTORY_PLAYER
+@app.get("/admin/auction/auction-history-player", status_code=200)
 def admin_endpoint(player_id:str):
     check_user(1)
 
     is_valid_id(player_id,IdStrings.PLAYER_ID)
     #must control presence because db.find() possibly returns []
     if not db.auction_user_presence(player_id):raise HTTPException(status_code=400, detail="Player not present")
-    return jsonable_encoder(db.auction_history(player_id))
+    return db.auction_history(player_id)
 
 
-# AUCTION_HISTORY_ALL
-@app.get("/admin/auction/auction-history-all")
+# AUCTION_HISTORY
+@app.get("/admin/auction/auction-history")
 def admin_endpoint():
     check_user(1)
     
-    return jsonable_encoder(db.auction_history_all())
+    return db.auction_history()
 
 
 ##### BID #####
 
-# BID_CREATE
-@app.post("/admin/auction/auction-bid", status_code=201)
-def player_endpoint(auction_id,player_id,bid):
-    check_user(0)
+# BID_CREATE TODO MODIFICARE 
+@app.post("/admin/auction/bid-create", status_code=201)
+def player_endpoint(bid: Bid):
+    check_user(1)
 
-    is_valid_id(auction_id,IdStrings.AUCTION_ID)
-    if mock_player:player_id = dummy_player_id
-    is_valid_id(player_id,IdStrings.PLAYER_ID)
+    is_valid_id(bid["bid_id"],IdStrings.BID_ID)
+    is_valid_id(bid["auction_id"],IdStrings.AUCTION_ID)
+    is_valid_id(bid["player_id"],IdStrings.PLAYER_ID)
+    if bid["bid"]<0:raise HTTPException(status_code=400, detail="bid must be a number higher than 0")
+    if bid["time"]<0:raise HTTPException(status_code=400, detail="time must be a number higher than 0")
 
     #extract player id
-    res = db.auction_bid(auction_id,player_id,bid,mock_tux)
+    res = db.bid_create(bid["auction_id"],player_id,bid,mock_tux)
     if res == 0: return res
+    #should be changed
     elif res == 1: raise HTTPException(status_code=400, detail="Auction does not exist")
     elif res == 2: raise HTTPException(status_code=400, detail="Player is owner of auction")
     elif res == 3: raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
@@ -310,13 +316,13 @@ def admin_endpoint(bid_id:str,bid_modifier:BidModifier):
     
     is_valid_id(bid_id,IdStrings.BID_ID)
     #must control presence because db.find() possibly returns []
-    if not db.bid_presence(bid_id):raise HTTPException(status_code=400, detail="Auction not present")
+    if not db.bid_presence(bid_id):raise HTTPException(status_code=400, detail="Bid not present")
     db.bid_modify(bid_id,bid_modifier)
 
 
 # BID_DELETE
 @app.delete("/admin/auction/bid-delete", status_code=201)
-def player_endpoint(bid_id):
+def admin_endpoint(bid_id):
     check_user(0)
 
     is_valid_id(bid_id,IdStrings.BID_ID)
@@ -324,36 +330,24 @@ def player_endpoint(bid_id):
     #add to currently ongoing auctions of the player
     res = db.bid_delete(bid_id)
     if res == 1: return 0
-    elif res == 0: raise HTTPException(status_code=400, detail="No auction found with specified criteria")
+    elif res == 0: raise HTTPException(status_code=400, detail="No bid found with specified bid_id")
 
 
-# BID_HISTORY_PLAYER
+# BID_HISTORY_PLAYER - same as player
 @app.get("/admin/auction/bid-history-player", status_code=200)
-def player_endpoint(player_id:str):
+def admin_endpoint(player_id:str):
     check_user(1)
 
     if mock_player:player_id = dummy_player_id
     is_valid_id(player_id,IdStrings.PLAYER_ID)
     
     #extract player id
-    return db.bid_history(player_id)
+    return db.bid_history_player(player_id)
 
 
-# BID_HISTORY_AUCTION
-@app.get("/admin/auction/bid-history-player", status_code=200)
-def player_endpoint(player_id:str):
-    check_user(1)
-
-    if mock_player:player_id = dummy_player_id
-    is_valid_id(player_id,IdStrings.PLAYER_ID)
-    
-    #extract player id
-    return db.bid_history(player_id)
-
-
-# BID_HISTORY_PLAYER_AUCTION
+# BID_HISTORY_PLAYER_AUCTION - same as player
 @app.get("/admin/auction/{auction_id}/bid-history", status_code=200)
-def player_endpoint(player_id:str,auction_id:str):
+def admin_endpoint(player_id:str,auction_id:str):
     check_user(1)
 
     if mock_player:player_id = dummy_player_id
@@ -364,12 +358,24 @@ def player_endpoint(player_id:str,auction_id:str):
     return db.bid_history_auction(player_id,auction_id)
 
 
-# BID_HISTORY_ALL
-@app.get("/admin/bid-history-all", status_code=200)
-def player_endpoint():
+# BID_HISTORY_AUCTION
+@app.get("/admin/auction/bid-history-player", status_code=200)
+def admin_endpoint(auction_id:str):
+    check_user(1)
+
+    if mock_player:player_id = dummy_player_id
+    is_valid_id(auction_id,IdStrings.AUCTION_ID)
+    
+    #extract player id
+    return db.bid_history_player_auction(player_id)
+
+
+# BID_HISTORY
+@app.get("/admin/bid-history", status_code=200)
+def admin_endpoint():
     check_user(1)
     
-    return db.bid_history_all()
+    return db.bid_history()
 
 
 # MARKET_ACTIVITY
@@ -377,7 +383,7 @@ def player_endpoint():
 def admin_endpoint():
     check_user(1)
 
-    return jsonable_encoder(db.market_activity())
+    return db.market_activity()
 '''
 if __name__ == "__main__":
     app.run(ssl_context=('cert.pem', 'key.pem'))
