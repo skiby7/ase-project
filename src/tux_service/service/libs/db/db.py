@@ -323,6 +323,24 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
         raise
 
 
+@transactional
+def delete_auction(session, auction_id: str):
+    try:
+        bidders = session.query(FreezedTux).filter_by(auction_id=auction_id).all()
+
+        if bidders is None:
+            raise AuctionNotFound(f"Cannot find {auction_id}")
+
+        for b in bidders:
+            if b.settled: continue
+            b.settled = True
+            if b.tux_amount > 0:
+                update_user_tux_balance(session, b.user_id, "deposit", b.tux_amount)
+
+
+    except SQLAlchemyError as e:
+        logger.error(f"Cannot update settle payments for auction {auction_id}: {e}")
+        raise
 
 @transactional
 def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer_id: str):
@@ -339,7 +357,7 @@ def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer
 
         other_bidders = session.query(FreezedTux).filter_by(auction_id=auction_id)
         for b in other_bidders:
-            b.settle = True
+            b.settled = True
 
 
     except SQLAlchemyError as e:
