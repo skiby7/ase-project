@@ -1,0 +1,46 @@
+.
+├── docker-compose.yml
+├── docker-compose_test.yml
+├── output.txt
+├── service
+│   ├── Dockerfile
+│   ├── Dockerfile_test
+│   ├── __pycache__
+│   │   └── app.cpython-312.pyc
+│   ├── app.py
+│   ├── app_test.py
+│   ├── auth
+│   │   ├── __pycache__
+│   │   │   └── access_token_utils.cpython-312.pyc
+│   │   └── access_token_utils.py
+│   ├── config.yml
+│   ├── database
+│   │   ├── auctions.json
+│   │   ├── bids.json
+│   │   └── db.py
+│   ├── libs
+│   │   └── __init__.py
+│   ├── requirements.txt
+│   ├── routers
+│   │   └── __init__.py
+│   ├── secrets
+│   │   ├── cert.pem
+│   │   ├── db_cert.pem
+│   │   ├── db_key.pem
+│   │   ├── key.pem
+│   │   ├── private.pem
+│   │   ├── public.pem
+│   │   ├── pw.txt
+│   │   └── server.pem
+│   └── utils
+│       ├── __pycache__
+│       │   ├── check.cpython-312.pyc
+│       │   └── util_classes.cpython-312.pyc
+│       ├── check.py
+│       └── util_classes.py
+└── tests
+    ├── integration
+    │   └── test_home.py
+    └── unit
+
+14 directories, 30 files
