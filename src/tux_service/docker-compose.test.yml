@@ -6,8 +6,6 @@ services:
             context: ./service
         environment:
             - TEST_RUN=true
-        ports:
-            - 9390:9090
         secrets:
             - jwt_public_key
             - ssl_private_key
