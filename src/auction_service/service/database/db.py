@@ -1,9 +1,7 @@
 from pymongo import MongoClient
 import json
 import uuid
-import random
 import time
-from bson import binary
 from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,IdStrings
 from fastapi import Body, FastAPI, HTTPException
 from uuid import UUID
@@ -16,7 +14,17 @@ class database:
     def __init__(self,auctionsFile,bidsFile):
         self.auctionsFile = auctionsFile
         self.bidsFile = bidsFile
-        self.client = MongoClient("db", 27017, maxPoolSize=50)
+
+        username = "root"
+        host = "db"
+        port = "27017"
+        db = "admin"
+        database = "mydatabase"
+        with open('/run/secrets/pw', 'r') as file:
+            password = file.read().strip()
+        uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
+        self.client = MongoClient(uri)
+        
         self.db = self.client["mydatabase"]
         if "auctions" in self.db.list_collection_names():
             print(" \n\n DB ACTIVE  \n\n")
@@ -70,9 +78,9 @@ class database:
     
     # TODO a seconda del feedback degli altri
     # AUCTION_CREATE
-    def auction_create(self,auction:Auction,mock_distro:bool):
+    def auction_create(self,auction:Auction,mock_check:bool):
         #TODO controllare che ci sia almeno 1 gacha con gacha_id disponibile da simo
-        if not mock_distro:
+        if not mock_check:
             pass
         if(auction.starting_price<0):
             raise HTTPException(status_code=400, detail="Invalid price")
@@ -101,13 +109,16 @@ class database:
     # DONE
     # AUCTION_DELETE
     #HP auction presence == True (check app-side)
-    def auction_delete(self,auction_id:UUID,mock_distro:bool,mock_tux:bool):
+    def auction_delete(self,auction_id:UUID,mock_check:bool):
         auction = self.db["auctions"].find_one({"auction_id":auction_id}) 
-        if not mock_distro:
-            #TODO return the bidded gacha
+        #TODO return the bidded gacha
+        if not mock_check:
+            
             pass
-        if (auction["current_winning_player_id"] is not None) and (not mock_tux):
-            #TODO return/unfreeze tux of current winning
+
+        #TODO return/unfreeze tux of current winning
+        if (not mock_check) and (auction["current_winning_player_id"] is not None):
+            
             pass
 
         self.db["auctions"].delete_one({"auction_id":auction_id})
@@ -129,8 +140,9 @@ class database:
 
     ##### BID #####
 
+    # DONE
     # BID
-    def bid(self,bid:Bid,mock_tux:bool):
+    def bid(self,bid:Bid,mock_check:bool):
         auction = self.db["auctions"].find_one({"auction_id":bid.auction_id,"active":True})
         if auction is None:
             raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
@@ -139,7 +151,7 @@ class database:
         if bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
         
-        if not mock_tux:
+        if not mock_check:
             #TODO restituire/unfreeze a quello che stava vincendo e prendere/unfreeze quello che vinceva
             pass
         
@@ -172,43 +184,19 @@ class database:
 
     ######### ADMIN #########
 
-
-    ##### AUCTION #####
-    
-    '''
-    # TODO a seconda del feedback degli altri
-    # AUCTION_MODIFY
-    def auction_modify(self,auction_id:UUID,auction_modifier:BidOptional):
-        
-        if auction_modifier.starting_price<0:raise HTTPException(status_code=400, detail="starting_price must be >=0")
-        if auction_modifier.current_winning_bid<0:raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
-        if auction_modifier.end_time<0:raise HTTPException(status_code=400, detail="end_time must be >= than current unix_time")
-
-        self.db["auctions"].update_one({"auction_id":auction_id},{"$set":auction_modifier})
-    '''
-    
     ##### BID #####
-    
-    '''
-    # TODO a seconda del feedback degli altri
-    # BID_MODIFY
-    def bid_modify(self,bid_id:UUID,bid_modifier:BidOptional):
-        if bid_modifier.bid<0:raise HTTPException(status_code=400, detail="starting_price must be >=0")
-        if bid_modifier.time<0:raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
-        
-        self.db["bid"].update_one({"auction_id":bid_id},{"$set":bid_modifier})
-    '''
+
 
     # DONE
     # BID_DELETE
-    def bid_delete(self,bid_id:UUID,mock_tux:bool):
+    def bid_delete(self,bid_id:UUID,mock_check:bool):
         bid = self.db["bids"].find_one({"bid_id":bid_id})
         auction = self.db["bids"].find_one({"bid_id":bid["auction_id"]})
 
         # bid was winning before deletion
         if (bid["player_id"]==auction["current_winning_player_id"]) and (bid["bid"]==auction["current_winning_bid"]):
             
-            if not mock_tux:
+            if not mock_check:
                 #TODO chiamare leo e restituire/unfreezare tux
                 pass
 

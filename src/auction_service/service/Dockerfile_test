@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
-CMD ["uvicorn", "app_test:tested_app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "app:test", "--host", "0.0.0.0", "--port", "9090","--ssl-keyfile=/run/secrets/app_key","--ssl-certfile=/run/secrets/app_cert"]

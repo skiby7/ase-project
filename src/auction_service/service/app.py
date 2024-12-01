@@ -16,6 +16,8 @@ unix_time = lambda: int(time.time())
 
 mock_check = None
 
+
+
 #dummy_player_id = "123e4567-e89b-12d3-a456-426614174000"
 
 app = FastAPI()
@@ -126,7 +128,7 @@ def player_endpoint(player_id:UUID,bid_filter:BidOptional,token_data: Annotated[
 # TODO Check if the player exists, maybe is done if gacha is available
 # AUCTION_CREATE
 @app.post("/auction/admin/auction-create", status_code=201)
-def player_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def admin_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check,token_data)
 
     db.auction_create(auction,mock_check)
@@ -145,7 +147,7 @@ def admin_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extr
 #DONE
 # AUCTION_FILTER
 @app.get("/auction/admin/auction-filter", status_code=200)
-def player_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def admin_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check,token_data)
 
     return db.auction_filter(auction_filter)
@@ -157,7 +159,7 @@ def player_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenDa
 # TODO Controllare che il player specificato nel bid esista
 # BID_CREATE
 @app.post("/auction/admin/bid", status_code=201)
-def player_endpoint(bid: Bid,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def admin_endpoint(bid: Bid,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check,token_data)
 
     db.bid(bid,mock_check)
@@ -169,12 +171,12 @@ def admin_endpoint(bid_id:UUID,token_data: Annotated[TokenData, Depends(extract_
     check_user(mock_check,token_data)
 
     db.bid_owner(bid_id)
-    db.bid_delete(bid_id)
+    db.bid_delete(bid_id,mock_check)
 
 
 # BID_FILTER
 @app.get("/auction/admin/bid-filter", status_code=200)
-def player_endpoint(bid_filter:BidOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def admin_endpoint(bid_filter:BidOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check,token_data)
 
     return db.bid_filter(bid_filter)
