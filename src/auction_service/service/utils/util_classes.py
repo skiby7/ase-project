@@ -23,11 +23,11 @@ class Auction(BaseModel):
 class AuctionOptional(BaseModel):
     player_id:Optional[UUID]
     gacha_id:Optional[UUID]
-    starting_price :Optional[UUID]
-    current_winning_player_id:Optional[UUID]
-    current_winning_bid:Optional[UUID]
-    end_time:Optional[UUID]
-    active:Optional[UUID]
+    starting_price:Optional[int]
+    current_winning_player_id:Optional[int]
+    current_winning_bid:Optional[int]
+    end_time:Optional[int]
+    active:Optional[bool]
 
 
 class Bid(BaseModel):

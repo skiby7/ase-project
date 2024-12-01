@@ -27,9 +27,9 @@ services:
       --tlsMode preferTLS
       --tlsCertificateKeyFile /run/secrets/cert_db
       --tlsCAFile /run/secrets/cert_db
-    # secrets:
-    #   - cert_db
-    #   - pw
+    secrets:
+      - cert_db
+      - pw
     tmpfs:
       - /data/db 
    

@@ -93,9 +93,9 @@ class database:
             if(not self.db["auctions"].find_one({"auction_id":id})):break
         
         auction={
-            "auction_id":id,
-            "player_id":auction.player_id,
-            "gacha_id":auction.gacha_id,
+            "auction_id":str(id),
+            "player_id":str(auction.player_id),
+            "gacha_id":str(auction.gacha_id),
             "starting_price":auction.starting_price,
             "current_winning_player_id":None,
             "current_winning_bid":0,
@@ -109,7 +109,7 @@ class database:
     # DONE
     # AUCTION_DELETE
     #HP auction presence == True (check app-side)
-    def auction_delete(self,auction_id:UUID,mock_check:bool):
+    def auction_delete(self,auction_id:str,mock_check:bool):
         auction = self.db["auctions"].find_one({"auction_id":auction_id}) 
         #TODO return the bidded gacha
         if not mock_check:
@@ -135,7 +135,12 @@ class database:
         if auction_filter.end_time is not None and auction_filter.end_time<0:
             raise HTTPException(status_code=400, detail="end_time must be >=0")
         
-        return list(self.db["auctions"].find(auction_filter.model_dump(),{"_id":0}))
+        filtered_dict = {
+            key: (str(value) if isinstance(value, UUID) else value)
+            for key, value in auction_filter.model_dump().items()
+            if value is not None
+        }
+        return list(self.db["auctions"].find(filtered_dict,{"_id":0}))
 
 
     ##### BID #####
@@ -143,10 +148,10 @@ class database:
     # DONE
     # BID
     def bid(self,bid:Bid,mock_check:bool):
-        auction = self.db["auctions"].find_one({"auction_id":bid.auction_id,"active":True})
+        auction = self.db["auctions"].find_one({"auction_id":str(bid.auction_id),"active":True})
         if auction is None:
             raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
-        if bid.auction_id == auction["player_id"]:
+        if str(bid.auction_id) == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
         if bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
@@ -156,7 +161,7 @@ class database:
             pass
         
         update={}
-        update["current_winning_player_id"]=bid.player_id
+        update["current_winning_player_id"]=str(bid.player_id)
         update["current_winning_bid"]=bid
         self.db["auctions"].update_one({},{"$set": update})
 
@@ -167,7 +172,6 @@ class database:
         bidInsert["bid_id"]=id
         bidInsert["time"]=unix_time()
         self.db["bids"].insert_one(bidInsert)
-        return 0
 
     # DONE
     # BID_FILTER
@@ -177,7 +181,12 @@ class database:
         if bid_filter.time is not None and bid_filter.time<0:
             raise HTTPException(status_code=400, detail="time must be >=0")
         
-        return self.db["bids"].find(bid_filter.model_dump(),{"_id":0})
+        filtered_dict = {
+            key: (str(value) if isinstance(value, UUID) else value)
+            for key, value in bid_filter.model_dump().items()
+            if value is not None
+        }
+        return self.db["bids"].find(filtered_dict,{"_id":0})
 
 
 
@@ -189,7 +198,7 @@ class database:
 
     # DONE
     # BID_DELETE
-    def bid_delete(self,bid_id:UUID,mock_check:bool):
+    def bid_delete(self,bid_id:str,mock_check:bool):
         bid = self.db["bids"].find_one({"bid_id":bid_id})
         auction = self.db["bids"].find_one({"bid_id":bid["auction_id"]})
 
@@ -275,13 +284,13 @@ class database:
     ######### SUPPORT #########
 
 
-    def auction_owner(self,auction_id:UUID):
+    def auction_owner(self,auction_id:str):
         owner = self.db["auctions"].find_one({"auction_id":auction_id},{"player_id":1})
         if owner is None:raise HTTPException(status_code=400, detail="No auction found with specified criteria")
         return owner["player_id"]
 
 
-    def bid_owner(self,bid_id:UUID):
+    def bid_owner(self,bid_id:str):
         owner = self.db["bids"].find_one({"bid_id":bid_id},{"bid_id":1})
         if owner is None:raise HTTPException(status_code=400, detail="No bid found with specified criteria")
         return owner["bid_id"]
