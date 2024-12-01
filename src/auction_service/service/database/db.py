@@ -6,6 +6,7 @@ import time
 from bson import binary
 from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,IdStrings
 from fastapi import Body, FastAPI, HTTPException
+from uuid import UUID
 unix_time = lambda: int(time.time())
 
 
@@ -67,11 +68,12 @@ class database:
 
     ##### AUCTION #####
     
-    #DONE
-    def auction_create(self,auction:Auction):
-        #control if gacha is already in bid
-        #da fare con simo
-        # if(not self.gacha_available(self,player_id,gacha_id)):return 1
+    # TODO a seconda del feedback degli altri
+    # AUCTION_CREATE
+    def auction_create(self,auction:Auction,mock_distro:bool):
+        #TODO controllare che ci sia almeno 1 gacha con gacha_id disponibile da simo
+        if not mock_distro:
+            pass
         if(auction.starting_price<0):
             raise HTTPException(status_code=400, detail="Invalid price")
         if(auction.end_time<unix_time()):
@@ -94,17 +96,26 @@ class database:
             }
 
         self.db["auctions"].insert_one(auction)
-        return 0
 
-
-    def auction_delete(self,auction_id,mock_distro):
-        #return the bidded gacha
+    
+    # DONE
+    # AUCTION_DELETE
+    #HP auction presence == True (check app-side)
+    def auction_delete(self,auction_id:UUID,mock_distro:bool,mock_tux:bool):
+        auction = self.db["auctions"].find_one({"auction_id":auction_id}) 
         if not mock_distro:
+            #TODO return the bidded gacha
+            pass
+        if (auction["current_winning_player_id"] is not None) and (not mock_tux):
+            #TODO return/unfreeze tux of current winning
             pass
 
-        return self.db["auctions"].delete_one({"player_id":player_id,"auction_id":auction_id})
-        
-    #DONE
+        self.db["auctions"].delete_one({"auction_id":auction_id})
+        self.db["bids"].delete_many({"auction_id":auction_id})
+
+
+    # DONE
+    # AUCTION_FILTER
     def auction_filter(self,auction_filter:AuctionOptional):
         if auction_filter.starting_price is not None and auction_filter.starting_price<0:
             raise HTTPException(status_code=400, detail="starting_price must be >=0")
@@ -113,24 +124,23 @@ class database:
         if auction_filter.end_time is not None and auction_filter.end_time<0:
             raise HTTPException(status_code=400, detail="end_time must be >=0")
         
-        return self.db["auctions"].find(auction_filter.model_dump(),{"_id":0})
+        return list(self.db["auctions"].find(auction_filter.model_dump(),{"_id":0}))
 
 
     ##### BID #####
 
-    #DONE
-    def bid(self,bid:Bid,mock_tux):
+    # BID
+    def bid(self,bid:Bid,mock_tux:bool):
         auction = self.db["auctions"].find_one({"auction_id":bid.auction_id,"active":True})
         if auction is None:
-            raise HTTPException(status_code=400, detail="Auction does not exist")
+            raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
         if bid.auction_id == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
         if bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
         
         if not mock_tux:
-            #restituire i soldi al player che stava vincendo 
-            # e prendere quello che ha biddato
+            #TODO restituire/unfreeze a quello che stava vincendo e prendere/unfreeze quello che vinceva
             pass
         
         update={}
@@ -147,7 +157,8 @@ class database:
         self.db["bids"].insert_one(bidInsert)
         return 0
 
-    #DONE
+    # DONE
+    # BID_FILTER
     def bid_filter(self,bid_filter:BidOptional):
         if bid_filter.bid is not None and bid_filter.bid<0:
             raise HTTPException(status_code=400, detail="bid must be >=0")
@@ -164,25 +175,71 @@ class database:
 
     ##### AUCTION #####
     
-    def auction_modify(self,auction_id,auction_modifier):
-        #scoprire come rimuovere campi a None dal modifier
-        self.db["auctions"].update_one({"auction_id":auction["auction_id"]},{"$set":auction})
+    '''
+    # TODO a seconda del feedback degli altri
+    # AUCTION_MODIFY
+    def auction_modify(self,auction_id:UUID,auction_modifier:BidOptional):
         
+        if auction_modifier.starting_price<0:raise HTTPException(status_code=400, detail="starting_price must be >=0")
+        if auction_modifier.current_winning_bid<0:raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
+        if auction_modifier.end_time<0:raise HTTPException(status_code=400, detail="end_time must be >= than current unix_time")
+
+        self.db["auctions"].update_one({"auction_id":auction_id},{"$set":auction_modifier})
+    '''
     
     ##### BID #####
-    #TODO bid_delete  (ricordarsi di fare il fallback sul bet minore),e tutto il resto
-    #per entrambi
     
+    '''
+    # TODO a seconda del feedback degli altri
     # BID_MODIFY
-    def bid_modify(self,bid):
-        #self.db["bid"].update_one({"auction_id":bid["auction_id"],"player_id":bid["player_id"]},{"$set":bid})
+    def bid_modify(self,bid_id:UUID,bid_modifier:BidOptional):
+        if bid_modifier.bid<0:raise HTTPException(status_code=400, detail="starting_price must be >=0")
+        if bid_modifier.time<0:raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
+        
+        self.db["bid"].update_one({"auction_id":bid_id},{"$set":bid_modifier})
+    '''
 
-
+    # DONE
     # BID_DELETE
-    def bid_delete(self,bid_id):
-        return self.db["bids"].delete_one({"bid_id":bid["bid_id"]})
+    def bid_delete(self,bid_id:UUID,mock_tux:bool):
+        bid = self.db["bids"].find_one({"bid_id":bid_id})
+        auction = self.db["bids"].find_one({"bid_id":bid["auction_id"]})
+
+        # bid was winning before deletion
+        if (bid["player_id"]==auction["current_winning_player_id"]) and (bid["bid"]==auction["current_winning_bid"]):
+            
+            if not mock_tux:
+                #TODO chiamare leo e restituire/unfreezare tux
+                pass
+
+            next_highest_bid = self.db["bids"].find_one({"auction_id": bid["auction_id"]},sort=[("bid", -1)])
+            if next_highest_bid:
+                # update auction
+                self.db["auctions"].update_one(
+                    {"auction_id": auction["auction_id"]},
+                    {
+                        "$set": {
+                            "current_winning_player_id": next_highest_bid["player_id"],
+                            "current_winning_bid": next_highest_bid["bid"]
+                        }
+                    }
+                )
+            else:
+                # reset winning
+                self.db["auctions"].update_one(
+                    {"auction_id": auction["auction_id"]},
+                    {
+                        "$set": {
+                            "current_winning_player_id": None,
+                            "current_winning_bid": 0
+                        }
+                    }
+                )
+        
+        self.db["bids"].delete_one({"bid_id":bid_id})
         
 
+    # DONE
     # MARKET_ACTIVITY
     def market_activity(self):
         twenty_four_hours_ago = unix_time() - 86400
@@ -227,21 +284,20 @@ class database:
         return {"avg": avg_bid, "count": total_bids, "bids": auctions}
 
 
+    ######### SUPPORT #########
 
 
-    #SUPPORT
-    
-    def auction_user_presence(self,player_id:str):
-        return False if (self.db["auctions"].find_one({"player_id":player_id}) is None) else True 
-    
+    def auction_owner(self,auction_id:UUID):
+        owner = self.db["auctions"].find_one({"auction_id":auction_id},{"player_id":1})
+        if owner is None:raise HTTPException(status_code=400, detail="No auction found with specified criteria")
+        return owner["player_id"]
 
-    def auction_presence(self,auction_id:str):
-        return False if (self.db["auctions"].find_one({"auction_id":auction_id}) is None) else True 
 
-    def bid_user_presence(self,bid_id:str):
-        return False if (self.db["bids"].find_one({"bid_id":bid_id}) is None) else True 
-    
-    #TODO FARE 2 FUZNIONI SUPPORT PER DELETE CERCARE SE AUCTION E BID APPARTENGONO A PLAYER SPECIFICATO
+    def bid_owner(self,bid_id:UUID):
+        owner = self.db["bids"].find_one({"bid_id":bid_id},{"bid_id":1})
+        if owner is None:raise HTTPException(status_code=400, detail="No bid found with specified criteria")
+        return owner["bid_id"]
+
 
 
 
