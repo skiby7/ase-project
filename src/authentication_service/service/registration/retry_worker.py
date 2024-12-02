@@ -10,7 +10,7 @@ def retry_delete_operation(url: str, uid: str, access_token: str, max_retry=5, a
             return
         else:
             logger.error(f"Retry failed: {url} returned {response.status_code} on attempt {attempt}")
-    except (requests.RequestException, ConnectionError):
+    except (requests.RequestException, ConnectionError) as e:
         logger.error(f"Delete retry exception: {url}/{uid} - {e} on attempt {attempt}")
     if attempt >= max_retry:
         logger.error(f"Exceeded retry attempts for {url}/{uid}. Compensation needed.")
