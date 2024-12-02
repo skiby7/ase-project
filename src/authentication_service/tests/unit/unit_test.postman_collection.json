@@ -88,6 +88,166 @@
 										"type": "text/javascript",
 										"packages": {}
 									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "User login scope openid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response contains id_token and token_type\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property('id_token');",
+											"    ",
+											"    pm.expect(responseJson.token_type.toLowerCase()).to.eql('bearer');",
+											"});",
+											"",
+											"pm.test(\"Decoded JWT contains required fields\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(require('atob')(base64Url));",
+											"    ",
+											"    pm.expect(decodedPayload).to.have.property('sub'); // ID dell'utente",
+											"    pm.expect(decodedPayload).to.have.property('iss'); // Issuer (emittente)",
+											"    pm.expect(decodedPayload).to.have.property('aud'); // Audience (destinatario)",
+											"    pm.expect(decodedPayload).to.have.property('exp'); // Scadenza",
+											"    pm.expect(decodedPayload).to.have.property('iat'); // Tempo di emissione",
+											"});",
+											"",
+											"pm.test(\"sub field matches user_uid variable\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    const user_uid = pm.variables.get(\"user_uid\");",
+											"",
+											"    pm.expect(decodedPayload.sub).to.eql(user_uid);",
+											"});",
+											"",
+											"pm.test(\"Decoded JWT contains valid field values\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    pm.expect(decodedPayload.iss).to.be.a('string').and.not.empty;",
+											"    pm.expect(decodedPayload.aud).to.be.a('string').and.not.empty;",
+											"    pm.expect(decodedPayload.exp).to.be.a('number');",
+											"    pm.expect(decodedPayload.iat).to.be.a('number');",
+											"});",
+											"",
+											"pm.test(\"Token expiration is in the future\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    const currentTime = Math.floor(Date.now() / 1000); ",
+											"    pm.expect(decodedPayload.exp).to.be.above(currentTime);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
 								}
 							],
 							"request": {
@@ -152,10 +312,9 @@
 											"type": "text"
 										},
 										{
-											"key": "",
-											"value": "",
-											"type": "text",
-											"disabled": true
+											"key": "scope",
+											"value": "openid",
+											"type": "text"
 										}
 									]
 								},
@@ -975,7 +1134,7 @@
 											"    pm.response.to.have.status(409);",
 											"    const responseJson = pm.response.json();",
 											"    pm.expect(responseJson).to.have.property('detail');",
-											"    pm.expect(responseJson.detail).to.have.string(\"Username already in use\");",
+											"    pm.expect(responseJson.detail).to.have.string(\"Email or username already in use\");",
 											"})",
 											""
 										],
@@ -1037,6 +1196,13 @@
 										],
 										"type": "text/javascript",
 										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
 									}
 								}
 							],
@@ -1133,6 +1299,13 @@
 										],
 										"type": "text/javascript",
 										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
 									}
 								}
 							],
@@ -1292,7 +1465,7 @@
 											"    pm.response.to.have.status(409);",
 											"    const responseJson = pm.response.json();",
 											"    pm.expect(responseJson).to.have.property('detail');",
-											"    pm.expect(responseJson.detail).to.have.string('Username already in use');",
+											"    pm.expect(responseJson.detail).to.have.string(\"Email or username already in use\");",
 											"});",
 											""
 										],
@@ -1580,6 +1753,9 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -1593,6 +1769,15 @@
 								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/admin/auth/accounts",
 									"host": [
@@ -1637,6 +1822,9 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -1650,6 +1838,15 @@
 								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/auth/accounts/xxx",
 									"host": [
@@ -1707,6 +1904,15 @@
 								},
 								"method": "DELETE",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/auth/accounts/yyy",
 									"host": [
@@ -1761,6 +1967,15 @@
 								},
 								"method": "DELETE",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
 									"host": [
@@ -1973,6 +2188,9 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -1986,6 +2204,15 @@
 								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/admin/auth/accounts",
 									"host": [
@@ -2031,6 +2258,9 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -2044,6 +2274,15 @@
 								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/admin/auth/accounts/{{user_uid}}",
 									"host": [
@@ -2229,6 +2468,15 @@
 								},
 								"method": "DELETE",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
 									"host": [
@@ -2249,6 +2497,103 @@
 				{
 					"name": "Failure tests",
 					"item": [
+						{
+							"name": "Admin login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New acocunt is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "{{admin_username}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{admin_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
 						{
 							"name": "Retrieve non-existing account",
 							"event": [
@@ -2278,6 +2623,9 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -2291,6 +2639,15 @@
 								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{base_url}}/admin/auth/accounts/yyy",
 									"host": [
@@ -2415,6 +2772,73 @@
 									]
 								},
 								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"new_email@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete of non existing account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Account not found\", () => {",
+											"    pm.response.to.have.status(404);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Account not found');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
 								"header": [],
 								"body": {
 									"mode": "raw",

@@ -22,3 +22,43 @@ def get_config_from_file(script_path, logger):
         log_l = "debug"
     logger.info("Starting v1.0.0")
     return http_port, log_l
+
+
+def get_log_config():
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            },
+        },
+        "handlers": {
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": "./service.log",
+                "formatter": "default",
+            },
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "default",
+            },
+        },
+        "loggers": {
+            "uvicorn": {
+                "level": "INFO",
+                "handlers": ["file", "console"],
+                "propagate": False,
+            },
+            "uvicorn.error": {
+                "level": "INFO",
+                "handlers": ["file", "console"],
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "level": "INFO",
+                "handlers": ["file", "console"],
+                "propagate": False,
+            },
+        },
+    }
