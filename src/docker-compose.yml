@@ -86,7 +86,7 @@ services:
         build:
             context: ./tux_service/service
         environment:
-            - DATABASE_ENGINE=postgresql://
+            - DATABASE_SCHEMA=postgresql://
             - DATABASE_IP=tux_db
             - DATABASE_PORT=5432
         secrets:

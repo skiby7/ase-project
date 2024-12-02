@@ -16,7 +16,19 @@ unix_time = lambda: int(time.time())
 
 logger = getLogger("uvicorn.error")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+
+DATABASE_IP = os.getenv("DATABASE_IP")
+DATABASE_PORT = os.getenv("DATABASE_PORT")
+DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
+with open("/run/secrets/tux_db_user") as f:
+    DATABASE_USER = f.read().strip("\n").strip()
+
+with open("/run/secrets/tux_db_password") as f:
+    DATABASE_PASSWORD = f.read().strip("\n").strip()
+
+DATABASE_URL = f"{DATABASE_SCHEMA}{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_IP}:{DATABASE_PORT}"
+
+
 TEST_RUN = os.getenv("TEST_RUN", "false") == "true"
 if TEST_RUN:
     import subprocess
