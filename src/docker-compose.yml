@@ -144,8 +144,8 @@ services:
     admin_nginx:
         container_name: admin_nginx
         image: nginx:latest
-        environment:
-            - NGINX_PORT=80
+        # environment:
+        #     - NGINX_PORT=80
         volumes:
             - ${PWD}/gateways/admin/nginx:/etc/nginx/conf.d
         ports:
