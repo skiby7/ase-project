@@ -1,8 +1,11 @@
 FROM python:3.12-slim
-WORKDIR /code/service
-RUN apt-get update -y && apt-get install -y build-essential
-COPY ./requirements.txt /code/requirements.txt
+
+WORKDIR /app
+
 COPY . .
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-EXPOSE 9092
-CMD ["python3", "-u", "main.py"]
+
+RUN pip install -r requirements.txt
+
+EXPOSE 9190
+
+CMD ["uvicorn", "app:test", "--host", "0.0.0.0", "--port", "9190","--ssl-keyfile=/run/secrets/key","--ssl-certfile=/run/secrets/cert"]
