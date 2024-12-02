@@ -191,10 +191,10 @@ class database:
             return None
         gachas.delete_one({"name": name})
 
-        #users = self.db["users"]
-        #user_list = list(users.find())
-        #for user in user_list:
-        #    self.remove_user_gacha(user["id"], name)
+        users = self.db["users"]
+        user_list = list(users.find())
+        for user in user_list:
+            self.remove_user_gacha(user["id"], name)
 
         return {"name" : name}
 
