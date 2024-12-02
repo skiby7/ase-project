@@ -4,7 +4,7 @@ services:
             context: service
             dockerfile: Dockerfile
         depends_on:
-            - db
+            - gacha_db
         ports:
             - 9190:9190
         secrets:
@@ -14,7 +14,7 @@ services:
             - jwt_private_key
             - jwt_public_key
 
-    db:
+    gacha_db:
         image: mongo:latest
         ports:
             - "27017:27017"
