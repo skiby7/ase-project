@@ -10,7 +10,7 @@ permissions:
     contents: read
 
 jobs:
-    lint_and_python_setup:
+    lint:
         runs-on: ubuntu-latest
         outputs:
             lint-success: ${{ steps.lint.outcome }}
