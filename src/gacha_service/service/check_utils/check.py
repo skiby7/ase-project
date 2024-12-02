@@ -22,7 +22,7 @@ def check_user(mock_check: bool,token_data: TokenData):
     if mock_check:
         return True 
     else:
-        if token_data.role  == "user":
+        if token_data.role == "user":
             return True
         else: 
             return False
@@ -31,7 +31,7 @@ def check_admin(mock_check: bool,token_data: TokenData):
     if mock_check:
         return True 
     else:
-        if token_data.role  == "admin":
+        if token_data.role == "admin":
             return True
         else: 
             return False

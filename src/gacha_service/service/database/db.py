@@ -190,6 +190,7 @@ class database:
         if not gacha:
             return None
         gachas.delete_one({"name": name})
+        #TODO: remove gacha inside the user colleciton
         return {"name" : name}
     
     def add_user(self, id: str):
