@@ -61,8 +61,7 @@ def create_user_balance(session, starting_fiat_balance: float, user_id: str):
 @transactional
 def delete_user_balance(session, user_id: str):
     to_delete = session.query(UserBalance).filter_by(user_id=user_id).first()
-    if not to_delete:
-        raise UserNotFound(f"Cannot find {user_id}")
+    if not to_delete: return
 
     session.delete(to_delete)
 

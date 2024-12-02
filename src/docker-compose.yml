@@ -1,11 +1,47 @@
+services:
+    auction:
+        restart: always
+        build:
+            context: ./auction_service/service
+        networks:
+            - gacha_network
+
+    authentication:
+        restart: always
+        build:
+            context: ./authentication_service/service
+        networks:
+            - gacha_network
+
+    gacha-roll:
+        restart: always
+        build:
+            context: ./gacha_service/service
+        networks:
+            - gacha_network
+
+    payment:
+        restart: always
+        build:
+            context: ./tux_service/service
+        networks:
+            - gacha_network
+
+    user:
+        restart: always
+        build:
+            context: ./user_service/service
+        networks:
+            - gacha_network
+
 include:
     - path:
-      - authentication_service/docker-compose.yml
-      - gacha_service/docker-compose.yml
-      - payment_service/docker-compose.yml
-      - auction_service/docker-compose.yml
-      - gateways/public/docker-compose.yml
-      - gateways/admin/docker-compose.yml
+          - authentication_service/docker-compose.yml
+          - gacha_service/docker-compose.yml
+          - payment_service/docker-compose.yml
+          - auction_service/docker-compose.yml
+          - gateways/public/docker-compose.yml
+          - gateways/admin/docker-compose.yml
 
 networks:
     gacha_public_network:
