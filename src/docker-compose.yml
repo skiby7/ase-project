@@ -155,6 +155,10 @@ services:
             - ssl_admin_api_key
         networks:
             - gacha_private_network
+        depends_on:
+            - authentication
+            - distro
+            - tux_service
 
     public_nginx:
         container_name: public_nginx
@@ -168,6 +172,10 @@ services:
             - ssl_public_api_key
         networks:
             - gacha_public_network
+        depends_on:
+            - authentication
+            - distro
+            - tux_service
 
 volumes:
     auth_db_data:
