@@ -7,13 +7,10 @@ from auth.access_token_utils import TokenData
 from gacha_utils.gacha import Gacha
 from check_utils.check import check_tux,check_user,check_admin
 from user_utils.user import User
+from user_utils.add_user import Add_user
 
-#TODO: SANITIZE ALL INPUT
 mock_check: bool = None
 mock_id: bool = None
-
-# token_data: Annotated[TokenData, Depends(extract_access_token)]
-# prendere cert
 
 app = FastAPI()
 db = database("utils/distros.json")
@@ -120,19 +117,19 @@ def user_gacha(gacha: Gacha, token_data: Annotated[TokenData, Depends(extract_ac
         return res 
 
 # Add user
-@app.post("/admin/add/{id}", status_code=200)
-def user_gacha(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+@app.post("/admin/users", status_code=200)
+def user_gacha(user: Add_user, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.add_user(id)
+        res = db.add_user(user.uid)
         if not res:
             raise HTTPException(status_code=400, detail="User already Present")
         else: 
             return res
 
 # Delete user
-@app.delete("/admin/delete/{id}", status_code=200)
+@app.delete("/admin/users/{id}", status_code=200)
 def user_gacha(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")

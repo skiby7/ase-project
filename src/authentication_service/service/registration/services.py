@@ -78,7 +78,6 @@ def create_account(email: str, username: str, password: str, role: str) -> Accou
     logger.info(f"Account created: {account}")
     return account
 
-
 def change_password(uid_account: str, old_pass: str, new_pass: str):
     validate_new_password(new_pass)
     account_DB: Account | None = get_account_db_by_uid(uid_account)

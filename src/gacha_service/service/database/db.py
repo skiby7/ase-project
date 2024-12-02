@@ -189,13 +189,13 @@ class database:
         gacha = gachas.find_one({"name": name})
         if not gacha:
             return None
+
+        users = self.db["users"]
+        user_list = list(users.find())
+        for user in user_list:
+            self.remove_user_gacha(user["id"], name)
+
         gachas.delete_one({"name": name})
-
-        #users = self.db["users"]
-        #user_list = list(users.find())
-        #for user in user_list:
-        #    self.remove_user_gacha(user["id"], name)
-
         return {"name" : name}
 
     def add_user(self, id: str):
