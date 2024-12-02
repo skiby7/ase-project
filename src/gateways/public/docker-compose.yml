@@ -1,0 +1,24 @@
+services:
+    public_nginx:
+        container_name: public_nginx
+        image: nginx:latest
+        volumes:
+            - ${PWD}/gateways/public/nginx:/etc/nginx/conf.d
+        ports:
+            - "8080:443"
+        secrets:
+            - ssl_public_api_cert
+            - ssl_public_api_key
+        networks:
+            - gacha_public_network
+
+secrets:
+    ssl_public_api_key:
+        file: secrets/key.key
+    ssl_public_api_cert:
+        file: secrets/cert.crt
+networks:
+    gacha_public_network:
+        driver: bridge
+    gacha_private_network:
+        driver: bridge

@@ -34,6 +34,17 @@ services:
         networks:
             - gacha_network
 
+include:
+    - path:
+          - authentication_service/docker-compose.yml
+          - gacha_service/docker-compose.yml
+          - payment_service/docker-compose.yml
+          - auction_service/docker-compose.yml
+          - gateways/public/docker-compose.yml
+          - gateways/admin/docker-compose.yml
+
 networks:
-    gacha_network:
+    gacha_public_network:
+        driver: bridge
+    gacha_private_network:
         driver: bridge
