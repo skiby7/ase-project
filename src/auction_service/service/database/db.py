@@ -80,6 +80,7 @@ class database:
     # AUCTION_CREATE
     def auction_create(self,auction:Auction,mock_check:bool):
         #TODO controllare che ci sia almeno 1 gacha con gacha_id disponibile da simo
+        #TODO controllare che il player esista
         if not mock_check:
             pass
         if(auction.starting_price<0):
@@ -87,11 +88,13 @@ class database:
         if(auction.end_time<unix_time()):
             raise HTTPException(status_code=400, detail="Invalid time")
         
-
-        while(True):
-            id=str(uuid.uuid4())
-            if(not self.db["auctions"].find_one({"auction_id":id})):break
-        
+        if mock_check:
+            id=str(UUID("00000000-0000-4000-8000-000000000000"))
+        else:
+            while(True):
+                id=str(uuid.uuid4())
+                if(not self.db["auctions"].find_one({"auction_id":id})):break
+            
         auction={
             "auction_id":str(id),
             "player_id":str(auction.player_id),
@@ -151,9 +154,9 @@ class database:
         auction = self.db["auctions"].find_one({"auction_id":str(bid.auction_id),"active":True})
         if auction is None:
             raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
-        if str(bid.auction_id) == auction["player_id"]:
+        if str(bid.player_id) == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
-        if bid <= auction["current_winning_bid"]:
+        if bid.bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
         
         if not mock_check:
@@ -162,15 +165,23 @@ class database:
         
         update={}
         update["current_winning_player_id"]=str(bid.player_id)
-        update["current_winning_bid"]=bid
+        update["current_winning_bid"]=bid.bid
         self.db["auctions"].update_one({},{"$set": update})
 
         bidInsert = bid.model_dump()
-        while(True):
-            id=str(uuid.uuid4())
-            if(not self.db["bids"].find_one({"bid_id":id})):break
+        if mock_check:
+            id=str(UUID("00000000-0000-4000-8000-000000000000"))
+        else:
+            while(True):
+                id=str(uuid.uuid4())
+                if(not self.db["auctions"].find_one({"auction_id":id})):break
         bidInsert["bid_id"]=id
         bidInsert["time"]=unix_time()
+        bidInsert = {
+            key: (str(value) if isinstance(value, UUID) else value)
+            for key, value in bidInsert.items()
+        }
+        
         self.db["bids"].insert_one(bidInsert)
 
     # DONE
@@ -186,7 +197,8 @@ class database:
             for key, value in bid_filter.model_dump().items()
             if value is not None
         }
-        return self.db["bids"].find(filtered_dict,{"_id":0})
+        print("caiao",filtered_dict,type(filtered_dict))
+        return list(self.db["bids"].find(filtered_dict,{"_id":0}))
 
 
 
@@ -278,7 +290,7 @@ class database:
         total_bids = count[0]["total_bids"] if count else 0
 
         # Return the results
-        return {"avg": avg_bid, "count": total_bids, "bids": auctions}
+        return {"avg": avg_bid, "count": total_bids, "bids": list(auctions)}
 
 
     ######### SUPPORT #########

@@ -45,6 +45,84 @@ scheduler.start()
 
 # HP for every endpoint: ENDPOINT_NAME - HP IN WHICH IT WORKS
 
+
+
+
+
+######### ADMIN #########
+
+
+##### AUCTION #####
+
+
+# TODO Check if the player exists, maybe is done if gacha is available
+# AUCTION_CREATE
+@app.post("/auction/admin/auction-create", status_code=201)
+def admin_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    print("ciaoooo")
+    check_admin(mock_check,token_data)
+
+    db.auction_create(auction,mock_check)
+
+
+# DONE
+# AUCTION_DELETE
+@app.delete("/auction/admin/auction-delete", status_code=200)
+def admin_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_admin(mock_check,token_data)
+    
+    db.auction_owner(str(auction_id))
+    db.auction_delete(str(auction_id),mock_check)
+
+
+#DONE
+# AUCTION_FILTER
+@app.get("/auction/admin/auction-filter", status_code=200)
+def admin_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_admin(mock_check,token_data)
+
+    return db.auction_filter(auction_filter)
+
+
+##### BID #####
+
+
+# TODO Controllare che il player specificato nel bid esista
+# BID_CREATE
+@app.post("/auction/admin/bid", status_code=201)
+def admin_endpoint(bid: Bid,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_admin(mock_check,token_data)
+
+    db.bid(bid,mock_check)
+
+
+# BID_DELETE
+@app.delete("/auction/admin/bid-delete", status_code=201)
+def admin_endpoint(bid_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_user(mock_check,token_data)
+
+    db.bid_owner(bid_id)
+    db.bid_delete(str(bid_id),mock_check)
+
+
+# BID_FILTER
+@app.get("/auction/admin/bid-filter", status_code=200)
+def admin_endpoint(bid_filter:BidOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_admin(mock_check,token_data)
+
+    return db.bid_filter(bid_filter)
+
+
+# MARKET_ACTIVITY
+@app.get("/auction/admin/market-activity", status_code=200)
+def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_admin(mock_check,token_data)
+
+    return db.market_activity()
+
+
+
+
 ######### PLAYER #########
 # HP player can only create and delete auctions (fair for bidders)
 # HP player cannot modify created auctions (fair for bidders)
@@ -116,76 +194,3 @@ def player_endpoint(player_id:UUID,bid_filter:BidOptional,token_data: Annotated[
     
     #extract player id
     return db.bid_filter(bid_filter)
-
-
-
-
-######### ADMIN #########
-
-
-##### AUCTION #####
-
-
-# TODO Check if the player exists, maybe is done if gacha is available
-# AUCTION_CREATE
-@app.post("/auction/admin/auction-create", status_code=201)
-def admin_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-
-    db.auction_create(auction,mock_check)
-
-
-# DONE
-# AUCTION_DELETE
-@app.delete("/auction/admin/auction-delete", status_code=200)
-def admin_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-    
-    db.auction_owner(auction_id)
-    db.auction_delete(str(auction_id),mock_check)
-
-
-#DONE
-# AUCTION_FILTER
-@app.get("/auction/admin/auction-filter", status_code=200)
-def admin_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-
-    return db.auction_filter(auction_filter)
-
-
-##### BID #####
-
-
-# TODO Controllare che il player specificato nel bid esista
-# BID_CREATE
-@app.post("/auction/admin/bid", status_code=201)
-def admin_endpoint(bid: Bid,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-
-    db.bid(bid,mock_check)
-
-
-# BID_DELETE
-@app.delete("/auction/admin/bid-delete", status_code=201)
-def admin_endpoint(bid_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_user(mock_check,token_data)
-
-    db.bid_owner(bid_id)
-    db.bid_delete(str(bid_id),mock_check)
-
-
-# BID_FILTER
-@app.get("/auction/admin/bid-filter", status_code=200)
-def admin_endpoint(bid_filter:BidOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-
-    return db.bid_filter(bid_filter)
-
-
-# MARKET_ACTIVITY
-@app.get("/auction/admin/market-activity", status_code=200)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check,token_data)
-
-    return db.market_activity()
