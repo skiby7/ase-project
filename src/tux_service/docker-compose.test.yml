@@ -1,0 +1,51 @@
+services:
+    tux_service:
+        container_name: tux_service
+        restart: no
+        build:
+            context: ./service
+        environment:
+            - TEST_RUN=true
+        ports:
+            - 9390:9090
+        secrets:
+            - jwt_public_key
+            - ssl_private_key
+            - ssl_cert
+        networks:
+            - gacha_network
+
+    newman:
+        image: postman/newman:latest
+        container_name: tux_service_tests
+        restart: no
+        depends_on:
+            - tux_service
+        entrypoint:
+            [
+                "newman",
+                "run",
+                "/etc/postman/TuxServiceTests.postman_collection.json",
+                "--environment",
+                "/etc/postman/TuxServiceEnv.postman_environment.json",
+                "--delay-request",
+                "100",
+                "--insecure",
+                "--reporters",
+                "cli",
+            ]
+        volumes:
+            - ./tests/unit:/etc/postman
+        networks:
+            - gacha_network
+secrets:
+    jwt_public_key:
+        file: ./service/secrets/public.pem
+    ssl_private_key:
+        file: ./service/secrets/key.pem
+    ssl_cert:
+        file: ./service/secrets/cert.pem
+
+networks:
+    gacha_network:
+        driver: bridge

@@ -1,0 +1,73 @@
+services:
+    tux_service:
+        container_name: tux_service
+        restart: unless-stopped
+        build:
+            context: ./service
+        environment:
+            - DATABASE_URL=postgresql://postgres@tux_db:5432/
+        ports:
+            - 9390:9090
+        secrets:
+            - jwt_public_key
+            - ssl_private_key
+            - ssl_cert
+        depends_on:
+            tux_db:
+                condition: service_healthy
+        networks:
+            - gacha_network
+
+    tux_db:
+        container_name: tux_db
+        image: postgres
+        restart: always
+        shm_size: 128mb
+        volumes:
+            - ./postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        secrets:
+            - db_password
+        networks:
+            - gacha_network
+
+    pgadmin:
+        container_name: pgadmin
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@admin.org
+            PGADMIN_DEFAULT_PASSWORD: admin
+            PGADMIN_CONFIG_SERVER_MODE: "False"
+        volumes:
+            - ./pgadmin:/var/lib/pgadmin
+        ports:
+            - 5050:80
+        networks:
+            - gacha_network
+        restart: unless-stopped
+
+secrets:
+    jwt_public_key:
+        file: ./service/secrets/public.pem
+    pgadmin_password:
+        file: ./service/secrets/pgadmin_password
+    db_password:
+        file: ./service/secrets/db_password
+    ssl_private_key:
+        file: ./service/secrets/key.pem
+    ssl_cert:
+        file: ./service/secrets/cert.pem
+    # ssl_mongo_cert_key:
+    #     file: ./service/secrets/mongo_cert_key.pem
+    # mongodb_password:
+    #     file: ./service/secrets/mongo_root_password
+
+networks:
+    gacha_network:
+        driver: bridge
