@@ -38,8 +38,8 @@ include:
     - path:
           - authentication_service/docker-compose.yml
           - gacha_service/docker-compose.yml
-          - payment_service/docker-compose.yml
-          - auction_service/docker-compose.yml
+          - tux_service/docker-compose.yml
+          # - auction_service/docker-compose.yml
           - gateways/public/docker-compose.yml
           - gateways/admin/docker-compose.yml
 
