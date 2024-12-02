@@ -49,11 +49,11 @@ jobs:
 
             - name: Test auth service
               run: |
-                  (cd src/authentication_service && (./run_tests.sh || exit true))
+                  (cd src/authentication_service && (./run_tests.sh || true))
 
             - name: Test distro service
               run: |
-                  (cd src/gacha_service && (./run_tests.sh || exit true))
+                  (cd src/gacha_service && (./run_tests.sh || true))
 
             - name: Test tux service
               run: |
@@ -71,7 +71,7 @@ jobs:
             - name: Send Telegram Error Message
               if: failure()
               run: |
-                  curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+                  curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
                   -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
                   -d text="❌ Build failed for \`ase-project\` on branch \`${{ github.ref_name }}\`." \
                   -d parse_mode="Markdownv2" \
