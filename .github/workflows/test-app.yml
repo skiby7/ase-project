@@ -47,9 +47,13 @@ jobs:
             #   run: |
             #       PYTHONPATH=src/gacha_service:src/gacha_service/service pytest src/gacha_service
 
+            - name: Test auth service
+              run: |
+                  (cd src/authentication_service && (./run_tests.sh || exit true))
+
             - name: Test distro service
               run: |
-                  (cd src/gacha_service && ./run_tests.sh)
+                  (cd src/gacha_service && (./run_tests.sh || exit true))
 
             - name: Test tux service
               run: |

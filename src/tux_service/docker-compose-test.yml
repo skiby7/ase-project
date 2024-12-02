@@ -2,6 +2,12 @@ services:
     tux_service:
         container_name: tux_service
         restart: no
+        healthcheck:
+            test: curl --silent --fail --insecure https://localhost:9090/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
         build:
             context: ./service
         environment:
@@ -18,7 +24,8 @@ services:
         container_name: tux_service_tests
         restart: no
         depends_on:
-            - tux_service
+            tux_service:
+                condition: service_healthy
         entrypoint:
             [
                 "newman",

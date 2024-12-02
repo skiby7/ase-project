@@ -3,6 +3,12 @@ services:
         build:
             context: service
             dockerfile: Dockerfile_test
+        healthcheck:
+            test: curl --silent --fail --insecure https://localhost:9090/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
         depends_on:
             - gacha_db
         ports:
@@ -42,7 +48,8 @@ services:
         container_name: distro_service_tests
         restart: no
         depends_on:
-            - distro
+            distro:
+                condition: service_healthy
         entrypoint:
             [
                 "newman",
