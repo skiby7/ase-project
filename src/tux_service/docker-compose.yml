@@ -7,7 +7,7 @@ services:
         environment:
             - DATABASE_URL=postgresql://postgres@tux_db:5432/
         ports:
-            - 9390:9090
+            - 9290:9290
         secrets:
             - jwt_public_key
             - ssl_private_key
