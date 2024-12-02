@@ -2,7 +2,8 @@ FROM python:3.12-alpine
 
 WORKDIR /app
 RUN apk add curl
-RUN pip install -r requirements.txt
+COPY ./requirements.txt /tmp
+RUN pip install -r /tmp/requirements.txt
 COPY . .
 EXPOSE 9190
 

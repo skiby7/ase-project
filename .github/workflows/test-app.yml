@@ -49,7 +49,7 @@ jobs:
 
             - name: Test auth service
               run: |
-                  (cd src/authentication_service && (./run_tests.sh || true))
+                  (cd src/authentication_service && ./run_tests.sh)
 
             - name: Test distro service
               run: |
