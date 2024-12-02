@@ -49,6 +49,10 @@ jobs:
 
             - name: Test tux service
               run: |
+                  (cd src/gacha_service && ./run_tests.sh)
+
+            - name: Test tux service
+              run: |
                   (cd src/tux_service && ./run_tests.sh)
 
             - name: Send Telegram Success Message
