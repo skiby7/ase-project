@@ -1,8 +1,8 @@
 services:
   distro:
-    build: 
+    build:
       context: service
-      dockerfile: Dockerfile_test
+      dockerfile: Dockerfile
     depends_on:
       - db
     ports:
@@ -22,7 +22,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_DATABASE: admin
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
-    command: mongod --quiet --logpath /dev/null 
+    command: mongod --quiet --logpath /dev/null
       --tlsAllowConnectionsWithoutCertificates
       --tlsMode preferTLS
       --tlsCertificateKeyFile /run/secrets/cert_db
@@ -31,24 +31,24 @@ services:
       - cert_db
       - pw
     volumes:
-      - dbdata:/data/db
-   
-secrets: 
-  pw: 
+      - dbdata1:/data/db
+
+secrets:
+  pw:
     file: ./service/secrets/pw.txt
-  cert: 
+  cert:
     file: ./service/secrets/cert.pem
-  key: 
+  key:
     file: ./service/secrets/key.pem
-  cert_db: 
+  cert_db:
     file: ./service/secrets/server.pem
   jwt_private_key:
     file: ./service/secrets/private.pem
   jwt_public_key:
     file: ./service/secrets/public.pem
 
-  volumes:
-    dbdata:
+volumes:
+    dbdata1:
 #services:
 #  distro:
 #    build: ./service
@@ -63,7 +63,7 @@ secrets:
 #      - '27017:27017'
 #    volumes:
 #      - dbdata:/data/db
-#    command: mongod --quiet --logpath /dev/null 
+#    command: mongod --quiet --logpath /dev/null
 #
 #volumes:
 #  dbdata:
