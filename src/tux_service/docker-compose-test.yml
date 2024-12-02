@@ -3,7 +3,7 @@ services:
         container_name: tux_service
         restart: no
         healthcheck:
-            test: curl --silent --fail --insecure https://localhost:9090/docs || exit 1
+            test: curl --silent --fail --insecure https://localhost:9290/docs || exit 1
             interval: 5s
             retries: 3
             start_period: 5s
