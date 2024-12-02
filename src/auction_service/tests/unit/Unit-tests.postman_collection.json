@@ -1,0 +1,4581 @@
+{
+	"info": {
+		"_postman_id": "74926d0c-f068-4bb9-9f89-54fdc241b1d3",
+		"name": "Unit-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40074080"
+	},
+	"item": [
+		{
+			"name": "Mocked",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "AUCTION_CREATE",
+							"item": [
+								{
+									"name": "201 Created",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Time",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 0,\r\n    \"end_time\": 100000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create?player_id=00000000-0000-4000-8000-000000000000",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											],
+											"query": [
+												{
+													"key": "player_id",
+													"value": "00000000-0000-4000-8000-000000000000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Starting_price",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": -1,\r\n    \"end_time\": 100000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Url_invalid_user",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 0,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Body_invalid_user",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000001\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 0,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "AUCTION_FILTER",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200  Active_auction_history",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 False_active",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":null,\r\n\"active\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_starting_price",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":-1,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_current_winning_bid",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":-1,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_end_time",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":-1,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "AUCTION_DELETE",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Player_id_not_valid",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/auction-delete?auction_id=00000000-0000-4000-8000-000000000000",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"auction-delete"
+											],
+											"query": [
+												{
+													"key": "auction_id",
+													"value": "00000000-0000-4000-8000-000000000000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Auction_id_not_found",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/auction-delete?auction_id=5fe0ece9-a5d7-4876-9c8f-b377c7c4de3d",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"auction-delete"
+											],
+											"query": [
+												{
+													"key": "auction_id",
+													"value": "5fe0ece9-a5d7-4876-9c8f-b377c7c4de3d"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 OK",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-delete?auction_id=00000000-0000-4000-8000-000000000000",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-delete"
+											],
+											"query": [
+												{
+													"key": "auction_id",
+													"value": "00000000-0000-4000-8000-000000000000"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "BID",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Url_invalid_user",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Body_invalid_user",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Auction_not_present",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Player_is_owner",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Bid_lower",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":0\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "BID_FILTER",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created_bid",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 Own_bids",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":null,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Body_invalid_user",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000000\",\r\n\"bid\":null,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Url_invalid_user",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":null,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000000/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000000",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Bid_negative",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":-1,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Time_negative",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":null,\r\n\"time\":-1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/00000000-0000-4000-8000-000000000001/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"00000000-0000-4000-8000-000000000001",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "AUCTION_CREATE",
+							"item": [
+								{
+									"name": "201 Created",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Time",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 0,\r\n    \"end_time\": 100000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Starting_price",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": -1,\r\n    \"end_time\": 100000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "AUCTION_FILTER",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200  Auction_history",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_starting_price",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":-1,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_current_winning_bid",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":-1,\r\n\"end_time\":null,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Negative_end_time",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"player_id\":null,\r\n\"gacha_id\":null,\r\n\"starting_price\":null,\r\n\"current_winning_player_id\":null,\r\n\"current_winning_bid\":null,\r\n\"end_time\":-1,\r\n\"active\":true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-filter"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "AUCTION_DELETE",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Auction_id_not_found",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-delete?auction_id=5fe0ece9-a5d7-4876-9c8f-b377c7c4de3d",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-delete"
+											],
+											"query": [
+												{
+													"key": "auction_id",
+													"value": "5fe0ece9-a5d7-4876-9c8f-b377c7c4de3d"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 OK",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-delete?auction_id=00000000-0000-4000-8000-000000000000",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-delete"
+											],
+											"query": [
+												{
+													"key": "auction_id",
+													"value": "00000000-0000-4000-8000-000000000000"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "BID",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Auction_not_present",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Player_is_owner",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Bid_lower",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":0\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "BID_FILTER",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created_bid",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 Own_bids",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":null,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Bid_negative",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":-1,\r\n\"time\":null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 Time_negative",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"bid_id\":null,\r\n\"auction_id\":null,\r\n\"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n\"bid\":null,\r\n\"time\":-1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid-filter",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid-filter"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "MARKET_ACTIVITY",
+							"item": [
+								{
+									"name": "201 Created_auction",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"name": "content-type",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "<calculated when request is sent>",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"player_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"gacha_id\": \"00000000-0000-4000-8000-000000000000\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/auction-create",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"auction-create"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created_bid",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created_bid Copy",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":2\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "201 Created_bid Copy 2",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Content-Length",
+												"value": "0",
+												"name": "content-length",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"auction_id\":\"00000000-0000-4000-8000-000000000000\",\r\n    \"player_id\":\"00000000-0000-4000-8000-000000000001\",\r\n    \"bid\":3\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/bid",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"bid"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 Ok",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cache-Control",
+												"value": "no-cache",
+												"name": "cache-control",
+												"type": "text"
+											},
+											{
+												"key": "Postman-Token",
+												"value": "<calculated when request is sent>",
+												"name": "postman-token",
+												"type": "text"
+											},
+											{
+												"key": "Host",
+												"value": "<calculated when request is sent>",
+												"name": "host",
+												"type": "text"
+											},
+											{
+												"key": "User-Agent",
+												"value": "PostmanRuntime/7.39.1",
+												"name": "user-agent",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*",
+												"name": "accept",
+												"type": "text"
+											},
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip, deflate, br",
+												"name": "accept-encoding",
+												"type": "text"
+											},
+											{
+												"key": "Connection",
+												"value": "keep-alive",
+												"name": "connection",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://localhost:9090/auction/admin/market-activity",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "9090",
+											"path": [
+												"auction",
+												"admin",
+												"market-activity"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
