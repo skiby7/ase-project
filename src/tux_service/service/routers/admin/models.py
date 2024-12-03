@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
+
 
 class TuxAccountModel(BaseModel):
-    user_id: str
-    initial_fiat_amount: float
+    user_id: str = Field(validation_alias=AliasChoices("uid", "user_id"))
+    initial_fiat_amount: float = 1000
 
 class FreezeTuxModel(BaseModel):
     user_id: str

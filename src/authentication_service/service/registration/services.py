@@ -18,9 +18,8 @@ from ..utils import password_utils
 from ..shared_libs.access_token_utils import TokenData
 
 urls_services_to_notify = [
-    "https://gacha-roll:9090/notify/user",
-    "https://auction:9090/notify/user",
-    "https://payment:9090/admin/balances"
+    "https://distro:9190/admin/users",
+    "https://tux_service:9290/admin/balances"
 ]
 
 def initialize_admin():
