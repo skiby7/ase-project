@@ -34,6 +34,8 @@ secrets:
         file: ./service/secrets/pw.txt
     auction_cert:
         file: ./service/secrets/cert.pem
+    cert_db:
+        file: ./service/secrets/server.pem
     auction_key:
         file: ./service/secrets/key.pem
     jwt_private_key:
