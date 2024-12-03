@@ -44,8 +44,12 @@ def freeze(auction_id: str, token_data: Annotated[TokenData, Depends(extract_acc
     try:
         update_freezed_tux(db_session, auction_id,
                            request.user_id, request.tux_amount)
-    except (InsufficientFunds, AlreadySettled, UserNotFound, ValueError) as e:
+    except (AlreadySettled, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
+    except InsufficientFunds as e:
+        raise HTTPException(status_code=402, detail=f"{e}")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -58,8 +62,6 @@ def auction_delete(auction_id: str, token_data: Annotated[TokenData, Depends(ext
 
     try:
         delete_auction(db_session, auction_id)
-    except AuctionNotFound as e:
-        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -72,8 +74,12 @@ def settle(auction_id: str, token_data: Annotated[TokenData, Depends(extract_acc
     try:
         settle_auction_payments(db_session, auction_id,
                                 request.winner_id, request.auctioneer_id)
-    except (InsufficientFunds, AlreadySettled, UserNotFound, AuctionNotFound) as e:
+    except (AlreadySettled, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
+    except InsufficientFunds as e:
+        raise HTTPException(status_code=402, detail=f"{e}")
+    except (UserNotFound, AuctionNotFound) as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -87,8 +93,8 @@ def highest_bidder(auction_id: str, token_data: Annotated[TokenData, Depends(ext
 
     try:
         user_id, amount = get_highest_bidder(db_session, auction_id)
-    except (AuctionNotFound) as e:
-        raise HTTPException(status_code=400, detail=f"{e}")
+    except AuctionNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 

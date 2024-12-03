@@ -59,6 +59,8 @@ def create_tables():
 def create_user_balance(session, starting_fiat_balance: float, user_id: str):
     if starting_fiat_balance < 0:
         raise ValueError("The starting balance cannot be a negative number!")
+    if user_exists(session, user_id):
+        raise ValueError(f"User {user_id} already exists!")
     new_account = UserBalance(
         user_id=user_id,
         tux_amount=0.0,
@@ -282,15 +284,19 @@ def update_freezed_tux(session, auction_id: str, user_id: str, new_tux_amount: f
         freeze request, I unfreeze all the other players
     """
     logger.debug(f"updating bid of auction {auction_id} -> ({user_id}, {new_tux_amount} tux)")
+    if not user_exists(session, user_id):
+        raise UserNotFound(f"User {user_id} does not exists!")
+
     if new_tux_amount < 0:
         raise ValueError("The new tux amount cannot be a negative number!")
     try:
         try:
             highest_bidder_id, highest_bid = get_highest_bidder(session, auction_id)
-        except:
+        except AuctionNotFound:
             highest_bidder_id, highest_bid = (None, 0)
+
         if highest_bid >= new_tux_amount:
-            raise LowerBidException(f"Current bid is {highest_bid}, cannot bid {new_tux_amount}")
+            raise ValueError(f"Current bid is {highest_bid}, cannot bid {new_tux_amount}")
 
         bidder = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=user_id).first()
         if bidder:
@@ -337,14 +343,13 @@ def delete_auction(session, auction_id: str):
         bidders = session.query(FreezedTux).filter_by(auction_id=auction_id).all()
 
         if bidders is None:
-            raise AuctionNotFound(f"Cannot find {auction_id}")
+            return
 
         for b in bidders:
-            if b.settled: continue
-            b.settled = True
-            if b.tux_amount > 0:
+            if not b.settled and b.tux_amount > 0:
                 update_user_tux_balance(session, b.user_id, "deposit", b.tux_amount)
-
+                b.settled = True
+            session.delete(b)
 
     except SQLAlchemyError as e:
         logger.error(f"Cannot update settle payments for auction {auction_id}: {e}")
@@ -352,6 +357,14 @@ def delete_auction(session, auction_id: str):
 
 @transactional
 def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer_id: str):
+    if winner_id == auctioneer_id:
+        raise ValueError("The auctioneer cannot win the auction!")
+
+    if not user_exists(session, winner_id):
+        raise UserNotFound(f"Winner {winner_id} not found!")
+    if not user_exists(session, auctioneer_id):
+        raise UserNotFound(f"Auctioneer {auctioneer_id} not found!")
+
     try:
         bidder = session.query(FreezedTux).filter_by(auction_id=auction_id, user_id=winner_id).first()
         if bidder is None:
