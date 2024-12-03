@@ -20,7 +20,7 @@ admin_router = APIRouter(
 
 @router.post('/accounts')
 def registration(registration_req: RegistrationModel) -> Account:
-    account = services.create_account(registration_req.email,
+    account = services.create_account_workflow(registration_req.email,
                                       registration_req.username,
                                       registration_req.password,
                                       role='user')
@@ -89,5 +89,5 @@ def delete_account(uid_account: str, token_data: Annotated[TokenData, Depends(ex
             detail="You do not have the permission for the required action",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    services.delete_account(uid=uid_account)
+    services.delete_account_workflow(uid=uid_account)
     return {"message": f"Account {uid_account} successfully deleted"}

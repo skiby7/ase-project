@@ -18,25 +18,34 @@ admin_router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post('/token')
 @admin_router.post('/token')
 def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user = services.validate_login(form_data.username, form_data.password)
-    if not user:
+    account = services.validate_login(form_data.username, form_data.password)
+    if not account:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
     access_token = services.create_access_token(
-        data = {"sub": user.uid, "username": user.username,"role": user.role},
-        expires_delta=timedelta(minutes=15)
+        account=account,
+        exp=timedelta(minutes=15)
     )
-    return {"access_token" : access_token, "token_type": "bearer"}
+    response = {"access_token": access_token, "token_type": "bearer"}
+    if 'openid' in form_data.scopes:
+        id_token = services.create_jwt_token(
+            account=account,
+            exp=timedelta(minutes=15),
+            aud=form_data.client_id
+        )
+        response.update({"id_token": id_token})
+    return response
 
 
 @router.get('/userinfo')
-@admin_router.post('/userinfo')
+@admin_router.get('/userinfo')
 def verify(token_data: Annotated[TokenData, Depends(extract_access_token)]):
     account = services.get_account_info(uid_account=token_data.sub)
     if not account:
