@@ -55,11 +55,10 @@ scheduler.start()
 ##### AUCTION #####
 
 
-# TODO Check if the player exists, maybe is done if gacha is available
+
 # AUCTION_CREATE
 @app.post("/auction/admin/auction-create", status_code=201)
 def admin_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    print("ciaoooo")
     check_admin(mock_check,token_data)
 
     db.auction_create(auction,mock_check)

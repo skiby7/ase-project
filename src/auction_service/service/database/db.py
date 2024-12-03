@@ -5,6 +5,7 @@ import time
 from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,IdStrings
 from fastapi import Body, FastAPI, HTTPException
 from uuid import UUID
+
 unix_time = lambda: int(time.time())
 
 
@@ -16,15 +17,16 @@ class database:
         self.bidsFile = bidsFile
 
         username = "root"
-        host = "db"
+        host = "auction_db"
         port = "27017"
         db = "admin"
         database = "mydatabase"
-        with open('/run/secrets/pw', 'r') as file:
+        with open('/run/secrets/auction_pw', 'r') as file:
             password = file.read().strip()
         uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
         self.client = MongoClient(uri)
-        
+
+        print("ciaoooo")
         self.db = self.client["mydatabase"]
         if "auctions" in self.db.list_collection_names():
             print(" \n\n DB ACTIVE  \n\n")
@@ -76,13 +78,18 @@ class database:
 
     ##### AUCTION #####
     
-    # TODO a seconda del feedback degli altri
     # AUCTION_CREATE
     def auction_create(self,auction:Auction,mock_check:bool):
-        #TODO controllare che ci sia almeno 1 gacha con gacha_id disponibile da simo
-        #TODO controllare che il player esista
+        
         if not mock_check:
+            #TODO controllare che ci sia almeno 1 gacha con gacha_id disponibile da simo
+            #remove_gacha delete method
             pass
+        
+        if not mock_check:
+            #TODO controllare che il player esista
+            pass
+        
         if(auction.starting_price<0):
             raise HTTPException(status_code=400, detail="Invalid price")
         if(auction.end_time<unix_time()):
@@ -114,14 +121,15 @@ class database:
     #HP auction presence == True (check app-side)
     def auction_delete(self,auction_id:str,mock_check:bool):
         auction = self.db["auctions"].find_one({"auction_id":auction_id}) 
-        #TODO return the bidded gacha
+        
         if not mock_check:
-            
+            #TODO return the bidded gacha
+            # add_gacha post method 
             pass
 
-        #TODO return/unfreeze tux of current winning
+        
         if (not mock_check) and (auction["current_winning_player_id"] is not None):
-            
+            #TODO return/unfreeze tux of current winning
             pass
 
         self.db["auctions"].delete_one({"auction_id":auction_id})
@@ -159,6 +167,10 @@ class database:
         if bid.bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
         
+        if not mock_check:
+            #TODO controllare che il player esista
+            pass
+
         if not mock_check:
             #TODO restituire/unfreeze a quello che stava vincendo e prendere/unfreeze quello che vinceva
             pass
