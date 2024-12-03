@@ -18,7 +18,7 @@ db = database("utils/distros.json")
 # View system gacha collection
 @app.get("/user/gacha/all", status_code=200)
 def user_gacha_all(token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if check_user(mock_check,token_data):
+    if check_user(mock_check,token_data,None):
         return db.get_all_gachas_user()
     else: 
         raise HTTPException(status_code=400, detail="Invalid User")
@@ -26,7 +26,7 @@ def user_gacha_all(token_data: Annotated[TokenData, Depends(extract_access_token
 # View user personal gacha collection
 @app.get("/{id}/gacha/collection", status_code=200)
 def user_gacha_collection(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check,token_data,id):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         res = db.get_user_gacha(id);
@@ -38,7 +38,7 @@ def user_gacha_collection(id: str, token_data: Annotated[TokenData, Depends(extr
 # View user personal gacha collection
 @app.get("/{id}/gacha/collection/{name}", status_code=200)
 def user_gacha_collection(id: str, name:str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check,token_data,id):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         res = db.get_user_collection_gacha(id,name);
@@ -52,7 +52,7 @@ def user_gacha_collection(id: str, name:str, token_data: Annotated[TokenData, De
 # View Specific Gacha Info
 @app.get("/user/gacha/{name}", status_code=200)
 def user_gacha_specific(name: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check, token_data, None):
         raise HTTPException(status_code=400, detail="Invalid User")
     gacha = db.get_specific_gacha(name,mock_id);
     if not gacha: 
@@ -64,7 +64,7 @@ def user_gacha_specific(name: str, token_data: Annotated[TokenData, Depends(extr
 mock_gacha_roll = None
 @app.post("/{id}/gacha/roll", status_code=200)
 def user_gacha_roll(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check, token_data, id):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         if check_tux(mock_check,token_data):
