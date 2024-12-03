@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 class User(BaseModel):
-    id: str
+    uid: str
     gacha_name: str
     

@@ -1,11 +1,10 @@
-FROM python:3.12-slim
+FROM python:3.12-alpine
 
 WORKDIR /app
-
+RUN apk add curl
+COPY ./requirements.txt /tmp
+RUN pip install -r /tmp/requirements.txt
 COPY . .
-
-RUN pip install -r requirements.txt
-
 EXPOSE 9190
 
-CMD ["uvicorn", "app:test", "--host", "0.0.0.0", "--port", "9190","--ssl-keyfile=/run/secrets/key","--ssl-certfile=/run/secrets/cert"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9190","--ssl-keyfile=/run/secrets/key","--ssl-certfile=/run/secrets/cert"]

@@ -2,6 +2,7 @@ fastapi[standard]
 PyYAML==6.0.1
 pymongo
 uuid
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
+bcrypt==3.2.2
 pyjwt[crypto]
 requests

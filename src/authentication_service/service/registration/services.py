@@ -18,9 +18,8 @@ from ..utils import password_utils
 from ..shared_libs.access_token_utils import TokenData
 
 urls_services_to_notify = [
-    "https://gacha-roll:9090/notify/user",
-    "https://auction:9090/notify/user",
-    "https://payment:9090/admin/balances"
+    "https://distro:9190/admin/users",
+    "https://tux_service:9290/admin/balances"
 ]
 
 def initialize_admin():
@@ -77,7 +76,6 @@ def create_account(email: str, username: str, password: str, role: str) -> Accou
     account = Account(uid=account_db.uid, username=account_db.username, email=account_db.email, role=role)
     logger.info(f"Account created: {account}")
     return account
-
 
 def change_password(uid_account: str, old_pass: str, new_pass: str):
     validate_new_password(new_pass)

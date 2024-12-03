@@ -2910,7 +2910,7 @@
 		},
 		{
 			"key": "base_url",
-			"value": "https://localhost:9090",
+			"value": "https://authentication:9090",
 			"type": "string"
 		},
 		{

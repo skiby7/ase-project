@@ -1,0 +1,92 @@
+services:
+    authentication:
+        restart: always
+        build:
+            context: ./service
+        healthcheck:
+            test: curl --silent --fail --insecure https://localhost:9090/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        environment:
+            - RESOURCE_PATH=/code/service/resources
+            - MAIN_MODULE=service.main_test
+        volumes:
+            # monto la libreria condivisa
+            - ../shared_libs:/code/service/shared_libs
+        ports:
+            - "9090:9090"
+        networks:
+            - test_network
+        depends_on:
+            - db
+        secrets:
+            - jwt_private_key
+            - jwt_public_key
+            - admin_account
+            - ssl_private_key
+            - ssl_cert
+            - mongodb_password
+
+    db:
+        container_name: db_authentication_test
+        image: mongo:latest
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongodb_password
+        command: mongod --auth --quiet --logpath /dev/null
+            --tlsAllowConnectionsWithoutCertificates
+            --tlsMode preferTLS
+            --tlsCertificateKeyFile /run/secrets/ssl_mongo_cert_key
+            --tlsCAFile /run/secrets/ssl_mongo_cert_key
+        secrets:
+            - mongodb_password
+            - ssl_mongo_cert_key
+        networks:
+            - test_network
+
+    newman:
+        image: postman/newman:latest
+        container_name: authentication_service_tests
+        restart: no
+        depends_on:
+            authentication:
+                condition: service_healthy
+        entrypoint:
+            [
+                "newman",
+                "run",
+                "/etc/postman/unit_test.postman_collection.json",
+                "--delay-request",
+                "100",
+                "--insecure",
+                "--reporters",
+                "cli",
+            ]
+        volumes:
+            - ./tests/unit/:/etc/postman
+        networks:
+            - test_network
+
+secrets:
+    jwt_private_key:
+        file: ./tests/test_secrets/private.pem
+    jwt_public_key:
+        file: ./tests/test_secrets/public.pem
+    admin_account:
+        file: ./tests/test_secrets/admin_account.json
+    ssl_private_key:
+        file: ./secrets/app_key.pem
+    ssl_cert:
+        file: ./secrets/app_cert.pem
+    ssl_mongo_cert_key:
+        file: ./secrets/ssl_mongo_cert_key.pem
+    mongodb_password:
+        file: ./tests/test_secrets/mongo_root_password
+
+networks:
+    test_network:

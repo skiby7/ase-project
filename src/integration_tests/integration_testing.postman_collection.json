@@ -1,0 +1,2583 @@
+{
+	"info": {
+		"_postman_id": "ce0e16d8-2299-45f8-9d72-bf3b139568c3",
+		"name": "Integration testing",
+		"description": "# ⛓️ Get started here\n\nPostman allows you to test your APIs using simple Javascript code. You can evaluate your response body, headers, cookies, and more using the [ChaiJS BDD](https://www.chaijs.com/api/bdd/) syntax.\n\nThis template guides you through the process of setting up an integration test to ensure that all individual components of an API function together seamlessly.\n\nThe API under test in this collection includes three endpoints for registering and receiving a token, accessing your unique generated name, and unregistering a token:\n\n- POST `/register`\n- POST `/unregister`\n- GET `/my-name`\n    \n\nBy setting up requests in the order of the operation, we can test the flow of data to and from the endpoints and ensure they work together as expected. We also verify that the data persists between requests on the back end.\n\n## 🔖 **How to use this template**\n\n**Step 1:** Check out the requests' documentation to learn more about -\n\n- what each request is meant to do.\n- the tests we've added against each one.\n    \n\n**Step 2:** Run this collection by clicking on \"Run\".\n\n<img src=\"https://content.pstmn.io/84019b0f-69c8-4c5f-98b9-2c90a6f9a0b1/Y29sbGVjdGlvbi1ydW5uZXItYnV0dG9uLmpwZWc=\" alt=\"\" height=\"103\" width=\"266\">\n\n**Step 3:** To customize this template, replace the request URLs with your API endpoints and add or edit the tests if needed.\n\n## ℹ️ Resources\n\n[Scripting in Postman](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)\n\n[Test script examples](https://learning.postman.com/docs/writing-scripts/script-references/test-examples/)\n\n[Postman Sandbox API reference](https://learning.postman.com/docs/sending-requests/grpc/postman-sandbox-api/#writing-assertions)\n\n[Using the Collection Runner](https://learning.postman.com/docs/collections/running-collections/intro-to-collection-runs/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38251344"
+	},
+	"item": [
+		{
+			"name": "Normal user tests",
+			"item": [
+				{
+					"name": "Successful tests",
+					"item": [
+						{
+							"name": "Account",
+							"item": [
+								{
+									"name": "Create my game account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New account is created\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('uid')",
+													"    pm.expect(pm.response.json().username).eqls(pm.collectionVariables.get('username'))",
+													"    pm.expect(pm.response.json().role).eqls('user')",
+													"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"{{email}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Login on the system",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Access token successfully returned\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('access_token')",
+													"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+													"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "oauth2",
+											"oauth2": [
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "string"
+												},
+												{
+													"key": "accessTokenUrl",
+													"value": "{{baseUrl}}/auth/token",
+													"type": "string"
+												},
+												{
+													"key": "tokenName",
+													"value": "user_token",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "Pippo",
+													"type": "string"
+												},
+												{
+													"key": "clientSecret",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "clientId",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "grant_type",
+													"value": "password_credentials",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "username",
+													"value": "{{username}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/token",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"token"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Modify my account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Username successfully updated\", () => {",
+													"    pm.expect(pm.response.json().username).to.eqls('New_pippo')",
+													"    pm.expect(pm.response.json().email).to.eqls('newpippo@gmail.com')",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"New_pippo\",\r\n    \"email\": \"newpippo@gmail.com\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Update password",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Password successfully updated\", () => {",
+													"        pm.response.to.have.status(200);",
+													"",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts/{{user_uid}}/changePassword",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}",
+												"changePassword"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Delete my game account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Returns 200 OK status\", () => {",
+													"    pm.response.to.have.status(200)",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Gacha collection + Tux managment",
+							"item": [
+								{
+									"name": "Create my game account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New account is created\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('uid')",
+													"    pm.expect(pm.response.json().username).eqls(pm.collectionVariables.get('username'))",
+													"    pm.expect(pm.response.json().role).eqls('user')",
+													"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"{{email}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Login from the system",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Access token successfully returned\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('access_token')",
+													"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+													"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "oauth2",
+											"oauth2": [
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "string"
+												},
+												{
+													"key": "accessTokenUrl",
+													"value": "{{baseUrl}}/auth/token",
+													"type": "string"
+												},
+												{
+													"key": "tokenName",
+													"value": "user_token",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "Pippo",
+													"type": "string"
+												},
+												{
+													"key": "clientSecret",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "clientId",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "grant_type",
+													"value": "password_credentials",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "username",
+													"value": "{{username}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "text"
+												},
+												{
+													"key": "scope",
+													"value": "openid",
+													"type": "text",
+													"disabled": true
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/token",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"token"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "See my gacha collection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"See my gacha collection\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+													"    pm.expect(jsonData.length).to.be.eqls(0); \r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/distro/{{user_uid}}/gacha/collection",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"{{user_uid}}",
+												"gacha",
+												"collection"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "See the system gacha collection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Retrieve system gacha\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+													"    pm.expect(jsonData.length).to.be.eqls(21); \r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/distro/user/gacha/all",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"user",
+												"gacha",
+												"all"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Want to see the info of a system gacha",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Info of system gacha\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    \r",
+													"    pm.expect(jsonData.name).to.eql(\"Ubuntu\");\r",
+													"    pm.expect(jsonData.rarity).to.eql(\"1\");\r",
+													"    pm.expect(jsonData).to.has.property('image')\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/distro/user/gacha/Ubuntu",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"user",
+												"gacha",
+												"Ubuntu"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Buy in-game currency",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response has valid data\", function () {",
+													"    const jsonData = pm.response.json();",
+													"    pm.expect(jsonData).to.have.property(\"detail\");",
+													"    pm.expect(jsonData.detail).to.eql(`Successully bought ${parseFloat((pm.variables.get(\"small_buy\"))).toFixed(1)} tux!`);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"amount\": {{small_buy}},\n  \"user_id\": \"{{user_uid}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/tux-management/buy",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"tux-management",
+												"buy"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Buy in-game currency check",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Tux_balance check\", function () {",
+													"    pm.response.to.have.status(200);",
+													"    var jsonData = pm.response.json();",
+													"    ",
+													"    var smallBuyValue = parseInt(pm.collectionVariables.get('small_buy'), 10);",
+													"",
+													"    pm.expect(jsonData.tux_balance).to.eql(smallBuyValue);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{base_public_url}}/tux-management/balances/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"tux-management",
+												"balances",
+												"{{user_uid}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Use in-game currency to roll a gacha",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Use in-game currency to roll a gacha\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.collectionVariables.set('gacha_name', pm.response.json().name)\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": []
+										},
+										"url": {
+											"raw": "{{base_public_url}}/distro/{{user_uid}}/gacha/roll",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"{{user_uid}}",
+												"gacha",
+												"roll"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Balance after roll",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Check balance after roll\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    amount = pm.collectionVariables.get('small_buy')\r",
+													"    expected = amount - 10\r",
+													"\r",
+													"    pm.expect(jsonData.tux_balance).to.be.eqls(expected)\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/tux-management/balances/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"tux-management",
+												"balances",
+												"{{user_uid}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Want to see the info of a gacha of my collection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Info gacha of my collections\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    \r",
+													"    pm.expect(jsonData.name).to.eql(pm.collectionVariables.get('gacha_name'));\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/distro/{{user_uid}}/gacha/collection/{{gacha_name}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"{{user_uid}}",
+												"gacha",
+												"collection",
+												"{{gacha_name}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "See my gacha collection after roll",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Collection after roll\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    \r",
+													"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+													"    pm.expect(jsonData.length).to.be.eqls(1); \r",
+													"    distro = jsonData[0]\r",
+													"    pm.expect(distro.name).to.be.eqls(\r",
+													"        pm.collectionVariables.get('gacha_name'))\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_public_url}}/distro/{{user_uid}}/gacha/collection",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"distro",
+												"{{user_uid}}",
+												"gacha",
+												"collection"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "View my transaction history",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response has valid data\", function () {",
+													"    const jsonData = pm.response.json();",
+													"    pm.expect(jsonData).to.have.property(\"purchase\");",
+													"    pm.expect(jsonData).to.have.property(\"auction\");",
+													"    pm.expect(jsonData).to.have.property(\"roll\");",
+													"    pm.expect(jsonData.purchase.length).to.eql(1);",
+													"    pm.expect(jsonData.roll.length).to.eql(1);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{base_public_url}}/tux-management/transactions/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"tux-management",
+												"transactions",
+												"{{user_uid}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Unregister",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Returns 200 OK status\", () => {",
+													"    pm.response.to.have.status(200)",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Auction market",
+							"item": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin user tests",
+			"item": [
+				{
+					"name": "Successful tests",
+					"item": [
+						{
+							"name": "Account",
+							"item": [
+								{
+									"name": "Login as admin from the system",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New acocunt is created\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('access_token')",
+													"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+													"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "oauth2",
+											"oauth2": [
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "string"
+												},
+												{
+													"key": "accessTokenUrl",
+													"value": "{{baseUrl}}/auth/token",
+													"type": "string"
+												},
+												{
+													"key": "tokenName",
+													"value": "user_token",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "Pippo",
+													"type": "string"
+												},
+												{
+													"key": "clientSecret",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "clientId",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "grant_type",
+													"value": "password_credentials",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "username",
+													"value": "{{admin_username}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{admin_password}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/token",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"token"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Register another account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Username already in use\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('uid')",
+													"    pm.expect(pm.response.json().username).eqls('pippo')",
+													"    pm.expect(pm.response.json().role).eqls('user')",
+													"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"{{email}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Check all users accounts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"All accounts retrieved and contains username 'admin'\", () => {",
+													"    pm.response.to.have.status(200); ",
+													"    const responseJson = pm.response.json(); ",
+													"    pm.expect(responseJson).to.have.property('data').that.is.an('array');",
+													"    ",
+													"    const containsAdmin = responseJson.data.some(item => item.username === pm.collectionVariables.get('admin_username'));",
+													"    pm.expect(containsAdmin).to.be.true;",
+													"});",
+													"",
+													"pm.test(\"All accounts retrieved and contains username 'pippo'\", () => {",
+													"    pm.response.to.have.status(200); ",
+													"    const responseJson = pm.response.json(); ",
+													"    pm.expect(responseJson).to.have.property('data').that.is.an('array');",
+													"    ",
+													"    const containsPippo = responseJson.data.some(item => item.username === pm.collectionVariables.get('username'));",
+													"    pm.expect(containsPippo).to.be.true;",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/accounts",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Check a specific user account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"User retrieved has username 'Pippo'\", () => {",
+													"    pm.response.to.have.status(200);",
+													"",
+													"    const responseJson = pm.response.json(); ",
+													"",
+													"    pm.expect(responseJson).to.have.property('username');",
+													"    pm.expect(responseJson.username).to.eql(pm.collectionVariables.get('username'));",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Modify a specific user account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response 200\", () => {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Username successfully updated\", () => {",
+													"    pm.expect(pm.response.json().email).to.eqls('newpippo@gmail.com')",
+													"})",
+													"",
+													"pm.test(\"Email successfully updated\", () => {",
+													"    pm.expect(pm.response.json().email).to.eqls('newpippo@gmail.com')",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"New_Pippo\",\r\n    \"email\": \"newpippo@gmail.com\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Check modify",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Username successfully updated\", () => {",
+													"    pm.expect(pm.response.json().email).to.eqls('newpippo@gmail.com')",
+													"})",
+													"",
+													"pm.test(\"Email successfully updated\", () => {",
+													"    pm.expect(pm.response.json().email).to.eqls('newpippo@gmail.com')",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+									},
+									"response": []
+								},
+								{
+									"name": "Delete another account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Returns 200 OK status\", () => {",
+													"    pm.response.to.have.status(200)",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/accounts/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts",
+												"{{user_uid}}"
+											]
+										},
+										"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Tux managment",
+							"item": [
+								{
+									"name": "Login as admin from the system Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New acocunt is created\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('access_token')",
+													"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+													"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "oauth2",
+											"oauth2": [
+												{
+													"key": "password",
+													"value": "{{user_password}}",
+													"type": "string"
+												},
+												{
+													"key": "accessTokenUrl",
+													"value": "{{baseUrl}}/auth/token",
+													"type": "string"
+												},
+												{
+													"key": "tokenName",
+													"value": "user_token",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "Pippo",
+													"type": "string"
+												},
+												{
+													"key": "clientSecret",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "clientId",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "grant_type",
+													"value": "password_credentials",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "username",
+													"value": "{{admin_username}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{admin_password}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/token",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"token"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Register another account Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Username already in use\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('uid')",
+													"    pm.expect(pm.response.json().username).eqls('pippo')",
+													"    pm.expect(pm.response.json().role).eqls('user')",
+													"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"{{email}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_public_url}}/auth/accounts",
+											"host": [
+												"{{base_public_url}}"
+											],
+											"path": [
+												"auth",
+												"accounts"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Check a specific player currency transaction history",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response has valid data\", function () {",
+													"    const jsonData = pm.response.json();",
+													"    pm.expect(jsonData).to.have.property(\"purchase\");",
+													"    pm.expect(jsonData).to.have.property(\"auction\");",
+													"    pm.expect(jsonData).to.have.property(\"roll\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{base_admin_url}}/tux-management/transactions/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"tux-management",
+												"transactions",
+												"{{user_uid}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TODO Check a specific player market history",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response status is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response has valid data\", function () {",
+													"    const jsonData = pm.response.json();",
+													"    pm.expect(jsonData).to.have.property(\"purchase\");",
+													"    pm.expect(jsonData).to.have.property(\"auction\");",
+													"    pm.expect(jsonData).to.have.property(\"roll\");",
+													"    pm.expect(jsonData.purchase.length).to.eql(1);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{base_admin_url}}/tux-dfsdfsf/transactions/{{user_uid}}",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"tux-dfsdfsf",
+												"transactions",
+												"{{user_uid}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Gacha",
+							"item": [
+								{
+									"name": "Login as admin from the system Copy 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New acocunt is created\", () => {",
+													"    pm.expect(pm.response.json()).to.have.property('access_token')",
+													"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+													"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "username",
+													"value": "{{admin_username}}",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "{{admin_password}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/auth/token",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"auth",
+												"token"
+											]
+										},
+										"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+									},
+									"response": []
+								},
+								{
+									"name": "Check all the gacha collection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Retrieve admin system gacha\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+													"    pm.expect(jsonData.length).to.be.eqls(21); \r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha/all",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha",
+												"all"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove gacha from system",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Remove gacha from collection\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData).to.eql({\"name\":\"Solus\"});\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha/remove/Solus",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha",
+												"remove",
+												"Solus"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove check",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Solus removed\", function() {\r",
+													"    pm.response.to.have.status(200);\r",
+													"\r",
+													"    var jsonData = pm.response.json();\r",
+													"\r",
+													"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+													"    pm.expect(jsonData.length).to.be.eql(20);\r",
+													"    var found = jsonData.find(item => item.name === \"Solus\");\r",
+													"    pm.expect(found).to.be.undefined;\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha/all",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha",
+												"all"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modify gacha",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Modify gacha info\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"    \r",
+													"    pm.expect(jsonData).to.eql({\r",
+													"        \"name\": \"Ubuntu\",\r",
+													"        \"rarity\": \"5\",\r",
+													"        \"image\": \"32131232\"\r",
+													"    });\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"name\": \"Ubuntu\",\"rarity\" : \"5\", \"image\":\"32131232\"}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modify check",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Solus removed\", function() {\r",
+													"    pm.response.to.have.status(200);\r",
+													"\r",
+													"    var jsonData = pm.response.json();\r",
+													"\r",
+													"    var ubuntu = jsonData.find(item => item.name === \"Ubuntu\");\r",
+													"    pm.expect(ubuntu.rarity).to.be.eqls('5')\r",
+													"    pm.expect(ubuntu.image).to.be.eqls('32131232')\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha/all",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha",
+												"all"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add new gacha",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"New gacha added\", function() {\r",
+													"    pm.response.to.have.status(200);\r",
+													"    var jsonData = pm.response.json();\r",
+													"\r",
+													"    pm.expect(jsonData.name).to.eql(\"fradistro\");\r",
+													"    pm.expect(jsonData.rarity).to.eql(\"1\");\r",
+													"    pm.expect(jsonData.image).to.eql(\"32131232\");\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"name\": \"fradistro\",\"rarity\" : \"1\", \"image\":\"32131232\"}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add check",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"fradistro added\", function() {\r",
+													"    pm.response.to.have.status(200);\r",
+													"\r",
+													"    var jsonData = pm.response.json();\r",
+													"\r",
+													"    var new_distro = jsonData.find(item => item.name === \"fradistro\");\r",
+													"    pm.expect(new_distro).to.be.not.undefined\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_admin_url}}/distro/gacha/all",
+											"host": [
+												"{{base_admin_url}}"
+											],
+											"path": [
+												"distro",
+												"gacha",
+												"all"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "base_public_url",
+			"value": "https://localhost:8080/api",
+			"type": "default"
+		},
+		{
+			"key": "user_password",
+			"value": "Ciaociao98??",
+			"type": "default"
+		},
+		{
+			"key": "user_uid",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": "pippo",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "pippo@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "new_user_password",
+			"value": "Ciaociao97??",
+			"type": "string"
+		},
+		{
+			"key": "small_buy",
+			"value": "70",
+			"type": "string"
+		},
+		{
+			"key": "gacha_name",
+			"value": ""
+		},
+		{
+			"key": "admin_username",
+			"value": "admin",
+			"type": "default"
+		},
+		{
+			"key": "admin_password",
+			"value": "Securepassword123?",
+			"type": "default"
+		},
+		{
+			"key": "base_admin_url",
+			"value": "https://localhost:8180/admin/api",
+			"type": "string"
+		}
+	]
+}

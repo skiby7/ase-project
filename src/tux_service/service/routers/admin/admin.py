@@ -2,7 +2,7 @@ from typing import Annotated
 from libs.auth import verify
 from fastapi import APIRouter, HTTPException, Body, Depends
 from routers.admin.models import TuxAccountModel
-from libs.db.db import create_user_balance, delete_user_balance, get_db, get_highest_bidder, update_freezed_tux, settle_auction_payments, delete_auction
+from libs.db.db import create_user_balance, delete_user_balance, user_exists, get_user_auction_transactions, get_user_purchase_transactions, get_user_roll_transactions, get_db, get_highest_bidder, update_freezed_tux, settle_auction_payments, delete_auction
 from libs.access_token_utils import TokenData, extract_access_token
 from routers.admin.models import FreezeTuxModel, SettleAuctionModel
 from libs.exceptions import AlreadySettled, AuctionNotFound, UserNotFound, InsufficientFunds
@@ -44,8 +44,12 @@ def freeze(auction_id: str, token_data: Annotated[TokenData, Depends(extract_acc
     try:
         update_freezed_tux(db_session, auction_id,
                            request.user_id, request.tux_amount)
-    except (InsufficientFunds, AlreadySettled, UserNotFound, ValueError) as e:
+    except (AlreadySettled, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
+    except InsufficientFunds as e:
+        raise HTTPException(status_code=402, detail=f"{e}")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -58,8 +62,6 @@ def auction_delete(auction_id: str, token_data: Annotated[TokenData, Depends(ext
 
     try:
         delete_auction(db_session, auction_id)
-    except AuctionNotFound as e:
-        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -72,13 +74,33 @@ def settle(auction_id: str, token_data: Annotated[TokenData, Depends(extract_acc
     try:
         settle_auction_payments(db_session, auction_id,
                                 request.winner_id, request.auctioneer_id)
-    except (InsufficientFunds, AlreadySettled, UserNotFound, AuctionNotFound) as e:
+    except (AlreadySettled, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"{e}")
+    except InsufficientFunds as e:
+        raise HTTPException(status_code=402, detail=f"{e}")
+    except (UserNotFound, AuctionNotFound) as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
     return {"detail": "Success!"}
 
+
+
+@router.get("/admin/transactions/{user_id}")
+def transactions(token_data: Annotated[TokenData, Depends(extract_access_token)], user_id: str, db_session = Depends(get_db)):
+    if not verify(token_data, None, True):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if not user_exists(db_session, user_id):
+        raise HTTPException(status_code=404, detail="User does not exists!")
+    purchase = get_user_purchase_transactions(db_session, user_id)
+    auction = get_user_auction_transactions(db_session, user_id)
+    roll = get_user_roll_transactions(db_session, user_id)
+    return {
+        "purchase" : purchase,
+        "auction"  : auction,
+        "roll"    : roll
+    }
 
 @router.get("/admin/auctions/{auction_id}/highest-bidder")
 def highest_bidder(auction_id: str, token_data: Annotated[TokenData, Depends(extract_access_token)], db_session=Depends(get_db)):
@@ -87,8 +109,8 @@ def highest_bidder(auction_id: str, token_data: Annotated[TokenData, Depends(ext
 
     try:
         user_id, amount = get_highest_bidder(db_session, auction_id)
-    except (AuctionNotFound) as e:
-        raise HTTPException(status_code=400, detail=f"{e}")
+    except AuctionNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 

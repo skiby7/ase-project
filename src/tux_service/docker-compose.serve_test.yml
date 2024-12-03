@@ -7,7 +7,7 @@ services:
         environment:
             - TEST_RUN=true
         ports:
-            - 9390:9390
+            - 9290:9290
         secrets:
             - jwt_public_key
             - ssl_private_key
