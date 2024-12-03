@@ -3,6 +3,9 @@ services:
       build:
         context: ./service
         dockerfile: Dockerfile_test
+
+      ports:
+        - 9390:9390
       secrets:
         - auction_pw
         - auction_cert
