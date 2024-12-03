@@ -1,5 +1,6 @@
 import requests
 from auth.access_token_utils import TokenData
+from fastapi import HTTPException
 
 def check_tux(mock_check: bool,token_data: TokenData):
     if mock_check:
@@ -12,11 +13,14 @@ def check_tux(mock_check: bool,token_data: TokenData):
         data = {
             "user_id": str(token_data.sub),
         }
-        response = requests.post("https://tux_service:9290/roll", json=data, headers=headers, verify=False)
-        if not response.status_code == 200:
-            return False
-        else:
-            return True
+        try:
+            response = requests.post("https://tux_service:9290/roll", json=data, headers=headers, verify=False)
+            if not response.status_code == 200:
+                return False
+            else:
+                return True
+        except (requests.RequestException, ConnectionError):
+            raise HTTPException(status_code=400, detail="Internal Server Error")
 
 def check_user(mock_check: bool,token_data: TokenData):
     if mock_check:

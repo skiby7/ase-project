@@ -36,18 +36,18 @@ def user_gacha_collection(id: str, token_data: Annotated[TokenData, Depends(extr
             return res
 
 # View user personal gacha collection
-#@app.get("/{id}/gacha/collection/{name}", status_code=200)
-#def user_gacha_collection(id: str, name:str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    #404 se non c'è nella collection dell'utente.
-    # + raririty 
-    #if not check_user(mock_check,token_data):
-    #    raise HTTPException(status_code=400, detail="Invalid User")
-    #else: 
-    #    res = db.get_user_gacha(id);
-    #    if res == 1: 
-    #        raise HTTPException(status_code=400, detail="User Not present")
-    #    else: 
-    #        return res
+@app.get("/{id}/gacha/collection/{name}", status_code=200)
+def user_gacha_collection(id: str, name:str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    if not check_user(mock_check,token_data):
+        raise HTTPException(status_code=400, detail="Invalid User")
+    else: 
+        res = db.get_user_collection_gacha(id,name);
+        if res == 1: 
+            raise HTTPException(status_code=400, detail="User Not present")
+        elif res == 2: 
+            raise HTTPException(status_code=404, detail="Gacha not present in the user collection")
+        else: 
+            return res
 
 # View Specific Gacha Info
 @app.get("/user/gacha/{name}", status_code=200)
