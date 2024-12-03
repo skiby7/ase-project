@@ -94,7 +94,7 @@ class database:
                     {"$push": {"gacha_list": {"gacha_id": gacha_id, "value": 1}}}
                 )
 
-        return {"name": gacha_name}
+        return {"name": gacha_name, "image": gacha["image"]}
 
     def remove_user_gacha(self, id: str, gacha_name: str):
         id = str(id)

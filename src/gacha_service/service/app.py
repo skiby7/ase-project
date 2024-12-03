@@ -48,7 +48,7 @@ def user_gacha_specific(name: str, token_data: Annotated[TokenData, Depends(extr
 
 # Use In-Game Currency to Roll Gach
 mock_gacha_roll = None
-@app.get("/{id}/gacha/roll", status_code=200)
+@app.post("/{id}/gacha/roll", status_code=200)
 def user_gacha_roll(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check_user(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid User")
