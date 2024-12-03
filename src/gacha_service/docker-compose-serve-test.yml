@@ -2,7 +2,7 @@ services:
     distro:
         build:
             context: service
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile_test
         depends_on:
             - gacha_db
         ports:
@@ -13,6 +13,8 @@ services:
             - pw
             - jwt_private_key
             - jwt_public_key
+        networks:
+            - gacha_network
 
     gacha_db:
         image: mongo:latest
@@ -30,8 +32,10 @@ services:
         secrets:
             - cert_db
             - pw
-        volumes:
-            - dbdata:/data/db
+        tmpfs:
+            - /data/db
+        networks:
+            - gacha_network
 
 secrets:
     pw:
@@ -47,5 +51,6 @@ secrets:
     jwt_public_key:
         file: ./service/secrets/public.pem
 
-volumes:
-    dbdata:
+networks:
+    gacha_network:
+        driver: bridge

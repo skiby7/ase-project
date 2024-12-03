@@ -208,7 +208,7 @@ class database:
                "gacha_list": []
            }
         users.insert_one(user)
-        return {"id": id}
+        return {"uid": id}
 
     def remove_user(self, id: str):
         id = str(id)
@@ -216,4 +216,4 @@ class database:
         if not users.find_one({"id": str(id)}):
             return None
         users.delete_one({"id": id})
-        return id
+        return {"uid": id}
