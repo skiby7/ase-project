@@ -94,7 +94,7 @@ class database:
                     {"$push": {"gacha_list": {"gacha_id": gacha_id, "value": 1}}}
                 )
 
-        return {"name": gacha_name}
+        return {"name": gacha_name, "image": gacha["image"]}
 
     def remove_user_gacha(self, id: str, gacha_name: str):
         id = str(id)
@@ -143,6 +143,25 @@ class database:
             gacha = gachas.find_one({"id": gacha_u["gacha_id"]})
             res.append({"value" : gacha_u["value"], "name" : gacha["name"], "image" : gacha["image"]})
         return res
+
+    def get_user_collection_gacha(self, id: str, name: str):
+        id = str(id)
+        gachas = self.db["gachas"]
+        users = self.db["users"]
+        user = users.find_one({"id": id})
+        gacha = gachas.find_one({"name": name})
+ 
+        if not user:
+            return 1
+
+        user_gachas = list(user["gacha_list"])
+
+        for gacha_u in user_gachas:
+            gacha = gachas.find_one({"id": gacha_u["gacha_id"]})
+            if gacha["name"] == name:
+                return ({"value" : gacha_u["value"], "name" : gacha["name"], "image" : gacha["image"], "rarity" : gacha["rarity"]})
+        
+        return 2
 
     def get_roll_gacha(self, id: str, mock):
         id = str(id)
@@ -208,7 +227,7 @@ class database:
                "gacha_list": []
            }
         users.insert_one(user)
-        return {"id": id}
+        return {"uid": id}
 
     def remove_user(self, id: str):
         id = str(id)
@@ -216,4 +235,4 @@ class database:
         if not users.find_one({"id": str(id)}):
             return None
         users.delete_one({"id": id})
-        return id
+        return {"uid": id}
