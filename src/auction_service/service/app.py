@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import Body, FastAPI, HTTPException, Depends
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
-from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,IdStrings
+from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,AuthId
 from utils.check import check_admin,check_user
 from auth.access_token_utils import extract_access_token
 from auth.access_token_utils import TokenData
@@ -21,7 +21,7 @@ mock_check = None
 #dummy_player_id = "123e4567-e89b-12d3-a456-426614174000"
 
 app = FastAPI()
-db = database("database/auctions.json","database/bids.json")
+db = database("database/auctions.json","database/bids.json","database/users.json")
 
 
 
@@ -32,10 +32,11 @@ def checkAuctionExpiration():
     print("SCHEDULED FUNCTION",flush=True)
     finishedAuctions = db.checkAuctionExpiration()
     for auction in finishedAuctions:
-        if not mock_check:break
-        #url_api
-        #requests.get(url_api)
-        #give gacha to winning player
+        db.collection["auctions"].update_one({"player_id":auction["player_id"]},{"$set":{"active":True}})
+        if mock_check:continue
+        token_data = db.auth_get_admin_token()
+        db.tux_settle_auction(str(auction["current_winning_player"]),str(auction["player_id"]),token_data)
+
         
 
 scheduler = BackgroundScheduler()
@@ -93,16 +94,6 @@ def admin_endpoint(bid: Bid,token_data: Annotated[TokenData, Depends(extract_acc
     check_admin(mock_check,token_data)
 
     db.bid(bid,mock_check)
-
-
-# BID_DELETE
-@app.delete("/auction/admin/bid-delete", status_code=201)
-def admin_endpoint(bid_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_user(mock_check,token_data)
-
-    db.bid_owner(bid_id)
-    db.bid_delete(str(bid_id),mock_check)
-
 
 # BID_FILTER
 @app.get("/auction/admin/bid-filter", status_code=200)
@@ -193,3 +184,17 @@ def player_endpoint(player_id:UUID,bid_filter:BidOptional,token_data: Annotated[
     
     #extract player id
     return db.bid_filter(bid_filter)
+
+######### COOPERATION #########
+
+@app.post("/users", status_code=200)
+def player_endpoint(body:AuthId,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_user(mock_check,token_data)
+    
+    db.add_user(str(body["uid"]))
+
+@app.delete("/users/{player_id}", status_code=200)
+def player_endpoint(body:AuthId,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_user(mock_check,token_data)
+    
+    db.remove_user(str(body["uid"]))

@@ -1,51 +1,3 @@
-# services:
-#   auction:
-#     build: 
-#       context: service
-#       dockerfile: Dockerfile_test 
-#     depends_on:
-#       - db
-#     ports:
-#       - 9090:9090
-#     secrets:
-#       - cert
-#       - key
-#       - pw
-#       - jwt_private_key
-#       - jwt_public_key
-
-#   db:
-#     image: mongo:latest
-#     ports:
-#       - '27017:27017'
-#     environment:
-#       MONGO_INITDB_ROOT_USERNAME: root
-#       MONGO_INITDB_DATABASE: admin
-#       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
-#     command: mongod --quiet --logpath /dev/null 
-#       --tlsAllowConnectionsWithoutCertificates
-#       --tlsMode preferTLS
-#       --tlsCertificateKeyFile /run/secrets/cert_db
-#       --tlsCAFile /run/secrets/cert_db
-#     secrets:
-#       - cert_db
-#       - pw
-#     tmpfs:
-#       - /data/db 
-   
-# secrets: 
-#   pw: 
-#     file: ./service/secrets/pw.txt
-#   cert: 
-#     file: ./service/secrets/cert.pem
-#   key: 
-#     file: ./service/secrets/key.pem
-#   cert_db: 
-#     file: ./service/secrets/server.pem
-#   jwt_private_key:
-#     file: ./service/secrets/private.pem
-#   jwt_public_key:
-#     file: ./service/secrets/public.pem
 services:
   auction:
       build:
@@ -59,6 +11,7 @@ services:
           - auction_pw
           - jwt_private_key
           - jwt_public_key
+          - admin_account
 
   auction_db:
       image: mongo:latest
@@ -74,6 +27,7 @@ services:
       secrets:
           - auction_cert_db
           - auction_pw
+          - admin_account
       volumes:
           - auction_db_data:/data/db
 
@@ -91,6 +45,8 @@ secrets:
     auction_cert_db:
         file: ./service/secrets/server.pem
     jwt_private_key:
-      file: ./service/secrets/private.pem
+        file: ./service/secrets/private.pem
     jwt_public_key:
-      file: ./service/secrets/public.pem
+        file: ./service/secrets/public.pem
+    admin_account:
+        file: ./service/secrets/admin_account.json
