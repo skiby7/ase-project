@@ -22,10 +22,13 @@ def check_tux(mock_check: bool,token_data: TokenData):
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-def check_user(mock_check: bool,token_data: TokenData):
+def check_user(mock_check: bool,token_data: TokenData, id: str):
     if mock_check:
         return True
     else:
+        if id is not None:
+            if token_data.sub != id:
+                return False
         if token_data.role == "user":
             return True
         else:
