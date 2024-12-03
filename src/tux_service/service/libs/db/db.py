@@ -39,7 +39,7 @@ if not DATABASE_URL:
     sys.exit(-1)
 
 logger.info(f"Configured url {DATABASE_URL}")
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, echo=TEST_RUN)
 Session = sessionmaker(bind=engine)
 
 def get_db():
