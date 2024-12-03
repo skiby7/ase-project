@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from routers.transactions.models import AuctionTransactionModel, PurchaseTransactionModel, RollTransactionModel
 from libs.db.utils import transactional
 from libs.db.tables import Base, RollTransaction, TuxPurchaseTransaction, InterUserTransaction, UserBalance, GameBalance, FreezedTux
-from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation, AuctionNotFound, LowerBidException
+from libs.exceptions import UserNotFound, AlreadySettled, InsufficientFunds, WrongOperation, AuctionNotFound
 
 unix_time = lambda: int(time.time())
 
