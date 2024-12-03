@@ -124,7 +124,7 @@ services:
         networks:
             - gacha_public_network
             - gacha_private_network
-    
+
     auction:
         build:
             context: ./auction_service/service
@@ -132,12 +132,12 @@ services:
         depends_on:
             - auction_db
         secrets:
+            - admin_account
             - auction_cert
             - auction_key
             - auction_pw
             - jwt_private_key
             - jwt_public_key
-
         networks:
             - gacha_public_network
             - gacha_private_network
@@ -234,8 +234,8 @@ volumes:
     pgadmin:
         driver: local
     auction_db_data:
-        driver: local  
-    
+        driver: local
+
 secrets:
     auction_pw:
         file: ./auction_service/service/secrets/pw.txt

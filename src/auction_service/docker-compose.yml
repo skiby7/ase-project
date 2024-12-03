@@ -1,46 +1,47 @@
 services:
-  distro:
-    build: 
+  auction:
+    build:
       context: service
-      dockerfile: Dockerfile_test
+      dockerfile: Dockerfile
     depends_on:
-      - db
+      - auction_db
     ports:
-      - 9190:9190
+      - 9390:9390
     secrets:
-      - cert
-      - key
-      - pw
+      - admin_account
+      - auction_cert
+      - auction_key
+      - auction_pw
       - jwt_private_key
       - jwt_public_key
 
-  db:
+  auction_db:
     image: mongo:latest
-    ports:
-      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_DATABASE: admin
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
-    command: mongod --quiet --logpath /dev/null 
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/auction_pw
+    command: mongod --quiet --logpath /dev/null
       --tlsAllowConnectionsWithoutCertificates
       --tlsMode preferTLS
       --tlsCertificateKeyFile /run/secrets/cert_db
       --tlsCAFile /run/secrets/cert_db
     secrets:
       - cert_db
-      - pw
+      - auction_pw
     tmpfs:
-      - /data/db 
-   
-secrets: 
-  pw: 
+      - /data/db
+
+secrets:
+  admin_account:
+    file: ./service/secrets/admin_account.json
+  auction_pw:
     file: ./service/secrets/pw.txt
-  cert: 
+  auction_cert:
     file: ./service/secrets/cert.pem
-  key: 
+  auction_key:
     file: ./service/secrets/key.pem
-  cert_db: 
+  cert_db:
     file: ./service/secrets/server.pem
   jwt_private_key:
     file: ./service/secrets/private.pem

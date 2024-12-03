@@ -37,7 +37,7 @@ def checkAuctionExpiration():
         token_data = db.auth_get_admin_token()
         db.tux_settle_auction(str(auction["current_winning_player"]),str(auction["player_id"]),token_data)
 
-        
+
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(checkAuctionExpiration,"interval",minutes=CHECK_EXPIRY_INTERVAL,coalesce=False,misfire_grace_time=20)
@@ -70,7 +70,7 @@ def admin_endpoint(auction:Auction,token_data: Annotated[TokenData, Depends(extr
 @app.delete("/auction/admin/auction-delete", status_code=200)
 def admin_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check,token_data)
-    
+
     db.auction_owner(str(auction_id))
     db.auction_delete(str(auction_id),mock_check)
 
@@ -116,7 +116,7 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 ######### PLAYER #########
 # HP player can only create and delete auctions (fair for bidders)
 # HP player cannot modify created auctions (fair for bidders)
-# HP player cannot retire a bid 
+# HP player cannot retire a bid
 
 ##### AUCTION #####
 
@@ -131,17 +131,17 @@ def player_endpoint(player_id:UUID,auction:Auction,token_data: Annotated[TokenDa
         raise HTTPException(status_code=400, detail="Player_id not valid.")
 
     db.auction_create(auction,mock_check)
-    
+
 
 # DONE
 # AUCTION_DELETE - playerd_id is owner of auction_id
 @app.delete("/auction/{player_id}/auction-delete", status_code=200)
 def player_endpoint(player_id:UUID,auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
-    
+
     if str(player_id) != db.auction_owner(str(auction_id)) or ((not mock_check) and str(player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid.")
-    
+
     db.auction_delete(str(auction_id),mock_check)
 
 
@@ -150,10 +150,10 @@ def player_endpoint(player_id:UUID,auction_id:UUID,token_data: Annotated[TokenDa
 @app.get("/auction/auction-filter", status_code=200)
 def player_endpoint(auction_filter:AuctionOptional,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
-    
+
     if auction_filter.active is None or (auction_filter.active is not None and auction_filter.active is False):
         raise HTTPException(status_code=400, detail="Active field must be set to True for player to use this endpoint")
-        
+
     return db.auction_filter(auction_filter)
 
 
@@ -181,7 +181,7 @@ def player_endpoint(player_id:UUID,bid_filter:BidOptional,token_data: Annotated[
 
     if player_id != bid_filter.player_id or ((not mock_check) and str(player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid.")
-    
+
     #extract player id
     return db.bid_filter(bid_filter)
 
@@ -190,11 +190,11 @@ def player_endpoint(player_id:UUID,bid_filter:BidOptional,token_data: Annotated[
 @app.post("/users", status_code=200)
 def player_endpoint(body:AuthId,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
-    
+
     db.add_user(str(body["uid"]))
 
 @app.delete("/users/{player_id}", status_code=200)
 def player_endpoint(body:AuthId,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
-    
+
     db.remove_user(str(body["uid"]))
