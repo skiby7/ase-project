@@ -189,26 +189,24 @@ class database:
             token_data = self.auth_get_admin_token()
             self.tux_freeze_tux(str(bid.player_id),bid.bid,token_data)
         
+        #TODO: check this
         update={}
         update["current_winning_player_id"]=str(bid.player_id)
         update["current_winning_bid"]=bid.bid
-        self.db["auctions"].update_one({},{"$set": update})
+
+        self.db["auctions"].update_one({"auction_id": auction["auction_id"]},{"$set": update})
 
         bidInsert = bid.model_dump()
         if mock_check:
             id=str(UUID("00000000-0000-4000-8000-000000000000"))
         else:
-            while(True):
-                id=str(uuid.uuid4())
-                if(not self.db["auctions"].find_one({"auction_id":id})):break
+            id=str(uuid.uuid4())
 
 
         bidInsert["bid_id"]=id
         bidInsert["time"]=unix_time()
-        bidInsert = {
-            key: (str(value) if isinstance(value, UUID) else value)
-            for key, value in bidInsert.items()
-        }
+        bidInsert["auction_id"]=auction["auction_id"]
+        bidInsert["value"]=bid.bid
         
         self.db["bids"].insert_one(bidInsert)
 
@@ -220,13 +218,13 @@ class database:
         if bid_filter.time is not None and bid_filter.time<0:
             raise HTTPException(status_code=400, detail="time must be >=0")
         
+        # TODO: check this
         filtered_dict = {
             key: (str(value) if isinstance(value, UUID) else value)
             for key, value in bid_filter.model_dump().items()
             if value is not None
         }
 
-        print("caiao",filtered_dict,type(filtered_dict))
         return list(self.db["bids"].find(filtered_dict,{"_id":0}))
 
 
