@@ -137,7 +137,7 @@ services:
         container_name: admin_nginx
         image: nginx:latest
         healthcheck:
-            test: curl --silent --fail --insecure https://admin_nginx:443/health || exit 1
+            test: service nginx status || exit 1
             interval: 5s
             retries: 3
             start_period: 60s
@@ -163,7 +163,7 @@ services:
         container_name: public_nginx
         image: nginx:latest
         healthcheck:
-            test: curl --silent --fail --insecure https://public_nginx:443/health || exit 1
+            test: service nginx status || exit 1
             interval: 5s
             retries: 3
             start_period: 60s
