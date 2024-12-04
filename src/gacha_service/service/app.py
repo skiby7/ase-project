@@ -79,7 +79,7 @@ def user_gacha_roll(id: str, token_data: Annotated[TokenData, Depends(extract_ac
             else:
                 return res
         else: 
-            raise HTTPException(status_code=400, detail="ERROR")
+            raise HTTPException(status_code=400, detail="Error, you don't have enough tux to complete the roll")
 
 # Admin View Gacha Collection
 @app.get("/admin/gacha/all", status_code=200)
