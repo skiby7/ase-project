@@ -14,3 +14,9 @@ def verify_name(name: str) -> bool:
         return True
     else:
         return False
+
+def verify_rarity(rarity: str) -> bool: 
+    if re.fullmatch(r"[1-5]", rarity):
+        return True
+    else:
+        return False

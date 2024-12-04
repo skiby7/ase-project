@@ -4,7 +4,7 @@ from database.db import database
 from typing import Annotated
 from auth.access_token_utils import extract_access_token
 from auth.access_token_utils import TokenData
-from gacha_utils.gacha import Gacha,verify_name
+from gacha_utils.gacha import Gacha, verify_name, verify_rarity
 from check_utils.check import check_tux,check_user,check_admin
 from user_utils.user import User
 from user_utils.add_user import Add_user
@@ -105,6 +105,8 @@ def user_gacha_modify(gacha: Gacha, token_data: Annotated[TokenData, Depends(ext
     else: 
         if not verify_name(gacha.name):
             raise HTTPException(status_code=400, detail="Gacha name not valid")
+        if not verify_rarity(gacha.rarity):
+            raise HTTPException(status_code=400, detail="Rarity not valid")
         res = db.add_gacha(gacha.name,gacha.rarity,gacha.image,mock_id)
         if not res: 
             raise HTTPException(status_code=400, detail="Gacha already present")
@@ -126,7 +128,9 @@ def user_gacha_modify(name, token_data: Annotated[TokenData, Depends(extract_acc
 def user_gacha(gacha: Gacha, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
-    else: 
+    else:  
+        if not verify_rarity(gacha.rarity):
+            raise HTTPException(status_code=400, detail="Rarity not valid")
         res = db.modify_gacha(gacha.name,gacha.rarity,gacha.image)
         if not res: 
             raise HTTPException(status_code=400, detail="Gacha Not present")
