@@ -30,11 +30,11 @@ class database:
         with open('/run/secrets/auction_pw', 'r') as file:
             password = file.read().strip()
         uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
-        print("ciao")
+
         self.client = MongoClient(uri)
-        print("ciao")
+        
         self.db = self.client["mydatabase"]
-        print("ciao")
+        
         if "auctions" in self.db.list_collection_names():
             print(" \n\n DB ACTIVE  \n\n")
         else: 
@@ -99,7 +99,7 @@ class database:
             self.check_player_presence(auction["player_id"])
 
         if(auction.starting_price<0):
-            raise HTTPException(status_code=400, detail="Invalid price")
+            raise HTTPException(status_code=400, detail="Invalid starting_price")
         if(auction.end_time<unix_time()):
             raise HTTPException(status_code=400, detail="Invalid time")
         
@@ -122,6 +122,7 @@ class database:
             }
 
         self.db["auctions"].insert_one(auction)
+        return id
 
     
     # DONE
@@ -170,11 +171,11 @@ class database:
     # DONE
     # BID
     def bid(self,bid:Bid,mock_check:bool):
-        time = unix_time
+        time_supp = unix_time()
         auction = self.db["auctions"].find_one({"auction_id":str(bid.auction_id),"active":True})
         if auction is None :
             raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
-        if time > auction["end_time"]:
+        if time_supp > auction["end_time"]:
             raise HTTPException(status_code=400, detail="Bid was made after the end of the auction")
         if str(bid.player_id) == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")

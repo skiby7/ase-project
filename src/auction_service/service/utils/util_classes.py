@@ -10,14 +10,10 @@ class IdStrings(Enum):
 
 
 class Auction(BaseModel):
-    #auction_id:UUID created bd side
     player_id:UUID
     gacha_name:str
     starting_price :int
-    #current_winning_player_id:UUID created bd side
-    #current_winning_bid:int created bd side
     end_time:int
-    #active:bool created bd side
 
 
 class AuctionOptional(BaseModel):
@@ -31,11 +27,9 @@ class AuctionOptional(BaseModel):
 
 
 class Bid(BaseModel):
-    #bid_id:UUID created db side
     auction_id:UUID
     player_id:UUID
     bid:int
-    #time:int created bd side
 
 
 class BidOptional(BaseModel):
