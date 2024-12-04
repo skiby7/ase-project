@@ -45,6 +45,30 @@ names = [
     "wing", "wozniak", "wright", "yonath", "zhukovsky"
 ]
 
+linux_distributions = [
+    "Alpine Linux",
+    "Arch Linux",
+    "Bodhi Linux",
+    "Debian",
+    "Fedora",
+    "Gentoo",
+    "HannaMontana Linux",
+    "Kali Linux",
+    "Manjaro",
+    "Mint",
+    "NixOS",
+    "openSUSE",
+    "Pop!_OS",
+    "Raspberry Pi OS",
+    "Slackware",
+    "Solus",
+    "Tails",
+    "TempleOS",
+    "Ubuntu",
+    "Void Linux",
+    "Zorin OS"
+]
+
 def gen_username():
     adjective = random.choice(adjectives)
     name = random.choice(names)
@@ -81,13 +105,14 @@ class Operations():
     userinfo = "/api/auth/userinfo"
     buy = "/api/tux-management/buy"
     roll = "/api/distro/{}/gacha/roll"
+    distro_info = "/api/distro/user/gacha/{}"
 
 class UserBehavior(HttpUser):
     wait_time = between(1, 3)  # Users wait between 1 and 3 seconds between tasks
 
     # Headers and initial setup
     def on_start(self):
-        pass
+        self.users = []
         # self.register_url = "/api/auth/accounts"
         # self.login_url = "/api/auth/token"
         # self.user_data = {
@@ -107,6 +132,10 @@ class UserBehavior(HttpUser):
         )
         if response.status_code in (200, 201):
             print("Registration successful")
+            self.users.append[{  # type: ignore
+                "username" : user_data["username"],
+                "password" : user_data["password"]
+            }]
             return True
         else:
             print(f"Failed to register: {response.status_code} {response.text}")

@@ -144,8 +144,6 @@ services:
             timeout: 5s
         volumes:
             - ../gateways/admin/nginx:/etc/nginx/conf.d
-        ports:
-            - "8180:443"
         secrets:
             - ssl_admin_api_cert
             - ssl_admin_api_key
@@ -170,8 +168,6 @@ services:
             timeout: 5s
         volumes:
             - ../gateways/public/nginx:/etc/nginx/conf.d
-        ports:
-            - "8080:443"
         secrets:
             - ssl_public_api_cert
             - ssl_public_api_key
