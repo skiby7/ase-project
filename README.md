@@ -14,9 +14,11 @@ To start the project just clone the repo and:
 
 ```bash
 cd ase-project/src
-docker compose up --build
+./run_backend.sh
 ```
 By default the two gateways will listen on port `8080` (normal users) and `8180` (admins). Now you can start locust in the same directory to start the performance testing.
+**Please note:** It is possible to start the services with `docker compose up`, but remember to execute `docker compose down` before starting any other compose file, otherwise there could be some container name conficts. The `run_backend.sh` script handles the cleanup for you.
+
 To start the integration tests, stop all running containersm head over `src/integration_tests` and execute the `run_tests.sh` script.
 This will start the dockerized version of `newman` along with the service container and will perform the integration tests in a production environment.
 To run individual tests, just move inside the service directory of choice and type:
