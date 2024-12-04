@@ -82,12 +82,6 @@ class database:
     # AUCTION_CREATE
     def auction_create(self, auction: Auction, mock_check: bool):
 
-        # Distro check
-        if not mock_check:
-            access_token = self.auth_get_admin_token()
-            self.gacha_remove_gacha(str(auction.player_id),
-                                    auction.gacha_name, access_token)
-
         # Player existence
         if not mock_check:
             self.check_player_presence(auction["player_id"])
@@ -96,6 +90,12 @@ class database:
             raise HTTPException(status_code=400, detail="Invalid starting_price")
         if (auction.end_time < unix_time()):
             raise HTTPException(status_code=400, detail="Invalid time")
+
+        # Distro check
+        if not mock_check:
+            access_token = self.auth_get_admin_token()
+            self.gacha_remove_gacha(str(auction.player_id),
+                                    auction.gacha_name, access_token)
 
         if mock_check:
             id = str(UUID("00000000-0000-4000-8000-000000000000"))
