@@ -80,15 +80,15 @@ class database:
     ##### AUCTION #####
 
     # AUCTION_CREATE
-    def auction_create(self, auction: Auction, mock_check: bool):
+    def auction_create(self, auction: Auction, mock_check: bool) -> Auction:
 
         # Player existence
         if not mock_check:
-            self.check_player_presence(auction["player_id"])
+            self.check_player_presence(str(auction.player_id))
 
-        if (auction.starting_price < 0):
+        if auction.starting_price < 0:
             raise HTTPException(status_code=400, detail="Invalid starting_price")
-        if (auction.end_time < unix_time()):
+        if auction.end_time < unix_time():
             raise HTTPException(status_code=400, detail="Invalid time")
 
         # Distro check
@@ -114,7 +114,7 @@ class database:
         }
 
         self.db["auctions"].insert_one(auction)
-        return id
+        return Auction(**auction)
 
     # DONE
     # AUCTION_DELETE
@@ -286,7 +286,7 @@ class database:
         if owner is None: raise HTTPException(status_code=400, detail="No bid found with specified criteria")
         return owner["bid_id"]
 
-    def check_player_presence(self, player_id):
+    def check_player_presence(self, player_id: str):
         if self.db["users"].find_one({"player_id": player_id}) is None:
             raise HTTPException(400, "Player is not existent according knowledge base")
 
@@ -300,8 +300,8 @@ class database:
             "gacha_name": gacha_name
         }
         try:
-            response = requests.delete("https://distro/admin/remove/user/gacha", headers=header, data=data,
-                                       verify=False)
+            response = requests.delete("https://distro:9190/admin/remove/user/gacha", headers=header,
+                                       json=data, verify=False)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="User's gacha cannot be found.")
         except (requests.RequestException, ConnectionError):
@@ -317,7 +317,8 @@ class database:
             "gacha_name": gacha_name
         }
         try:
-            response = requests.post("https://distro/admin/add/user/gacha", headers=header, data=data, verify=False)
+            response = requests.post("https://distro:9190/admin/add/user/gacha",
+                                     headers=header, json=data, verify=False)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Gacha cannot be added to its collection")
         except (requests.RequestException, ConnectionError):
