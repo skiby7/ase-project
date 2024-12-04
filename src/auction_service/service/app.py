@@ -122,11 +122,11 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 
 # DONE
 # AUCTION_CREATE - player_id == auction.player_id
-@app.post("/auction/{player_id}/auction-create", status_code=201)
-def player_endpoint(player_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)],auction:Auction=Body()):
+@app.post("/auctions", status_code=201)
+def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],auction:Auction=Body()):
     check_user(mock_check,token_data)
 
-    if (player_id != auction.player_id) or ((not mock_check) and str(player_id) != token_data.sub):
+    if ((not mock_check) and str(auction.player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     db.auction_create(auction,mock_check)
@@ -134,15 +134,15 @@ def player_endpoint(player_id:UUID,token_data: Annotated[TokenData, Depends(extr
 
 # DONE
 # AUCTION_DELETE - playerd_id is owner of auction_id
-@app.delete("/auction/{player_id}/auction-delete", status_code=200)
-def player_endpoint(player_id:UUID,auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
+@app.delete("/auctions/{auction_id}", status_code=200)
+def player_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
 
-    if str(player_id) != db.auction_owner(str(auction_id)) or ((not mock_check) and str(player_id) != token_data.sub):
+    if str(token_data.sub) != db.auction_owner(str(auction_id)):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     db.auction_delete(str(auction_id),mock_check)
-
+    return {"message": "auction {auction_id} succesfully deleted"}
 
 # DONE
 # AUCTION_FILTER - "active":True
