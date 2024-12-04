@@ -2528,7 +2528,7 @@
 		},
 		{
 			"key": "base_public_url",
-			"value": "https://localhost:8080/api",
+			"value": "https://public_nginx:443/api",
 			"type": "default"
 		},
 		{
@@ -2576,7 +2576,7 @@
 		},
 		{
 			"key": "base_admin_url",
-			"value": "https://localhost:8180/admin/api",
+			"value": "https://admin_nginx:443/admin/api",
 			"type": "string"
 		}
 	]

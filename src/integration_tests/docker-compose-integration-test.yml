@@ -134,7 +134,7 @@ services:
             - gacha_private_network_tests
 
     admin_nginx:
-        container_name: admin_nginx
+        # container_name: admin_nginx
         image: nginx:latest
         healthcheck:
             test: service nginx status || exit 1
@@ -160,7 +160,7 @@ services:
                 condition: service_healthy
 
     public_nginx:
-        container_name: public_nginx
+        # container_name: public_nginx
         image: nginx:latest
         healthcheck:
             test: service nginx status || exit 1
