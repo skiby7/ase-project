@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import Body, FastAPI, HTTPException, Depends
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
-from utils.util_classes import Auction, Bid, AuctionOptional, BidOptional, AuthId
+from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, AuthId
 from utils.check import check_admin, check_user
 from auth.access_token_utils import extract_access_token
 from auth.access_token_utils import TokenData
@@ -53,7 +53,7 @@ scheduler.start()
 
 # AUCTION_CREATE
 @app.post("/auction/admin/auction-create", status_code=201)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: Auction = Body()):
+def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
     check_admin(mock_check, token_data)
 
     return db.auction_create(auction, mock_check)
@@ -118,27 +118,27 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 # DONE
 # AUCTION_CREATE - player_id == auction.player_id
 @app.post("/auctions", status_code=201)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],auction:Auction=Body()):
-    check_user(mock_check,token_data)
+def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
+    check_user(mock_check, token_data)
 
     if (mock_check or str(auction.player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
-    auction_id = db.auction_create(auction, mock_check)
-    return {"message": "auction {auction_id} succesfully deleted"}
+    return db.auction_create(auction, mock_check)
 
 
 # DONE
 # AUCTION_DELETE - playerd_id is owner of auction_id
 @app.delete("/auctions/{auction_id}", status_code=200)
-def player_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_user(mock_check,token_data)
+def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    check_user(mock_check, token_data)
 
     if mock_check or (str(token_data.sub) != db.auction_owner(str(auction_id))):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
-    db.auction_delete(str(auction_id),mock_check)
-    return {"message": "auction {auction_id} succesfully deleted"}
+    db.auction_delete(str(auction_id), mock_check)
+    return {"message": f"auction {auction_id} succesfully deleted"}
+
 
 # DONE
 # AUCTION_FILTER - "active":True
@@ -162,8 +162,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid: Bid = Body()):
     check_user(mock_check, token_data)
-
-    if mock_check or (token_data.sub != bid.player_id):
+    if mock_check or (token_data.sub != str(bid.player_id)):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     # extract player id

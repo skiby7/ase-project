@@ -4,7 +4,7 @@ import uuid
 import time
 
 from pymongo.results import InsertOneResult, DeleteResult
-from utils.util_classes import Auction, Bid, AuctionOptional, BidOptional, IdStrings
+from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, IdStrings, AuctionPublic
 from fastapi import Body, FastAPI, HTTPException
 from uuid import UUID
 import requests
@@ -80,7 +80,7 @@ class database:
     ##### AUCTION #####
 
     # AUCTION_CREATE
-    def auction_create(self, auction: Auction, mock_check: bool) -> Auction:
+    def auction_create(self, auction: AuctionCreate, mock_check: bool) -> AuctionPublic:
 
         # Player existence
         if not mock_check:
@@ -114,7 +114,7 @@ class database:
         }
 
         self.db["auctions"].insert_one(auction)
-        return Auction(**auction)
+        return AuctionPublic(**auction)
 
     # DONE
     # AUCTION_DELETE
@@ -173,12 +173,12 @@ class database:
 
         # Player existence
         if not mock_check:
-            self.check_player_presence(bid["player_id"])
+            self.check_player_presence(str(bid.player_id))
 
         # Tux freeze
         if not mock_check:
-            token_data = self.auth_get_admin_token()
-            self.tux_freeze_tux(str(bid.player_id), bid.bid, token_data)
+            access_token = self.auth_get_admin_token()
+            self.tux_freeze_tux(str(bid.player_id), bid.bid, access_token)
 
         # TODO: check this
         update = {}
@@ -325,9 +325,9 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    def tux_freeze_tux(auction_id, user_id, tux_amount, token_data):
+    def tux_freeze_tux(auction_id, user_id, tux_amount, access_token):
         header = {
-            "Authorization": f"Bearer {token_data.jwt}",
+            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         data = {
@@ -335,8 +335,10 @@ class database:
             "tux_amount": tux_amount
         }
         try:
-            response = requests.post("https://tux_service/admin/auctions/{auction_id}/freeze", headers=header,
-                                     data=data, verify=False)
+            response = requests.post("https://tux_service:9290/admin/auctions/{auction_id}/freeze", headers=header,
+                                     json=data, verify=False)
+            if response.status_code == 402:
+                raise HTTPException(status_code=402, detail="Insufficient tux balance to place the bid")
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Cannot retrieve tux from bidder account.")
         except (requests.RequestException, ConnectionError):

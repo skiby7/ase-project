@@ -11,7 +11,14 @@ class IdStrings(Enum):
     GACHA_ID = "gacha_id"
 
 
-class Auction(BaseModel):
+class AuctionCreate(BaseModel):
+    player_id: UUID
+    gacha_name: str
+    starting_price: int
+    end_time: int
+
+class AuctionPublic(BaseModel):
+    auction_id: str
     player_id: UUID
     gacha_name: str
     starting_price: int
