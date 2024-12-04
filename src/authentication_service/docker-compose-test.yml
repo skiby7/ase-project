@@ -12,9 +12,6 @@ services:
         environment:
             - RESOURCE_PATH=/code/service/resources
             - MAIN_MODULE=service.main_test
-        volumes:
-            # monto la libreria condivisa
-            - ../shared_libs:/code/service/shared_libs
         ports:
             - "9090:9090"
         networks:

@@ -6,9 +6,6 @@ services:
             context: ./authentication_service/service
         environment:
             - RESOURCE_PATH=/code/service/resources
-        volumes:
-            #monto la libreria condivisa
-            - ./shared_libs:/code/service/shared_libs
         depends_on:
             - auth_db
         secrets:

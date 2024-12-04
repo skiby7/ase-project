@@ -1,0 +1,262 @@
+services:
+    authentication:
+        container_name: authentication
+        restart: always
+        healthcheck:
+            test: curl --silent --fail --insecure https://authentication:9090/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        build:
+            context: ../authentication_service/service
+        environment:
+            - RESOURCE_PATH=/code/service/resources
+        depends_on:
+            - auth_db
+        secrets:
+            - jwt_private_key
+            - jwt_public_key
+            - admin_account
+            - ssl_private_key
+            - ssl_cert
+            - mongodb_password
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    auth_db:
+        container_name: db_authentication
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongodb_password
+        command: mongod --auth --quiet --logpath /dev/null
+            --tlsAllowConnectionsWithoutCertificates
+            --tlsMode preferTLS
+            --tlsCertificateKeyFile /run/secrets/ssl_mongo_cert_key
+            --tlsCAFile /run/secrets/ssl_mongo_cert_key
+        secrets:
+            - mongodb_password
+            - ssl_mongo_cert_key
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    distro:
+        healthcheck:
+            test: curl --silent --fail --insecure https://distro:9190/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        build:
+            context: ../gacha_service/service
+        depends_on:
+            - gacha_db
+        secrets:
+            - cert
+            - key
+            - pw
+            - jwt_private_key
+            - jwt_public_key
+
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    gacha_db:
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/pw
+        command: mongod --quiet --logpath /dev/null
+            --tlsAllowConnectionsWithoutCertificates
+            --tlsMode preferTLS
+            --tlsCertificateKeyFile /run/secrets/cert_db
+            --tlsCAFile /run/secrets/cert_db
+        secrets:
+            - cert_db
+            - pw
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    tux_service:
+        container_name: tux_service
+        restart: unless-stopped
+        build:
+            context: ../tux_service/service
+        healthcheck:
+            test: curl --silent --fail --insecure https://tux_service:9290/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        environment:
+            - DATABASE_SCHEMA=postgresql://
+            - DATABASE_IP=tux_db
+            - DATABASE_PORT=5432
+        secrets:
+            - tux_db_user
+            - tux_db_password
+            - jwt_public_key
+            - ssl_private_key
+            - ssl_cert
+        depends_on:
+            tux_db:
+                condition: service_healthy
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    tux_db:
+        container_name: tux_db
+        image: postgres
+        restart: always
+        shm_size: 128mb
+        environment:
+            POSTGRES_USER_FILE: /run/secrets/tux_db_user
+            POSTGRES_PASSWORD_FILE: /run/secrets/tux_db_password
+            # POSTGRES_HOST_AUTH_METHOD: trust
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        secrets:
+            - tux_db_user
+            - tux_db_password
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    admin_nginx:
+        # container_name: admin_nginx
+        image: nginx:latest
+        healthcheck:
+            test: service nginx status || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 60s
+            timeout: 5s
+        volumes:
+            - ../gateways/admin/nginx:/etc/nginx/conf.d
+        ports:
+            - "8180:443"
+        secrets:
+            - ssl_admin_api_cert
+            - ssl_admin_api_key
+        networks:
+            - gacha_private_network_tests
+        depends_on:
+            authentication:
+                condition: service_healthy
+            distro:
+                condition: service_healthy
+            tux_service:
+                condition: service_healthy
+
+    public_nginx:
+        # container_name: public_nginx
+        image: nginx:latest
+        healthcheck:
+            test: service nginx status || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 60s
+            timeout: 5s
+        volumes:
+            - ../gateways/public/nginx:/etc/nginx/conf.d
+        ports:
+            - "8080:443"
+        secrets:
+            - ssl_public_api_cert
+            - ssl_public_api_key
+        networks:
+            - gacha_public_network_tests
+        depends_on:
+            authentication:
+                condition: service_healthy
+            distro:
+                condition: service_healthy
+            tux_service:
+                condition: service_healthy
+
+    newman:
+        image: postman/newman:latest
+        container_name: integration_tests
+        restart: no
+        depends_on:
+            authentication:
+                condition: service_healthy
+            distro:
+                condition: service_healthy
+            tux_service:
+                condition: service_healthy
+            public_nginx:
+                condition: service_healthy
+            admin_nginx:
+                condition: service_healthy
+        entrypoint:
+            [
+                "newman",
+                "run",
+                "/etc/postman/integration_tests.postman_collection.json",
+                "--delay-request",
+                "100",
+                "--insecure",
+                "--reporters",
+                "cli",
+            ]
+        volumes:
+            - ./tests/:/etc/postman
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+secrets:
+    pw:
+        file: ../gacha_service/service/secrets/pw.txt
+    cert:
+        file: ../gacha_service/service/secrets/cert.pem
+    key:
+        file: ../gacha_service/service/secrets/key.pem
+    cert_db:
+        file: ../gacha_service/service/secrets/server.pem
+    jwt_private_key:
+        file: ../authentication_service/secrets/private.pem
+    jwt_public_key:
+        file: ../authentication_service/secrets/public.pem
+    admin_account:
+        file: ../authentication_service/secrets/admin_account.json
+    ssl_private_key:
+        file: ../authentication_service/secrets/app_key.pem
+    ssl_cert:
+        file: ../authentication_service/secrets/app_cert.pem
+    ssl_mongo_cert_key:
+        file: ../authentication_service/secrets/ssl_mongo_cert_key.pem
+    mongodb_password:
+        file: ../authentication_service/secrets/mongo_root_password
+    pgadmin_password:
+        file: ./service/secrets/pgadmin_password
+    ssl_admin_api_key:
+        file: ../gateways/admin/secrets/key.key
+    ssl_admin_api_cert:
+        file: ../gateways/admin/secrets/cert.crt
+    ssl_public_api_key:
+        file: ../gateways/public/secrets/key.key
+    ssl_public_api_cert:
+        file: ../gateways/public/secrets/cert.crt
+    tux_db_user:
+        file: ../tux_service/service/secrets/db_user
+    tux_db_password:
+        file: ../tux_service/service/secrets/db_password
+
+networks:
+    gacha_public_network_tests:
+        driver: bridge
+    gacha_private_network_tests:
+        driver: bridge
