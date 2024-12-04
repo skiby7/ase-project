@@ -45,7 +45,7 @@ names = [
     "wing", "wozniak", "wright", "yonath", "zhukovsky"
 ]
 
-linux_distributions = [
+linux_distros = [
     "Alpine Linux",
     "Arch Linux",
     "Bodhi Linux",
@@ -105,7 +105,10 @@ class Operations():
     userinfo = "/api/auth/userinfo"
     buy = "/api/tux-management/buy"
     roll = "/api/distro/{}/gacha/roll"
+    system_collection = "/api/distro/user/gacha/all"
     distro_info = "/api/distro/user/gacha/{}"
+    transaction_history = "/api/tux-management/transactions/{}"
+
 
 class UserBehavior(HttpUser):
     wait_time = between(1, 3)  # Users wait between 1 and 3 seconds between tasks
@@ -123,23 +126,6 @@ class UserBehavior(HttpUser):
         # self.auth_token = None
         # self.user_id = None
         # self.register()
-
-    def register(self, user_data: dict):
-        response = self.client.post(
-            Operations.register,
-            json=user_data,
-            verify=False  # Accept self-signed certificates
-        )
-        if response.status_code in (200, 201):
-            print("Registration successful")
-            self.users.append[{  # type: ignore
-                "username" : user_data["username"],
-                "password" : user_data["password"]
-            }]
-            return True
-        else:
-            print(f"Failed to register: {response.status_code} {response.text}")
-            return False
 
     def fetch_token(self, user_data: dict):
         data = {
@@ -177,24 +163,47 @@ class UserBehavior(HttpUser):
         print(f"Failed to fetch token: {response.status_code} {response.text}")
         return None
 
-    @task
-    def they_see_me_rolling(self):
+    @task(weight=20)
+    def register(self):
         username = gen_username()
         user_data = {
             "username" : username,
             "password" : gen_password(),
             "email"    : gen_email(username)
         }
-        if not self.register(user_data):
-            print(f"Cannot register {user_data}, skipping!")
+        response = self.client.post(
+            Operations.register,
+            json=user_data,
+            verify=False  # Accept self-signed certificates
+        )
+        if response.status_code in (200, 201):
+            print("Registration successful")
+            self.users.append({  # type: ignore
+                "username" : user_data["username"],
+                "password" : user_data["password"]
+            })
+            print(f"{len(self.users)} available")
+            return
+        else:
+            print(f"Failed to register: {response.status_code} {response.text}")
             return
 
+    @task(weight=2)
+    def they_see_me_rolling(self):
+        if len(self.users) == 0:
+            print("No users available, skipping...")
+            return
+
+        user_data = random.choice(self.users)
         auth_token, _ = self.fetch_token(user_data)
         if not auth_token:
-            print("No auth token. Skipping operations.")
+            print("No auth token, skipping...")
             return
-        del user_data['email']
         user_id = self.login(user_data, auth_token)
+
+        if not user_id:
+            print("No auth token, skipping...")
+            return
         headers = {
             "Authorization": f"Bearer {auth_token}",
             "Content-Type": "application/json"
@@ -223,3 +232,96 @@ class UserBehavior(HttpUser):
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
+
+    @task(weight=3)
+    def get_distro_info(self):
+        if len(self.users) == 0:
+            print("No users available, skipping...")
+            return
+
+        user_data = random.choice(self.users)
+        auth_token, _ = self.fetch_token(user_data)
+        if not auth_token:
+            print("No auth token, skipping...")
+            return
+
+        user_id = self.login(user_data, auth_token)
+        if not user_id:
+            print("No auth token, skipping...")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {auth_token}",
+            "Content-Type": "application/json"
+        }
+        response = self.client.get(
+            Operations.distro_info.format(random.choice(linux_distros)),
+            headers=headers,
+            verify=False
+        )
+        if response.status_code == 200:
+            print("Operation performed successfully")
+        else:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")
+
+    @task(weight=3)
+    def get_distro_available(self):
+        if len(self.users) == 0:
+            print("No users available, skipping...")
+            return
+
+        user_data = random.choice(self.users)
+        auth_token, _ = self.fetch_token(user_data)
+        if not auth_token:
+            print("No auth token, skipping...")
+            return
+
+        user_id = self.login(user_data, auth_token)
+        if not user_id:
+            print("No auth token, skipping...")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {auth_token}",
+            "Content-Type": "application/json"
+        }
+        response = self.client.get(
+            Operations.system_collection,
+            headers=headers,
+            verify=False
+        )
+        if response.status_code == 200:
+            print("Operation performed successfully")
+        else:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")
+
+    @task(weight=3)
+    def get_user_transactions(self):
+        if len(self.users) == 0:
+            print("No users available, skipping...")
+            return
+
+        user_data = random.choice(self.users)
+        auth_token, _ = self.fetch_token(user_data)
+        if not auth_token:
+            print("No auth token, skipping...")
+            return
+
+        user_id = self.login(user_data, auth_token)
+        if not user_id:
+            print("No auth token, skipping...")
+            return
+
+        headers = {
+            "Authorization": f"Bearer {auth_token}",
+            "Content-Type": "application/json"
+        }
+        response = self.client.get(
+            Operations.transaction_history.format(user_id),
+            headers=headers,
+            verify=False
+        )
+        if response.status_code == 200:
+            print("Operation performed successfully")
+        else:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")

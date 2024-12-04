@@ -122,31 +122,6 @@ services:
             - gacha_public_network
             - gacha_private_network
 
-    # pgadmin:
-    #     container_name: pgadmin
-    #     image: dpage/pgadmin4
-    #     environment:
-    #         PGADMIN_DEFAULT_EMAIL: admin@admin.org
-    #         PGADMIN_DEFAULT_PASSWORD: admin
-    #         PGADMIN_CONFIG_SERVER_MODE: "False"
-    #     ports:
-    #         - 5443:443
-    #     secrets:
-    #         - ssl_admin_api_key
-    #         - ssl_admin_api_cert
-    #     volumes:
-    #         - pgadmin:/var/lib/pgadmin
-    #     networks:
-    #         - gacha_public_network
-    #         - gacha_private_network
-    #     restart: unless-stopped
-    #     command: >
-    #         sh -c "
-    #         cp /run/secrets/ssl_admin_api_key /pgadmin4/ssl/server.crt &&
-    #         cp /run/secrets/ssl_admin_api_cert /pgadmin4/ssl/server.key &&
-    #         chmod 600 /pgadmin4/ssl/server.* &&
-    #         python3 /pgadmin4/pgAdmin4.py"
-
     admin_nginx:
         container_name: admin_nginx
         image: nginx:latest
