@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Body, Depends
 from logging import getLogger
 from libs.access_token_utils import TokenData, extract_access_token
 
-from libs.exceptions import InsufficientFunds
+from libs.exceptions import InsufficientFunds, UserNotFound
 logger = getLogger("uvicorn.error")
 router = APIRouter()
 
@@ -30,6 +30,8 @@ def buy(token_data: Annotated[TokenData, Depends(extract_access_token)], buy_req
         fiat_balance = get_user_fiat_balance(session, buy_request.user_id)
         create_purchase_transaction(new_session, tux_amount, fiat_balance, tux_balance, buy_request.user_id, False)
         raise HTTPException(status_code=402, detail=f"{ins}")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
 
@@ -38,5 +40,4 @@ def buy(token_data: Annotated[TokenData, Depends(extract_access_token)], buy_req
 
 @router.get("/tux-price")
 def tux_price():
-
     return {"price" : FIAT_TO_TUX}

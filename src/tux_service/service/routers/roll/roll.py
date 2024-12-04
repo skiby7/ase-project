@@ -18,10 +18,12 @@ def roll(token_data: Annotated[TokenData, Depends(extract_access_token)], reques
 
     try:
         roll_gacha(db_session, request.user_id, ROLL_PRICE)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
     except InsufficientFunds as e:
         new_session = next(get_db())
         create_roll_transaction(new_session, ROLL_PRICE, request.user_id, False)
-        raise HTTPException(status_code=400, detail=f"{e}")
+        raise HTTPException(status_code=402, detail=f"{e}")
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:

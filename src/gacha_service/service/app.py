@@ -4,7 +4,7 @@ from database.db import database
 from typing import Annotated
 from auth.access_token_utils import extract_access_token
 from auth.access_token_utils import TokenData
-from gacha_utils.gacha import Gacha
+from gacha_utils.gacha import Gacha,verify_name
 from check_utils.check import check_tux,check_user,check_admin
 from user_utils.user import User
 from user_utils.add_user import Add_user
@@ -18,7 +18,7 @@ db = database("utils/distros.json")
 # View system gacha collection
 @app.get("/user/gacha/all", status_code=200)
 def user_gacha_all(token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if check_user(mock_check,token_data):
+    if check_user(mock_check,token_data,None):
         return db.get_all_gachas_user()
     else: 
         raise HTTPException(status_code=400, detail="Invalid User")
@@ -26,7 +26,7 @@ def user_gacha_all(token_data: Annotated[TokenData, Depends(extract_access_token
 # View user personal gacha collection
 @app.get("/{id}/gacha/collection", status_code=200)
 def user_gacha_collection(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check,token_data,id):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         res = db.get_user_gacha(id);
@@ -35,10 +35,24 @@ def user_gacha_collection(id: str, token_data: Annotated[TokenData, Depends(extr
         else: 
             return res
 
+# View user personal gacha collection
+@app.get("/{id}/gacha/collection/{name}", status_code=200)
+def user_gacha_collection(id: str, name:str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    if not check_user(mock_check,token_data,id):
+        raise HTTPException(status_code=400, detail="Invalid User")
+    else: 
+        res = db.get_user_collection_gacha(id,name);
+        if res == 1: 
+            raise HTTPException(status_code=400, detail="User Not present")
+        elif res == 2: 
+            raise HTTPException(status_code=404, detail="Gacha not present in the user collection")
+        else: 
+            return res
+
 # View Specific Gacha Info
 @app.get("/user/gacha/{name}", status_code=200)
 def user_gacha_specific(name: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check, token_data, None):
         raise HTTPException(status_code=400, detail="Invalid User")
     gacha = db.get_specific_gacha(name,mock_id);
     if not gacha: 
@@ -48,9 +62,9 @@ def user_gacha_specific(name: str, token_data: Annotated[TokenData, Depends(extr
 
 # Use In-Game Currency to Roll Gach
 mock_gacha_roll = None
-@app.get("/{id}/gacha/roll", status_code=200)
+@app.post("/{id}/gacha/roll", status_code=200)
 def user_gacha_roll(id: str, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    if not check_user(mock_check,token_data):
+    if not check_user(mock_check, token_data, id):
         raise HTTPException(status_code=400, detail="Invalid User")
     else: 
         if check_tux(mock_check,token_data):
@@ -89,6 +103,8 @@ def user_gacha_modify(gacha: Gacha, token_data: Annotated[TokenData, Depends(ext
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
+        if not verify_name(gacha.name):
+            raise HTTPException(status_code=400, detail="Gacha name not valid")
         res = db.add_gacha(gacha.name,gacha.rarity,gacha.image,mock_id)
         if not res: 
             raise HTTPException(status_code=400, detail="Gacha already present")
@@ -158,7 +174,7 @@ def user_gacha(user: User, token_data: Annotated[TokenData, Depends(extract_acce
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.add_user_gacha(user.id,user.gacha_name)
+        res = db.add_user_gacha(user.uid,user.gacha_name)
         if not res:
             raise HTTPException(status_code=400, detail="User not Present")
         elif res == 1: 
@@ -172,7 +188,7 @@ def user_gacha(user: User, token_data: Annotated[TokenData, Depends(extract_acce
     if not check_admin(mock_check,token_data):
         raise HTTPException(status_code=400, detail="Invalid Admin")
     else: 
-        res = db.remove_user_gacha(user.id,user.gacha_name)
+        res = db.remove_user_gacha(user.uid,user.gacha_name)
         if not res:
             raise HTTPException(status_code=400, detail="Gacha not Present")
         elif res == 1: 

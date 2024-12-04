@@ -20,7 +20,7 @@ def balance(user_id: str, token_data: Annotated[TokenData, Depends(extract_acces
         fiat_balance = get_user_fiat_balance(session, user_id)
         logger.debug(f"fiat: {fiat_balance} - tux: {tux_balance}")
     except UserNotFound as e:
-        raise HTTPException(status_code=400, detail=f"{e}")
+        raise HTTPException(status_code=404, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
     return {
