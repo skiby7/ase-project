@@ -200,6 +200,7 @@ class database:
         bidInsert["value"] = bid.bid
 
         self.db["bids"].insert_one(bidInsert)
+        return {"bid_id" : bidInsert["bid_id"], "player_id" : bidInsert["player_id"], "time": bidInsert["time"], "auction_id" : bidInsert["auction_id"], "value" : bidInsert["value"]}
 
     # DONE
     # BID_FILTER

@@ -121,10 +121,11 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],auction:Auction=Body()):
     check_user(mock_check,token_data)
 
-    if ((not mock_check) and str(auction.player_id) != token_data.sub):
+    if (mock_check or str(auction.player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
-    return db.auction_create(auction, mock_check)
+    auction_id = db.auction_create(auction, mock_check)
+    return {"message": "auction {auction_id} succesfully deleted"}
 
 
 # DONE
@@ -133,7 +134,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 def player_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check,token_data)
 
-    if str(token_data.sub) != db.auction_owner(str(auction_id)):
+    if mock_check or (str(token_data.sub) != db.auction_owner(str(auction_id))):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     db.auction_delete(str(auction_id),mock_check)
@@ -141,7 +142,7 @@ def player_endpoint(auction_id:UUID,token_data: Annotated[TokenData, Depends(ext
 
 # DONE
 # AUCTION_FILTER - "active":True
-@app.get("/auction/auction-filter", status_code=200)
+@app.get("/auctions/filters", status_code=200)
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     auction_filter: AuctionOptional = Body()):
     check_user(mock_check, token_data)
@@ -157,21 +158,21 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 
 # DONE
 # AUCTION_BID - player_id == bid.player_id
-@app.post("/auction/{player_id}/bid", status_code=201)
-def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
+@app.post("/auctions/{auction_id}/bids", status_code=201)
+def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid: Bid = Body()):
     check_user(mock_check, token_data)
 
-    if (player_id != bid.player_id) or ((not mock_check) and (str(player_id) != token_data.sub)):
+    if mock_check or (token_data.sub != bid.player_id):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     # extract player id
-    db.bid(bid, mock_check)
+    return db.bid(bid, mock_check)
 
 
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id
-@app.get("/auction/{player_id}/bid-filter", status_code=200)
+@app.get("/auctions/{player_id}/bid-filter", status_code=200)
 def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid_filter: BidOptional = Body()):
     check_user(mock_check, token_data)
