@@ -69,7 +69,7 @@ jobs:
 
     notify_success:
         runs-on: ubuntu-latest
-        needs: test_services
+        needs: integration_test
         if: success()
         steps:
             - name: Send Telegram Success Message
@@ -82,7 +82,7 @@ jobs:
 
     notify_failure:
         runs-on: ubuntu-latest
-        needs: test_services
+        needs: integration_test
         if: failure()
         steps:
             - name: Send Telegram Error Message
