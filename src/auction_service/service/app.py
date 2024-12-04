@@ -31,10 +31,11 @@ CHECK_EXPIRY_INTERVAL=1 #in minute
 def checkAuctionExpiration():
     finishedAuctions = db.checkAuctionExpiration()
     for auction in finishedAuctions:
-        db.collection["auctions"].update_one({"player_id":auction["player_id"]},{"$set":{"active":True}})
+        #db.collection["auctions"].update_one({"player_id":auction["player_id"]},{"$set":{"active":False}})
         if mock_check:continue
         token_data = db.auth_get_admin_token()
-        db.tux_settle_auction(str(auction["current_winning_player"]),str(auction["player_id"]),token_data)
+        db.gacha_add_gacha(str(auction["auction_id"]), str(auction["gacha_name"]), token_data)
+        db.tux_settle_auction(str(auction["auction_id"]),str(auction["current_winning_player"]),str(auction["player_id"]),token_data)
 
 
 
@@ -62,7 +63,6 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
     check_admin(mock_check,token_data)
 
     return db.auction_create(auction,mock_check)
-
 
 # DONE
 # AUCTION_DELETE

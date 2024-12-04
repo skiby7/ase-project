@@ -106,9 +106,7 @@ class database:
         if mock_check:
             id=str(UUID("00000000-0000-4000-8000-000000000000"))
         else:
-            while(True):
-                id=str(uuid.uuid4())
-                if(not self.db["auctions"].find_one({"auction_id":id})):break
+            id=str(uuid.uuid4())
             
         auction={
             "auction_id":str(id),
@@ -227,6 +225,7 @@ class database:
             for key, value in bid_filter.model_dump().items()
             if value is not None
         }
+
         print("caiao",filtered_dict,type(filtered_dict))
         return list(self.db["bids"].find(filtered_dict,{"_id":0}))
 
