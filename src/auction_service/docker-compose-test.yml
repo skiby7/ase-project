@@ -3,6 +3,14 @@ services:
         build:
             context: ./service
             dockerfile: Dockerfile_test
+        healthcheck:
+            test: curl --silent --fail --insecure https://localhost:9390/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        depends_on:
+            - auction_db
         ports:
             - 9390:9390
         secrets:
@@ -12,8 +20,13 @@ services:
             - jwt_private_key
             - jwt_public_key
             - admin_account
+        networks:
+            - gacha_network
+
     auction_db:
         image: mongo:latest
+        ports:
+            - "27017:27017"
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_DATABASE: admin
@@ -28,6 +41,31 @@ services:
             - auction_pw
         tmpfs:
             - /data/db
+        networks:
+            - gacha_network
+
+    newman:
+        image: postman/newman:latest
+        container_name: distro_service_tests
+        restart: no
+        depends_on:
+            auction:
+                condition: service_healthy
+        entrypoint:
+            [
+                "newman",
+                "run",
+                "/etc/postman/auction_unit.postman_collection.json",
+                "--delay-request",
+                "100",
+                "--insecure",
+                "--reporters",
+                "cli",
+            ]
+        volumes:
+            - ./tests/:/etc/postman
+        networks:
+            - gacha_network
 
 secrets:
     auction_pw:
@@ -44,3 +82,7 @@ secrets:
         file: ./service/secrets/public.pem
     admin_account:
         file: ./service/secrets/admin_account.json
+
+networks:
+  gacha_network:
+    driver: bridge
