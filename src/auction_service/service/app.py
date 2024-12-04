@@ -186,14 +186,16 @@ def player_endpoint(player_id:UUID,token_data: Annotated[TokenData, Depends(extr
 
 ######### COOPERATION #########
 
-@app.post("/users", status_code=200)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],body:AuthId=Body()):
-    check_user(mock_check,token_data)
+@app.post("/admin/auction/users", status_code=200)
+def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
+                    user: AuthId):
+    check_admin(mock_check,token_data)
 
-    db.add_user(str(body["uid"]))
+    db.add_user(user.uid)
 
-@app.delete("/users/{player_id}", status_code=200)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],body:AuthId=Body()):
-    check_user(mock_check,token_data)
+@app.delete("/admin/auction/users/{player_id}", status_code=200)
+def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
+                    player_id: str):
+    check_admin(mock_check,token_data)
 
-    db.remove_user(str(body["uid"]))
+    db.remove_user(player_id)

@@ -19,7 +19,8 @@ from ..shared_libs.access_token_utils import TokenData
 
 urls_services_to_notify = [
     "https://distro:9190/admin/users",
-    "https://tux_service:9290/admin/balances"
+    "https://tux_service:9290/admin/balances",
+    "https://auction:9390/admin/auction/users"
 ]
 
 def initialize_admin():

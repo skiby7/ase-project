@@ -203,6 +203,7 @@ services:
             - authentication
             - distro
             - tux_service
+            - auction
 
     public_nginx:
         container_name: public_nginx
@@ -220,6 +221,7 @@ services:
             - authentication
             - distro
             - tux_service
+            - auction
 
 volumes:
     auth_db_data:

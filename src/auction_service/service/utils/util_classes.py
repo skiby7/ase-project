@@ -40,4 +40,4 @@ class BidOptional(BaseModel):
     time:Optional[int]
 
 class AuthId(BaseModel):
-    uid:str
+    uid: str

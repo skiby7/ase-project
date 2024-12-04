@@ -1,7 +1,9 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, DeleteOne
 import json
 import uuid
 import time
+
+from pymongo.results import InsertOneResult, DeleteResult
 from utils.util_classes import Auction,Bid,AuctionOptional,BidOptional,IdStrings
 from fastapi import Body, FastAPI, HTTPException
 from uuid import UUID
@@ -32,12 +34,12 @@ class database:
         uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
 
         self.client = MongoClient(uri)
-        
+
         self.db = self.client["mydatabase"]
-        
+
         if "auctions" in self.db.list_collection_names():
             print(" \n\n DB ACTIVE  \n\n")
-        else: 
+        else:
             self.db_inizialization()
 
 
@@ -65,9 +67,9 @@ class database:
     ### SCHEDULED CHECK ###
 
     def checkAuctionExpiration(self):
-        current_time = unix_time()  
+        current_time = unix_time()
         expired_auctions = []
-        
+
         expired_auctions_cursor = self.db["auctions"].find({
             "end_time": {"$lt": current_time},
             "active": True
@@ -85,15 +87,15 @@ class database:
 
 
     ##### AUCTION #####
-    
+
     # AUCTION_CREATE
     def auction_create(self,auction:Auction,mock_check:bool):
-        
+
         # Distro check
         if not mock_check:
             token_data = self.auth_get_admin_token()
             self.gacha_remove_gacha(str(auction.player_id),auction.gacha_name,token_data)
-        
+
         # Player existence
         if not mock_check:
             self.check_player_presence(auction["player_id"])
@@ -102,12 +104,12 @@ class database:
             raise HTTPException(status_code=400, detail="Invalid starting_price")
         if(auction.end_time<unix_time()):
             raise HTTPException(status_code=400, detail="Invalid time")
-        
+
         if mock_check:
             id=str(UUID("00000000-0000-4000-8000-000000000000"))
         else:
             id=str(uuid.uuid4())
-            
+
         auction={
             "auction_id":str(id),
             "player_id":str(auction.player_id),
@@ -122,23 +124,23 @@ class database:
         self.db["auctions"].insert_one(auction)
         return id
 
-    
+
     # DONE
     # AUCTION_DELETE
     #HP auction presence == True (check app-side)
     def auction_delete(self,auction_id:str,mock_check:bool):
-        auction = self.db["auctions"].find_one({"auction_id":auction_id}) 
-        
+        auction = self.db["auctions"].find_one({"auction_id":auction_id})
+
         # Distro update
         if not mock_check:
             token_data = self.auth_get_admin_token()
-    
+
             self.gacha_add_gacha(str(auction["player_id"]),auction["gacha_name"],token_data)
 
         # Tux return
         if (not mock_check) and (auction["current_winning_player_id"] is not None):
             token_data = self.auth_get_admin_token()
-            
+
             self.tux_delete_auction(str(auction_id),token_data)
             pass
 
@@ -155,7 +157,7 @@ class database:
             raise HTTPException(status_code=400, detail="current_winning_bid must be >=0")
         if auction_filter.end_time is not None and auction_filter.end_time<0:
             raise HTTPException(status_code=400, detail="end_time must be >=0")
-        
+
         filtered_dict = {
             key: (str(value) if isinstance(value, UUID) else value)
             for key, value in auction_filter.model_dump().items()
@@ -179,11 +181,11 @@ class database:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
         if bid.bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
-        
+
         # Player existence
         if not mock_check:
             self.check_player_presence(bid["player_id"])
-        
+
         # Tux freeze
         if not mock_check:
             token_data = self.auth_get_admin_token()
@@ -250,7 +252,7 @@ class database:
                 }
             }
         ]
-    
+
         pipelineCount = [
             {
                 "$match": {
@@ -261,13 +263,13 @@ class database:
                 "$count": "total_bids"  # Count the number of bids
             }
         ]
-        
+
         # Perform aggregation for average bid and total bid count
         avg_result = self.db["bids"].aggregate(pipelineAvg)
         count_result = self.db["bids"].aggregate(pipelineCount)
-        
-        avg = list(avg_result) 
-        count = list(count_result)  
+
+        avg = list(avg_result)
+        count = list(count_result)
 
         # Check if results are available
         avg_bid = avg[0]["average_bid"] if avg else 0
@@ -280,12 +282,14 @@ class database:
     ######### SUPPORT #########
 
     def add_user(self,player_id):
-        res = self.collection["users"].insert_one({"player_id":player_id})["inserted_id"]
-        if res is None:raise HTTPException(400,"Auction_service was not able to add the player to its colleciton")
+        res: InsertOneResult = self.db["users"].insert_one({"player_id":player_id})
+        if res.inserted_id is None:
+            raise HTTPException(400,"Auction_service was not able to add the player to its colleciton")
 
     def remove_user(self,player_id):
-        res = self.collection["users"].delete_one({"player_id":player_id})["deleted_count"]
-        if res == 0:raise HTTPException(400,"Auction_service was not able to add the player to its colleciton")
+        res: DeleteResult = self.db["users"].delete_one({"player_id":player_id})
+        if res.deleted_count == 0:
+            raise HTTPException(400,"Auction_service was not able to add the player to its colleciton")
 
     def auction_owner(self,auction_id:str):
         owner = self.db["auctions"].find_one({"auction_id":auction_id},{"player_id":1})
@@ -319,7 +323,7 @@ class database:
                 raise HTTPException(status_code=400, detail="User's gacha cannot be found.")
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
-        
+
 
     def gacha_add_gacha(uid,gacha_name,token_data):
         header = {
@@ -336,7 +340,7 @@ class database:
                 raise HTTPException(status_code=400, detail="Gacha cannot be added to its collection")
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
-        
+
 
     def tux_freeze_tux(auction_id,user_id,tux_amount,token_data):
         header = {
@@ -345,7 +349,7 @@ class database:
         }
         data = {
             "user_id": user_id,
-            "tux_amount": tux_amount 
+            "tux_amount": tux_amount
         }
         try:
             response = requests.post("https://tux_service/admin/auctions/{auction_id}/freeze", headers=header,data=data,verify=False)
@@ -366,7 +370,7 @@ class database:
                 raise HTTPException(status_code=400, detail="Tux_service error from deletion of auction")
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
-        
+
     #da usare fuori
     def tux_settle_auction(auction_id,winner_id,auctioneer_id,token_data):
         header = {
@@ -383,7 +387,7 @@ class database:
                 raise HTTPException(status_code=400, detail="Tux_service error from ending auction")
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
-    
+
 
     def auth_get_admin_token(self):
         data = {
