@@ -1,0 +1,27 @@
+# Use the official PostgreSQL base image
+FROM postgres:latest
+
+
+# Define paths for SSL files
+ENV SSL_CERT_DIR=/etc/postgresql/ssl
+
+# Create the SSL directory and set permissions
+RUN mkdir -p $SSL_CERT_DIR \
+    && chmod 700 $SSL_CERT_DIR
+
+# Copy SSL certificates into the container
+# Replace these paths with your actual certificate file locations
+COPY ./secrets/server.crt $SSL_CERT_DIR/server.crt
+COPY ./secrets/server.key $SSL_CERT_DIR/server.key
+COPY ./secrets/ca.crt $SSL_CERT_DIR/ca.crt
+
+# Set ownership and permissions
+RUN chown -R postgres:postgres $SSL_CERT_DIR \
+    && chmod 600 $SSL_CERT_DIR/server.key
+
+# Set the default command to start PostgreSQL with SSL enabled
+CMD ["postgres", \
+    "-c", "ssl=on", \
+    "-c", "ssl_cert_file=/etc/postgresql/ssl/server.crt", \
+    "-c", "ssl_key_file=/etc/postgresql/ssl/server.key", \
+    "-c", "ssl_ca_file=/etc/postgresql/ssl/ca.crt"]
