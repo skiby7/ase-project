@@ -1,13 +1,14 @@
 import random
+from multiprocessing import Manager
 import string
 from locust import HttpUser, task, between, TaskSet
 import urllib3
 from time import time
-from threading import Lock
 unix_time = lambda: int(time())
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-global_users = []
-users_lock = Lock()
+manager = Manager()
+
+global_users = manager.list()
 
 adjectives = [
     "adoring", "affectionate", "agitated", "amazing", "awesome", "beautiful",
@@ -117,7 +118,8 @@ class Operations():
 
 
 
-class Tasks(TaskSet):
+class Users(HttpUser):
+    wait_time = between(1, 3)
 
     # Headers and initial setup
     def on_start(self):
@@ -185,6 +187,7 @@ class Tasks(TaskSet):
         }
 
 
+
     def buy_tux(self, user_id, headers, amount):
         data = {"user_id":str(user_id), "amount" : amount}
         response = self.client.post(
@@ -227,8 +230,7 @@ class Tasks(TaskSet):
         if len(global_users) == 0:
             print("No users available, skipping...")
             return
-        with users_lock:
-            user_data = random.choice(global_users)
+        user_data = random.choice(global_users)
         if not user_data:
             return
         user_id, headers = self.do_auth(user_data)
@@ -259,8 +261,7 @@ class Tasks(TaskSet):
             print("No users available, skipping...")
             return
 
-        with users_lock:
-            user_data = random.choice(global_users)
+        user_data = random.choice(global_users)
 
         if not user_data:
             return
@@ -283,8 +284,7 @@ class Tasks(TaskSet):
             print("No users available, skipping...")
             return
 
-        with users_lock:
-            user_data = random.choice(global_users)
+        user_data = random.choice(global_users)
 
         if not user_data:
             return
@@ -307,8 +307,7 @@ class Tasks(TaskSet):
             print("No users available, skipping...")
             return
 
-        with users_lock:
-            user_data = random.choice(global_users)
+        user_data = random.choice(global_users)
 
         if not user_data:
             return
@@ -332,8 +331,8 @@ class Tasks(TaskSet):
             return
         auction_duration = 10
         starting_price = 10
-        with users_lock:
-            users = random.sample(global_users, len(global_users) // 2)
+
+        users = random.sample(global_users, len(global_users) // 2)
 
         auctioneer = users[0]
         bidders = users[1:]
@@ -408,8 +407,3 @@ class Tasks(TaskSet):
             if response.status_code != 200:
                 continue
             last_bid += 1
-
-
-class Users(HttpUser):
-    wait_time = between(1, 3)
-    tasks = [Tasks]
