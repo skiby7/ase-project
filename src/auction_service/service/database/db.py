@@ -172,10 +172,11 @@ class database:
             raise HTTPException(status_code=400, detail="Bid was made after the end of the auction")
         if str(bid.player_id) == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
-        if bid.bid <= auction["current_winning_bid"]:
-            raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
         if bid.bid < auction["starting_price"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than starting price")
+        if bid.bid <= auction["current_winning_bid"]:
+            raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
+        
 
         # Player existence
         self.check_player_presence(str(bid.player_id))
