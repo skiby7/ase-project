@@ -37,11 +37,12 @@ def get_account_info(uid_account: str) -> Account | None:
                    username=account_DB.username,
                    role=account_DB.role)
 
-def create_access_token(account: Account, exp: timedelta | None = None):
+def create_access_token(account: Account, exp: timedelta | None = None, scope: str = "impersonate"):
     to_encode = {
         "iss": ISSUER,
         "sub": account.uid,
         "username": account.username,
+        "scope": scope,
         "role": account.role,
         "exp": get_expires(exp)
     }
