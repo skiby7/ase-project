@@ -353,7 +353,7 @@ class database:
             "Content-Type": "application/json"
         }
         try:
-            response = requests.post("https://tux_service/admin/auctions/" + auction_id, headers=header, verify=False)
+            response = requests.post(f"https://tux_service:9290/admin/auctions/{auction_id}", headers=header, verify=False)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from deletion of auction")
         except (requests.RequestException, ConnectionError):
