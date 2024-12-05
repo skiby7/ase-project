@@ -43,6 +43,10 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
         response.update({"id_token": id_token})
     return response
 
+@router.post('/logout')
+@admin_router.post('/logout')
+def logout(token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    return {"message": f"Logout successful. The access token of user {token_data.username} has been invalidated."}
 
 @router.get('/userinfo')
 @admin_router.get('/userinfo')
