@@ -83,8 +83,8 @@ class database:
     def auction_create(self, auction: AuctionCreate, mock_check: bool) -> AuctionPublic:
 
         # Player existence
-        if not mock_check:
-            self.check_player_presence(str(auction.player_id))
+        #if not mock_check:
+        self.check_player_presence(str(auction.player_id))
 
         if auction.starting_price < 0:
             raise HTTPException(status_code=400, detail="Invalid starting_price")
