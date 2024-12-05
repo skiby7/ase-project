@@ -24,6 +24,8 @@ class AuctionPublic(BaseModel):
     starting_price: int
     end_time: int
 
+class AuctionStatus(BaseModel):
+    status: bool
 
 class AuctionOptional(BaseModel):
     player_id: Optional[UUID] = None

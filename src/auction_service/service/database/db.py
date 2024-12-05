@@ -4,7 +4,7 @@ import uuid
 import time
 
 from pymongo.results import InsertOneResult, DeleteResult
-from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, AuctionPublic
+from utils.util_classes import AuctionCreate, AuctionStatus, Bid, AuctionOptional, BidOptional, AuctionPublic
 from fastapi import HTTPException
 from uuid import UUID
 import requests
@@ -118,6 +118,13 @@ class database:
         self.db["auctions"].insert_one(auction_to_insert)
         return AuctionPublic(**auction_to_insert)
 
+
+    def get_auction_by_id(self, auction_id: UUID):
+        auction = self.db["auctions"].find_one({"auction_id": str(auction_id)})
+        if auction is None:
+            raise HTTPException(status_code=404, detail="Auction does not exist")
+        return auction
+
     # DONE
     # AUCTION_DELETE
     # HP auction presence == True (check app-side)
@@ -137,12 +144,21 @@ class database:
             token_data = self.auth_get_admin_token()
 
             self.tux_delete_auction(str(auction_id), token_data)
-            pass
 
         self.db["auctions"].delete_one({"auction_id": auction_id})
         self.db["bids"].delete_many({"auction_id": auction_id})
 
         return True
+
+    def edit_auction_status(self, auction_id: UUID, status: bool):
+        updated_field = {"active": status}
+        result = self.db["auctions"].update_one(
+            {"auction_id": str(auction_id)},
+            {"$set": updated_field}
+        )
+        if result.modified_count <= 0:
+            raise HTTPException(status_code=404, detail="Auction does not exist or is not active")
+
 
     # DONE
     # AUCTION_FILTER
@@ -165,11 +181,11 @@ class database:
 
     # DONE
     # BID
-    def bid(self, bid: Bid, mock_check: bool):
+    def bid(self, bid: Bid, auction_id: UUID, mock_check: bool):
         time_supp = unix_time()
-        auction = self.db["auctions"].find_one({"auction_id": str(bid.auction_id), "active": True})
+        auction = self.db["auctions"].find_one({"auction_id": str(auction_id), "active": True})
         if auction is None:
-            raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
+            raise HTTPException(status_code=404, detail="Auction does not exist or is not active")
         if time_supp > auction["end_time"]:
             raise HTTPException(status_code=400, detail="Bid was made after the end of the auction")
         if str(bid.player_id) == auction["player_id"]:
@@ -179,10 +195,9 @@ class database:
         if bid.bid <= auction["current_winning_bid"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
 
-
         # Player existence
         if not self.player_exists(str(bid.player_id)):
-            raise HTTPException(400, "Player is not existent according knowledge base")
+            raise HTTPException(400, "Player does not exists")
 
         # Tux freeze
         if not mock_check:
@@ -210,8 +225,7 @@ class database:
         self.db["bids"].insert_one(bidInsert)
         return {"bid_id" : bidInsert["bid_id"], "player_id" : bidInsert["player_id"], "time": bidInsert["time"], "auction_id" : bidInsert["auction_id"], "value" : bidInsert["value"]}
 
-    # DONE
-    # BID_FILTER
+
     def bid_filter(self, bid_filter: BidOptional):
         if bid_filter.bid is not None and bid_filter.bid < 0:
             raise HTTPException(status_code=400, detail="bid must be >=0")
@@ -228,21 +242,19 @@ class database:
 
     ######### ADMIN #########
 
-    # DONE
-    # MARKET_ACTIVITY
     def market_activity(self):
         twenty_four_hours_ago = unix_time() - 86400
         auctions = self.db["bids"].find({"time": {"$gte": twenty_four_hours_ago}}, {"_id": 0})
         pipelineAvg = [
             {
                 "$match": {
-                    "time": {"$gte": twenty_four_hours_ago}  # Filter bids in the last 24 hours
+                    "time": {"$gte": twenty_four_hours_ago}
                 }
             },
             {
                 "$group": {
-                    "_id": None,  # No need to group by any field
-                    "average_bid": {"$avg": "$bid"}  # Calculate the average of the 'bid' field
+                    "_id": None,
+                    "average_bid": {"$avg": "$bid"}
                 }
             }
         ]
@@ -250,27 +262,31 @@ class database:
         pipelineCount = [
             {
                 "$match": {
-                    "time": {"$gte": twenty_four_hours_ago}  # Filter bids in the last 24 hours
+                    "time": {"$gte": twenty_four_hours_ago}
                 }
             },
             {
-                "$count": "total_bids"  # Count the number of bids
+                "$count": "total_bids"
             }
         ]
 
-        # Perform aggregation for average bid and total bid count
+
         avg_result = self.db["bids"].aggregate(pipelineAvg)
         count_result = self.db["bids"].aggregate(pipelineCount)
 
         avg = list(avg_result)
         count = list(count_result)
 
-        # Check if results are available
+
         avg_bid = avg[0]["average_bid"] if avg else 0
         total_bids = count[0]["total_bids"] if count else 0
 
-        # Return the results
-        return {"avg": avg_bid, "count": total_bids, "bids": list(auctions)}
+
+        return {
+            "avg": avg_bid,
+            "count": total_bids,
+            "bids": list(auctions)
+        }
 
     ######### SUPPORT #########
 
@@ -284,7 +300,7 @@ class database:
 
     def remove_user(self, player_id):
         if not self.player_exists(player_id):
-            raise HTTPException(404, f"uuid {player_id} does not exists")
+            return
 
         res: DeleteResult = self.db["users"].delete_one({"player_id": player_id})
         if res.deleted_count == 0:
@@ -370,7 +386,7 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    # da usare fuori
+
     def tux_settle_auction(self, auction_id, winner_id, auctioneer_id, access_token):
         header = {
             "Authorization": f"Bearer {access_token}",
@@ -387,6 +403,7 @@ class database:
                 raise HTTPException(status_code=400, detail="Tux_service error from ending auction")
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
+
 
     def auth_get_admin_token(self) -> str:
         data = {
