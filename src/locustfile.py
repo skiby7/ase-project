@@ -114,8 +114,8 @@ class Operations():
     bid = "/api/auction/auctions/{}/bids"
 
 
-class UserBehavior(TaskSet):
-    wait_time = between(1, 3)  # Users wait between 1 and 3 seconds between tasks
+
+class Tasks(TaskSet):
 
     # Headers and initial setup
     def on_start(self):
@@ -234,7 +234,7 @@ class UserBehavior(TaskSet):
             return
         for i in range(10):
             response = self.buy_tux(user_id, headers, 10)
-            if response.status_code == 200:
+            if response == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -338,12 +338,6 @@ class UserBehavior(TaskSet):
 
 
         response = self.buy_tux(user_id, headers, 10)
-        if response.status_code == 200:
-            print("Operation performed successfully")
-        else:
-            print(f"Failed to perform operation: {response.status_code} {response.text}")
-            return
-
 
         if response.status_code != 200:
             print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -370,7 +364,7 @@ class UserBehavior(TaskSet):
             bidder["headers"] = headers
 
             response = self.buy_tux(user_id, headers, 1000)
-            if response.status_code == 200:
+            if response == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -405,3 +399,8 @@ class UserBehavior(TaskSet):
             if response.status_code != 200:
                 continue
             last_bid += 1
+
+
+class Users(HttpUser):
+    wait_time = between(1, 3)
+    tasks = [Tasks]
