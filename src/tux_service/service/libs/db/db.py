@@ -371,6 +371,8 @@ def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer
             raise UserNotFound(f"User {winner_id} is not bidding in auction {auction_id}")
         if bidder.settled:
             raise AlreadySettled(f"Already settled {auction_id} for user {winner_id}")
+        if bidder.tux_amount <= 0:
+            raise ValueError(f"{winner_id} is not the highest bidder! Tux amount: {bidder.tux_amount}")
 
         update_user_tux_balance(session, bidder.user_id, "deposit", bidder.tux_amount)
         create_user_transaction(session, auction_id, bidder.tux_amount, winner_id, auctioneer_id)
