@@ -347,13 +347,13 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    def tux_delete_auction(self, auction_id, token_data):
+    def tux_delete_auction(self, auction_id, access_token):
         header = {
-            "Authorization": f"Bearer {token_data.jwt}",
+            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         try:
-            response = requests.post(f"https://tux_service:9290/admin/auctions/{auction_id}", headers=header, verify=False)
+            response = requests.delete(f"https://tux_service:9290/admin/auctions/{auction_id}", headers=header, verify=False)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from deletion of auction")
         except (requests.RequestException, ConnectionError):
