@@ -282,15 +282,14 @@
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/filters?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
+					"raw": "https://{{base_url}}:9390/auctions?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
 					],
 					"port": "9390",
 					"path": [
-						"auctions",
-						"filters"
+						"auctions"
 					],
 					"query": [
 						{
@@ -494,7 +493,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bid-filter?player_id=c6529a4d-45f2-4c73-8749-8c206ac16666",
+					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bids?player_id=c6529a4d-45f2-4c73-8749-8c206ac16666",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -503,7 +502,7 @@
 					"path": [
 						"auctions",
 						"c6529a4d-45f2-4c73-8749-8c206ac16666",
-						"bid-filter"
+						"bids"
 					],
 					"query": [
 						{

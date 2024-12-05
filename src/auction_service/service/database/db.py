@@ -183,7 +183,6 @@ class database:
             access_token = self.auth_get_admin_token()
             self.tux_freeze_tux(str(bid.auction_id), str(bid.player_id), bid.bid, access_token)
 
-        # TODO: check this
         update = {}
         update["current_winning_player_id"] = str(bid.player_id)
         update["current_winning_bid"] = bid.bid
@@ -213,7 +212,6 @@ class database:
         if bid_filter.time is not None and bid_filter.time < 0:
             raise HTTPException(status_code=400, detail="time must be >=0")
 
-        # TODO: check this
         filtered_dict = {
             key: (str(value) if isinstance(value, UUID) else value)
             for key, value in bid_filter.model_dump().items()
