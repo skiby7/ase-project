@@ -13,7 +13,7 @@ unix_time = lambda: int(time.time())
 
 ### INIT ###
 
-mock_check = None
+mock_check = False
 
 # dummy_player_id = "123e4567-e89b-12d3-a456-426614174000"
 
@@ -53,8 +53,8 @@ scheduler.start()
 
 
 # AUCTION_CREATE
-@app.post("/auction/admin/auction-create", status_code=201)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
+@app.post("/auctions/", status_code=201)
+def admin_auction_create(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
     check_admin(mock_check, token_data)
 
     return db.auction_create(auction, mock_check)
@@ -62,8 +62,8 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 
 # DONE
 # AUCTION_DELETE
-@app.delete("/auction/admin/auction-delete", status_code=200)
-def admin_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+@app.delete("/auctions/{auction_id}", status_code=200)
+def admin_auction_delete(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_admin(mock_check, token_data)
 
     db.auction_owner(str(auction_id))
@@ -72,8 +72,8 @@ def admin_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(ex
 
 # DONE
 # AUCTION_FILTER
-@app.get("/auction/admin/auction-filter", status_code=200)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
+@app.get("/auctions/auction-filter", status_code=200)
+def admin_auction_filter(token_data: Annotated[TokenData, Depends(extract_access_token)],
                    auction_filter: AuctionOptional = Body()):
     check_admin(mock_check, token_data)
 
