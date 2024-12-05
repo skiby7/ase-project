@@ -42,7 +42,7 @@ def init():
     if os.path.isfile(config_path):
 
         with open(config_path, "r") as f:
-            config = yaml.load(f.read(), Loader=yaml.Loader)
+            config = yaml.safe_load(f.read())
 
         http_port = config.get("http_port", 9090)
         log_l = config.get("log_level", "info")

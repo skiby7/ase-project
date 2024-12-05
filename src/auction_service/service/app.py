@@ -188,7 +188,7 @@ def get_player_bids(player_id: UUID, token_data: Annotated[TokenData, Depends(ex
                     bid_filter: BidOptional = Query()):
     check_user(mock_check, token_data)
 
-    if player_id != bid_filter.player_id or ((not mock_check) and str(player_id) != token_data.sub):
+    if (not mock_check and str(player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     # extract player id

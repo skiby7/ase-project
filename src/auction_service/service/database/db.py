@@ -174,7 +174,7 @@ class database:
             raise HTTPException(status_code=400, detail="Bid was made after the end of the auction")
         if str(bid.player_id) == auction["player_id"]:
             raise HTTPException(status_code=400, detail="Player is owner of auction")
-        if bid.bid <= auction["current_winning_bid"]:
+        if bid.bid <= auction["current_winning_bid"] or bid.bid <= auction["starting_price"]:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
 
         # Player existence
@@ -313,7 +313,7 @@ class database:
         }
         try:
             response = requests.delete("https://distro:9190/admin/remove/user/gacha", headers=header,
-                                       json=data, verify=False)
+                                       json=data, verify=False, timeout=5)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="User's gacha cannot be found.")
         except (requests.RequestException, ConnectionError):
@@ -330,7 +330,7 @@ class database:
         }
         try:
             response = requests.post("https://distro:9190/admin/add/user/gacha",
-                                     headers=header, json=data, verify=False)
+                                     headers=header, json=data, verify=False, timeout=5)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Gacha cannot be added to its collection")
         except (requests.RequestException, ConnectionError):
@@ -347,7 +347,7 @@ class database:
         }
         try:
             response = requests.post(f"https://tux_service:9290/admin/auctions/{auction_id}/freeze", headers=header,
-                                     json=data, verify=False)
+                                     json=data, verify=False, timeout=5)
             if response.status_code == 402:
                 raise HTTPException(status_code=402, detail="Insufficient tux balance to place the bid")
             if not response.status_code == 200:
@@ -361,7 +361,7 @@ class database:
             "Content-Type": "application/json"
         }
         try:
-            response = requests.delete(f"https://tux_service:9290/admin/auctions/{auction_id}", headers=header, verify=False)
+            response = requests.delete(f"https://tux_service:9290/admin/auctions/{auction_id}", headers=header, verify=False, timeout=5)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from deletion of auction")
         except (requests.RequestException, ConnectionError):
@@ -379,7 +379,7 @@ class database:
         }
         try:
             response = requests.post(f"https://tux_service:9290/admin/auctions/{auction_id}/settle-auction",
-                                     headers=header, json=data, verify=False)
+                                     headers=header, json=data, verify=False, timeout=5)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from ending auction")
         except (requests.RequestException, ConnectionError):
@@ -391,7 +391,7 @@ class database:
             'password': self.admin_account["password"],
         }
         try:
-            response = requests.post("https://authentication:9090/auth/token", data=data, verify=False)
+            response = requests.post("https://authentication:9090/auth/token", data=data, verify=False, timeout=5)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from ending auction")
         except (requests.RequestException, ConnectionError):
