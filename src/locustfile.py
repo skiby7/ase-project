@@ -357,7 +357,7 @@ class Tasks(TaskSet):
         gacha = response.json()["name"]
 
         for bidder in bidders:
-            user_id, headers = self.do_auth(auctioneer)
+            user_id, headers = self.do_auth(bidder)
             if not user_id or not headers:
                 return
 
