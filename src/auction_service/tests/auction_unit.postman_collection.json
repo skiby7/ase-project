@@ -8,513 +8,1462 @@
 	},
 	"item": [
 		{
-			"name": "Create Player 1",
-			"event": [
+			"name": "TestOk",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Auction_create test\", function(){\r",
-							"    pm.response.to.have.status(200);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/admin/auction/users",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"admin",
-						"auction",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Auction",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"test\", function(){\r",
-							"    pm.response.to.have.status(201);\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Auction",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"test\", function(){\r",
-							"    pm.response.to.have.status(200);\r",
-							"})\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/{{auction}}",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions",
-						"{{auction}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Auction 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"test\", function(){\r",
-							"    pm.response.to.have.status(201);\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.collectionVariables.set('auction1', pm.response.json().auction_id);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Auction 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"test\", function(){\r",
-							"    pm.response.to.have.status(201);\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.collectionVariables.set('auction2', pm.response.json().auction_id);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Tails\",\r\n    \"starting_price\": 12,\r\n    \"end_time\": 10000000000\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Auction Filter by player 1 id",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"test\", function(){\r",
-							"    pm.response.to.have.status(200);\r",
-							"    var jsonData = pm.response.json();\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions"
-					],
-					"query": [
+					"name": "Create Player 1",
+					"event": [
 						{
-							"key": "player_id",
-							"value": "c6529a4d-45f2-4c73-8749-8c206ac1f866"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid data\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.eql(\"Success!\");\r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction",
+					"event": [
 						{
-							"key": "active",
-							"value": "true"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check gacha_name field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.gacha_name).to.eql(\"Ubuntu\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.starting_price).to.eql(10);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.end_time).to.eql(10000000000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Player 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Auction_create test\", function(){\r",
-							"    pm.response.to.have.status(200);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/admin/auction/users",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"admin",
-						"auction",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Bid auction 1",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Auction_create test\", function(){\r",
-							"    pm.response.to.have.status(201);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions",
-						"{{auction1}}",
-						"bids"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Bid auction 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Auction_create test\", function(){\r",
-							"    pm.response.to.have.status(201);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction2}}\",\r\n    \"bid\": 20\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/{{auction2}}/bids",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions",
-						"{{auction2}}",
-						"bids"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Bid filter by player 2 id",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Auction_create test\", function(){\r",
-							"    pm.response.to.have.status(200);\r",
-							"})"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bids?player_id=c6529a4d-45f2-4c73-8749-8c206ac16666",
-					"protocol": "https",
-					"host": [
-						"{{base_url}}"
-					],
-					"port": "9390",
-					"path": [
-						"auctions",
-						"c6529a4d-45f2-4c73-8749-8c206ac16666",
-						"bids"
-					],
-					"query": [
+					"name": "Delete Auction",
+					"event": [
 						{
-							"key": "player_id",
-							"value": "c6529a4d-45f2-4c73-8749-8c206ac16666"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction}}",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction1', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check gacha_name field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.gacha_name).to.eql(\"Ubuntu\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.starting_price).to.eql(10);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.end_time).to.eql(10000000000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction2', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Check gacha_name field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.gacha_name).to.eql(\"Tails\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.starting_price).to.eql(12);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.end_time).to.eql(10000000000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Tails\",\r\n    \"starting_price\": 12,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auction Filter by player 1 id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    var jsonData = pm.response.json();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"    pm.expect(jsonData[1].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check gacha_name\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].gacha_name.toLowerCase()).to.eql(\"ubuntu\");\r",
+									"    pm.expect(jsonData[1].gacha_name.toLowerCase()).to.eql(\"tails\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].starting_price).to.eql(10);\r",
+									"    pm.expect(jsonData[1].starting_price).to.eql(12);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check current_winning_player_id\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].current_winning_player_id).to.be.null;\r",
+									"    pm.expect(jsonData[1].current_winning_player_id).to.be.null;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check current_winning_bid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].current_winning_bid).to.eql(0);\r",
+									"    pm.expect(jsonData[1].current_winning_bid).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].end_time).to.eql(10000000000);\r",
+									"    pm.expect(jsonData[1].end_time).to.eql(10000000000);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check active\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].active).to.be.true;\r",
+									"    pm.expect(jsonData[1].active).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							],
+							"query": [
+								{
+									"key": "player_id",
+									"value": "c6529a4d-45f2-4c73-8749-8c206ac1f866"
+								},
+								{
+									"key": "active",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Player 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid data\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.eql(\"Success!\");\r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify bid_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().bid_id).to.equal(\"00000000-0000-4000-8000-000000000000\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify player_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().player_id).to.equal(\"c6529a4d-45f2-4c73-8749-8c206ac16666\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify auction_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().auction_id).to.equal(pm.collectionVariables.get(\"auction1\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify value is correct\", function () {\r",
+									"    pm.expect(pm.response.json().value).to.equal(20);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction1}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify bid_id in the response\", function () {\r",
+									"    pm.expect(pm.response.json().bid_id).to.eql(\"00000000-0000-4000-8000-000000000000\");\r",
+									"});\r",
+									"pm.test(\"Verify player_id in the response\", function () {\r",
+									"    pm.expect(pm.response.json().player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac16666\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify auction_id in the response\", function () {\r",
+									"    pm.expect(pm.response.json().auction_id).to.eql(pm.collectionVariables.get(\"auction2\"));\r",
+									"});\r",
+									"pm.test(\"Verify value in the response\", function () {\r",
+									"    pm.expect(pm.response.json().value).to.eql(20);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction2}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction2}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction2}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid filter by player 2 id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify bid_id in response\", function () {\r",
+									"    pm.expect(pm.response.json()[0].bid_id).to.eql(\"00000000-0000-4000-8000-000000000000\");\r",
+									"    pm.expect(pm.response.json()[1].bid_id).to.eql(\"00000000-0000-4000-8000-000000000000\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify player_id in response\", function () {\r",
+									"    pm.expect(pm.response.json()[0].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac16666\");\r",
+									"    pm.expect(pm.response.json()[1].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac16666\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Verify auction_id in response\", function () {\r",
+									"    pm.expect(pm.response.json()[0].auction_id).to.eql(pm.collectionVariables.get(\"auction1\"));\r",
+									"    pm.expect(pm.response.json()[1].auction_id).to.eql(pm.collectionVariables.get(\"auction2\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify value in response\", function () {\r",
+									"    pm.expect(pm.response.json()[0].value).to.eql(20);\r",
+									"    pm.expect(pm.response.json()[1].value).to.eql(20);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"c6529a4d-45f2-4c73-8749-8c206ac16666",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Player 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"7b3e249c-349d-45fa-8f0b-e5d4797adfff\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin create auction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"// Test for specific fields in the response body\r",
+									"pm.test(\"Verify player_id in the response\", function () {\r",
+									"    pm.expect(pm.response.json().player_id).to.eql(\"7b3e249c-349d-45fa-8f0b-e5d4797adfff\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify gacha_name in the response\", function () {\r",
+									"    pm.expect(pm.response.json().gacha_name).to.eql(\"TempleOS\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify starting_price in the response\", function () {\r",
+									"    pm.expect(pm.response.json().starting_price).to.eql(30);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify end_time in the response\", function () {\r",
+									"    pm.expect(pm.response.json().end_time).to.eql(10000000000);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"7b3e249c-349d-45fa-8f0b-e5d4797adfff\",\r\n    \"gacha_name\": \"TempleOS\",\r\n    \"starting_price\": 30,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auction Admin Filter by gacha name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].auction_id).to.eql(pm.collectionVariables.get(\"auction\"))\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify player ID is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].player_id).to.eql(\"7b3e249c-349d-45fa-8f0b-e5d4797adfff\");\r",
+									"});\r",
+									"pm.test(\"Verify gacha name is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].gacha_name).to.eql(\"TempleOS\");\r",
+									"});\r",
+									"pm.test(\"Verify starting price is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].starting_price).to.eql(30);\r",
+									"});\r",
+									"pm.test(\"Verify current winning player ID is null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].current_winning_player_id).to.be.null;\r",
+									"});\r",
+									"pm.test(\"Verify current winning bid is 0\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].current_winning_bid).to.eql(0);\r",
+									"});\r",
+									"pm.test(\"Verify end time is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].end_time).to.eql(10000000000);\r",
+									"});\r",
+									"pm.test(\"Verify auction is active\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].active).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions?gacha_name=TempleOS",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions"
+							],
+							"query": [
+								{
+									"key": "gacha_name",
+									"value": "TempleOS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Player 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users/c6529a4d-45f2-4c73-8749-8c206ac1f866",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users",
+								"c6529a4d-45f2-4c73-8749-8c206ac1f866"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Player 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users/c6529a4d-45f2-4c73-8749-8c206ac16666",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users",
+								"c6529a4d-45f2-4c73-8749-8c206ac16666"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Player 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users/7b3e249c-349d-45fa-8f0b-e5d4797adfff",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users",
+								"7b3e249c-349d-45fa-8f0b-e5d4797adfff"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "TestFail",
+			"item": [
+				{
+					"name": "Create Player 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid data\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.eql(\"Success!\");\r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Player 1 Twice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction Wrong Param",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(400);\r",
+									"    const jsonData = pm.response.json();\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": -10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction Wrong Param",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(422);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": null,\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": -10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction Wrong Param",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(422);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": null,\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Auction 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction1', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check gacha_name field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.gacha_name).to.eql(\"Ubuntu\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.starting_price).to.eql(10);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.end_time).to.eql(10000000000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Player 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has valid data\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.eql(\"Success!\");\r",
+									"}); "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/users",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1 Wrong Bid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": -12\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction1}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1 Wrong User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction1}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1 Wrong Auction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac1f866/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"c6529a4d-45f2-4c73-8749-8c206ac1f866",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "00000000-0000-4000-8000-000000000000",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",

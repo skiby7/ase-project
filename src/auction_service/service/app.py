@@ -97,12 +97,12 @@ def admin_auction_filter(token_data: Annotated[TokenData, Depends(extract_access
 
 # TODO Controllare che il player specificato nel bid esista
 # BID_CREATE
-@app.post("/admin/bids", status_code=201)
-def admin_bid(token_data: Annotated[TokenData, Depends(extract_access_token)], bid: Bid = Body()):
+@app.post("/admin/auctions/{auction_id}/bids", status_code=201)
+def admin_bid(token_data: Annotated[TokenData, Depends(extract_access_token)], auction_id: UUID, bid: Bid = Body()):
     if not check_admin(mock_check, token_data):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    db.bid(bid, mock_check)
+    db.bid(bid, auction_id, mock_check)
     return {"details":"Success!"}
 
 
@@ -123,6 +123,21 @@ def admin_market_activity(token_data: Annotated[TokenData, Depends(extract_acces
 
     return db.market_activity()
 
+
+@app.post("/admin/auctions/users", status_code=200)
+def admin_add_user(token_data: Annotated[TokenData, Depends(extract_access_token)], user: AuthId):
+    check_admin(mock_check, token_data)
+
+    db.add_user(user.uid)
+    return {"detail":"Success!"}
+
+
+@app.delete("/admin/auctions/users/{player_id}", status_code=200)
+def admin_remove_user(token_data: Annotated[TokenData, Depends(extract_access_token)], player_id: str):
+    check_admin(mock_check, token_data)
+
+    db.remove_user(player_id)
+    return {"detail":"Success!"}
 
 ######### PLAYER #########
 # HP player can only create and delete auctions (fair for bidders)
@@ -175,15 +190,13 @@ def get_auctions_player(token_data: Annotated[TokenData, Depends(extract_access_
 # DONE
 # AUCTION_BID - player_id == bid.player_id
 @app.post("/auctions/{auction_id}/bids", status_code=201)
-def bid_player(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    bid: Bid = Body()):
+def bid_player(token_data: Annotated[TokenData, Depends(extract_access_token)], auction_id: UUID, bid: Bid = Body()):
     check_user(mock_check, token_data)
     if not mock_check and (token_data.sub != str(bid.player_id)):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     # extract player id
-    return db.bid(bid, mock_check)
-
+    return db.bid(bid, auction_id, mock_check)
 
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id
@@ -200,18 +213,3 @@ def get_player_bids(player_id: UUID, token_data: Annotated[TokenData, Depends(ex
 
 
 ######### COOPERATION #########
-
-@app.post("/admin/auction/users", status_code=200)
-def admin_add_user(token_data: Annotated[TokenData, Depends(extract_access_token)], user: AuthId):
-    check_admin(mock_check, token_data)
-
-    db.add_user(user.uid)
-    return {"detail":"Success!"}
-
-
-@app.delete("/admin/auction/users/{player_id}", status_code=200)
-def admin_remove_user(token_data: Annotated[TokenData, Depends(extract_access_token)], player_id: str):
-    check_admin(mock_check, token_data)
-
-    db.remove_user(player_id)
-    return {"detail":"Success!"}

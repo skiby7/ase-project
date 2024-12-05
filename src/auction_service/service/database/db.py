@@ -165,11 +165,11 @@ class database:
 
     # DONE
     # BID
-    def bid(self, bid: Bid, mock_check: bool):
+    def bid(self, bid: Bid, auction_id: UUID, mock_check: bool):
         time_supp = unix_time()
-        auction = self.db["auctions"].find_one({"auction_id": str(bid.auction_id), "active": True})
+        auction = self.db["auctions"].find_one({"auction_id": str(auction_id), "active": True})
         if auction is None:
-            raise HTTPException(status_code=400, detail="Auction does not exist or is not active")
+            raise HTTPException(status_code=404, detail="Auction does not exist or is not active")
         if time_supp > auction["end_time"]:
             raise HTTPException(status_code=400, detail="Bid was made after the end of the auction")
         if str(bid.player_id) == auction["player_id"]:
@@ -284,7 +284,7 @@ class database:
 
     def remove_user(self, player_id):
         if not self.player_exists(player_id):
-            raise HTTPException(404, f"uuid {player_id} does not exists")
+            return
 
         res: DeleteResult = self.db["users"].delete_one({"player_id": player_id})
         if res.deleted_count == 0:
