@@ -102,7 +102,7 @@ class database:
         else:
             id = str(uuid.uuid4())
 
-        auction = {
+        auction_to_insert = {
             "auction_id": str(id),
             "player_id": str(auction.player_id),
             "gacha_name": auction.gacha_name,
@@ -113,8 +113,8 @@ class database:
             "active": True
         }
 
-        self.db["auctions"].insert_one(auction)
-        return AuctionPublic(**auction)
+        self.db["auctions"].insert_one(auction_to_insert)
+        return AuctionPublic(**auction_to_insert)
 
     # DONE
     # AUCTION_DELETE
@@ -344,7 +344,7 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    def tux_delete_auction(auction_id, token_data):
+    def tux_delete_auction(self, auction_id, token_data):
         header = {
             "Authorization": f"Bearer {token_data.jwt}",
             "Content-Type": "application/json"

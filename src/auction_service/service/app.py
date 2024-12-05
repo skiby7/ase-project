@@ -2,7 +2,7 @@ import logging
 
 from database.db import database
 from uuid import UUID
-from fastapi import Body, FastAPI, HTTPException, Depends
+from fastapi import Body, FastAPI, HTTPException, Depends, Query
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, AuthId
@@ -57,29 +57,33 @@ scheduler.start()
 
 
 # AUCTION_CREATE
-@app.post("/auctions/", status_code=201)
+@app.post("/admin/auctions/", status_code=201)
 def admin_auction_create(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
-    check_admin(mock_check, token_data)
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     return db.auction_create(auction, mock_check)
 
 
 # DONE
 # AUCTION_DELETE
-@app.delete("/auctions/{auction_id}", status_code=200)
+@app.delete("/admin/auctions/{auction_id}", status_code=200)
 def admin_auction_delete(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check, token_data)
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     db.auction_owner(str(auction_id))
     db.auction_delete(str(auction_id), mock_check)
+    return {"details":"Success!"}
 
 
 # DONE
 # AUCTION_FILTER
-@app.get("/auctions/auction-filter", status_code=200)
+@app.get("/admin/auctions", status_code=200)
 def admin_auction_filter(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                   auction_filter: AuctionOptional = Body()):
-    check_admin(mock_check, token_data)
+                   auction_filter: AuctionOptional = Query()):
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     return db.auction_filter(auction_filter)
 
@@ -89,25 +93,29 @@ def admin_auction_filter(token_data: Annotated[TokenData, Depends(extract_access
 
 # TODO Controllare che il player specificato nel bid esista
 # BID_CREATE
-@app.post("/auction/admin/bid", status_code=201)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], bid: Bid = Body()):
-    check_admin(mock_check, token_data)
+@app.post("/admin/bids", status_code=201)
+def admin_bid(token_data: Annotated[TokenData, Depends(extract_access_token)], bid: Bid = Body()):
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     db.bid(bid, mock_check)
+    return {"details":"Success!"}
 
 
 # BID_FILTER
-@app.get("/auction/admin/bid-filter", status_code=200)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], bid_filter: BidOptional = Body()):
-    check_admin(mock_check, token_data)
+@app.get("/admin/auctions/{auction_id}/bids", status_code=200)
+def admin_bid_filter(token_data: Annotated[TokenData, Depends(extract_access_token)], bid_filter: BidOptional = Query()):
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     return db.bid_filter(bid_filter)
 
 
 # MARKET_ACTIVITY
-@app.get("/auction/admin/market-activity", status_code=200)
-def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)]):
-    check_admin(mock_check, token_data)
+@app.get("/admin/auctions/activity", status_code=200)
+def admin_market_activity(token_data: Annotated[TokenData, Depends(extract_access_token)]):
+    if not check_admin(mock_check, token_data):
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     return db.market_activity()
 

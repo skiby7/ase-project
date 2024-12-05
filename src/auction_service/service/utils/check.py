@@ -8,7 +8,10 @@ def check_user(mock_check: bool,token_data: TokenData):
             raise HTTPException(status_code=403, detail="Invalid User")
 
 def check_admin(mock_check: bool,token_data: TokenData):
-    if not mock_check:
-        if token_data.role  != "admin":
-            raise HTTPException(status_code=403, detail="Invalid User")
+    if mock_check:
+        return True
 
+    if token_data.role  != "admin":
+        return False
+
+    return True
