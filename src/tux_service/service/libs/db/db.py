@@ -26,7 +26,9 @@ else:
     DATABASE_IP = os.getenv("DATABASE_IP")
     DATABASE_PORT = os.getenv("DATABASE_PORT")
     DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
-
+    DATABASE_CA = os.getenv("DATABASE_CA")
+    DATABASE_CRT = os.getenv("DATABASE_CRT")
+    DATABASE_KEY = os.getenv("DATABASE_KEY")
     with open("/run/secrets/tux_db_user") as f:
         DATABASE_USER = f.read().strip("\n").strip()
 
@@ -34,12 +36,13 @@ else:
         DATABASE_PASSWORD = f.read().strip("\n").strip()
 
     DATABASE_URL = f"{DATABASE_SCHEMA}{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_IP}:{DATABASE_PORT}"
-
+    if DATABASE_CA and DATABASE_CRT and DATABASE_KEY:
+        DATABASE_URL = f"{DATABASE_URL}?sslmode=prefer&sslrootcert={DATABASE_CA}&sslcert={DATABASE_CRT}&sslkey={DATABASE_KEY}"
 if not DATABASE_URL:
     sys.exit(-1)
 
 logger.info(f"Configured url {DATABASE_URL}")
-engine = create_engine(DATABASE_URL, echo=TEST_RUN)
+engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 
 def get_db():
@@ -371,6 +374,8 @@ def settle_auction_payments(session, auction_id: str, winner_id: str, auctioneer
             raise UserNotFound(f"User {winner_id} is not bidding in auction {auction_id}")
         if bidder.settled:
             raise AlreadySettled(f"Already settled {auction_id} for user {winner_id}")
+        if bidder.tux_amount <= 0:
+            raise ValueError(f"{winner_id} is not the highest bidder! Tux amount: {bidder.tux_amount}")
 
         update_user_tux_balance(session, bidder.user_id, "deposit", bidder.tux_amount)
         create_user_transaction(session, auction_id, bidder.tux_amount, winner_id, auctioneer_id)

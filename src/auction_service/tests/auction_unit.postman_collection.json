@@ -1,0 +1,570 @@
+{
+	"info": {
+		"_postman_id": "c2b64be6-e9bf-4c3c-ab54-888be27dd44d",
+		"name": "Unit-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39573642",
+		"_collection_link": "https://solar-meadow-925541.postman.co/workspace/ase-project~d10fc23c-d681-464b-9659-40d096bfb64e/collection/39573642-c2b64be6-e9bf-4c3c-ab54-888be27dd44d?action=share&source=collection_link&creator=39573642"
+	},
+	"item": [
+		{
+			"name": "Create Player 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Auction_create test\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/admin/auction/users",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"admin",
+						"auction",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"test\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.collectionVariables.set('auction', pm.response.json().auction_id);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"test\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions/{{auction}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions",
+						"{{auction}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Auction 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"test\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.collectionVariables.set('auction1', pm.response.json().auction_id);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Ubuntu\",\r\n    \"starting_price\": 10,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Auction 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"test\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.collectionVariables.set('auction2', pm.response.json().auction_id);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Tails\",\r\n    \"starting_price\": 12,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auction Filter by player 1 id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"test\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions"
+					],
+					"query": [
+						{
+							"key": "player_id",
+							"value": "c6529a4d-45f2-4c73-8749-8c206ac1f866"
+						},
+						{
+							"key": "active",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Player 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Auction_create test\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uid\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/admin/auction/users",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"admin",
+						"auction",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bid auction 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Auction_create test\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions",
+						"{{auction1}}",
+						"bids"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bid auction 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Auction_create test\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction2}}\",\r\n    \"bid\": 20\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions/{{auction2}}/bids",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions",
+						"{{auction2}}",
+						"bids"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bid filter by player 2 id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Auction_create test\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 00000000-0000-4000-8000-000000000000.Pippo.Admin",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bids?player_id=c6529a4d-45f2-4c73-8749-8c206ac16666",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"port": "9390",
+					"path": [
+						"auctions",
+						"c6529a4d-45f2-4c73-8749-8c206ac16666",
+						"bids"
+					],
+					"query": [
+						{
+							"key": "player_id",
+							"value": "c6529a4d-45f2-4c73-8749-8c206ac16666"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "auction",
+			"type": "string"
+		},
+		{
+			"key": "auction1 ",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "auction2 ",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "auction",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "auction1",
+			"value": ""
+		},
+		{
+			"key": "auction2",
+			"value": ""
+		}
+	]
+}

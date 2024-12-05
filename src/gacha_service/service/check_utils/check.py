@@ -14,7 +14,7 @@ def check_tux(mock_check: bool,token_data: TokenData):
             "user_id": str(token_data.sub),
         }
         try:
-            response = requests.post("https://tux_service:9290/roll", json=data, headers=headers, verify=False)
+            response = requests.post("https://tux_service:9290/roll", json=data, headers=headers, verify=False, timeout=5)
             if not response.status_code == 200:
                 return False
             else:
