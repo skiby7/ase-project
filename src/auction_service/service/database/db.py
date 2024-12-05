@@ -308,13 +308,13 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    def gacha_add_gacha(self, uid, gacha_name, access_token):
+    def gacha_add_gacha(self, player_uid, gacha_name, access_token):
         header = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         data = {
-            "uid": uid,
+            "uid": player_uid,
             "gacha_name": gacha_name
         }
         try:
@@ -357,9 +357,9 @@ class database:
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
     # da usare fuori
-    def tux_settle_auction(self, auction_id, winner_id, auctioneer_id, token_data):
+    def tux_settle_auction(self, auction_id, winner_id, auctioneer_id, access_token):
         header = {
-            "Authorization": f"Bearer {token_data.jwt}",
+            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         data = {
@@ -367,7 +367,7 @@ class database:
             "auctioneer_id": auctioneer_id
         }
         try:
-            response = requests.post(f"https://tux_service/admin/auctions/{auction_id}/settle-auction",
+            response = requests.post(f"https://tux_service:9290/admin/auctions/{auction_id}/settle-auction",
                                      headers=header, json=data, verify=False)
             if not response.status_code == 200:
                 raise HTTPException(status_code=400, detail="Tux_service error from ending auction")
