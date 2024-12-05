@@ -131,7 +131,7 @@ def admin_market_activity(token_data: Annotated[TokenData, Depends(extract_acces
 # DONE
 # AUCTION_CREATE - player_id == auction.player_id
 @app.post("/auctions", status_code=201)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
+def create_auction_player(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
     check_user(mock_check, token_data)
 
     if not mock_check and (str(auction.player_id) != token_data.sub):
@@ -143,7 +143,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 # DONE
 # AUCTION_DELETE - playerd_id is owner of auction_id
 @app.delete("/auctions/{auction_id}", status_code=200)
-def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
+def delete_auction_player(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check, token_data)
 
     if not mock_check and (str(token_data.sub) != db.auction_owner(str(auction_id))):
@@ -156,8 +156,7 @@ def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(e
 # DONE
 # AUCTION_FILTER - "active":True
 @app.get("/auctions", status_code=200)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    auction_filter: AuctionOptional = Query()):
+def get_auctions_player(token_data: Annotated[TokenData, Depends(extract_access_token)], auction_filter: AuctionOptional = Query()):
     check_user(mock_check, token_data)
 
     if auction_filter.active is None or (auction_filter.active is not None and auction_filter.active is False):
@@ -172,7 +171,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 # DONE
 # AUCTION_BID - player_id == bid.player_id
 @app.post("/auctions/{auction_id}/bids", status_code=201)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
+def bid_player(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid: Bid = Body()):
     check_user(mock_check, token_data)
     if not mock_check and (token_data.sub != str(bid.player_id)):
@@ -185,7 +184,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id
 @app.get("/auctions/{player_id}/bids", status_code=200)
-def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
+def get_player_bids(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid_filter: BidOptional = Query()):
     check_user(mock_check, token_data)
 
@@ -199,16 +198,16 @@ def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(ex
 ######### COOPERATION #########
 
 @app.post("/admin/auction/users", status_code=200)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    user: AuthId):
+def admin_add_user(token_data: Annotated[TokenData, Depends(extract_access_token)], user: AuthId):
     check_admin(mock_check, token_data)
 
     db.add_user(user.uid)
+    return {"detail":"Success!"}
 
 
 @app.delete("/admin/auction/users/{player_id}", status_code=200)
-def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    player_id: str):
+def admin_remove_user(token_data: Annotated[TokenData, Depends(extract_access_token)], player_id: str):
     check_admin(mock_check, token_data)
 
     db.remove_user(player_id)
+    return {"detail":"Success!"}

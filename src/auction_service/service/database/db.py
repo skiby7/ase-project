@@ -1,11 +1,11 @@
-from pymongo import MongoClient, DeleteOne
+from pymongo import MongoClient
 import json
 import uuid
 import time
 
 from pymongo.results import InsertOneResult, DeleteResult
-from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, IdStrings, AuctionPublic
-from fastapi import Body, FastAPI, HTTPException
+from utils.util_classes import AuctionCreate, Bid, AuctionOptional, BidOptional, AuctionPublic
+from fastapi import HTTPException
 from uuid import UUID
 import requests
 
@@ -84,7 +84,9 @@ class database:
 
         # Player existence
         #if not mock_check:
-        self.check_player_presence(str(auction.player_id))
+        if not self.player_exists(str(auction.player_id)):
+            raise HTTPException(400, "Player is not existent according knowledge base")
+
 
         if auction.starting_price < 0:
             raise HTTPException(status_code=400, detail="Invalid starting_price")
@@ -176,7 +178,8 @@ class database:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
 
         # Player existence
-        self.check_player_presence(str(bid.player_id))
+        if not self.player_exists(str(bid.player_id)):
+            raise HTTPException(400, "Player is not existent according knowledge base")
 
         # Tux freeze
         if not mock_check:
@@ -269,14 +272,20 @@ class database:
     ######### SUPPORT #########
 
     def add_user(self, player_id):
+        if self.player_exists(player_id):
+            raise HTTPException(400, f"uuid {player_id} already exists")
+
         res: InsertOneResult = self.db["users"].insert_one({"player_id": player_id})
         if res.inserted_id is None:
             raise HTTPException(400, "Auction_service was not able to add the player to its colleciton")
 
     def remove_user(self, player_id):
+        if not self.player_exists(player_id):
+            raise HTTPException(404, f"uuid {player_id} does not exists")
+
         res: DeleteResult = self.db["users"].delete_one({"player_id": player_id})
         if res.deleted_count == 0:
-            raise HTTPException(400, "Auction_service was not able to add the player to its colleciton")
+            raise HTTPException(400, "Auction_service was not able to remove the player to its colleciton")
 
     def auction_owner(self, auction_id: str):
         owner = self.db["auctions"].find_one({"auction_id": auction_id}, {"player_id": 1})
@@ -288,9 +297,10 @@ class database:
         if owner is None: raise HTTPException(status_code=400, detail="No bid found with specified criteria")
         return owner["bid_id"]
 
-    def check_player_presence(self, player_id: str):
+    def player_exists(self, player_id: str):
         if self.db["users"].find_one({"player_id": player_id}) is None:
-            raise HTTPException(400, "Player is not existent according knowledge base")
+            return False
+        return True
 
     def gacha_remove_gacha(self, uid, gacha_name, access_token):
         header = {
