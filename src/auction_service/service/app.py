@@ -149,7 +149,8 @@ def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(e
     if not mock_check and (str(token_data.sub) != db.auction_owner(str(auction_id))):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
-    db.auction_delete(str(auction_id), mock_check)
+    if not db.auction_delete(str(auction_id), mock_check):
+        return  {"message": f"auction {auction_id} not present"} 
     return {"message": f"auction {auction_id} succesfully deleted"}
 
 
@@ -180,7 +181,6 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 
     # extract player id
     return db.bid(bid, mock_check)
-
 
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id

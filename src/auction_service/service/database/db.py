@@ -97,10 +97,10 @@ class database:
             self.gacha_remove_gacha(str(auction.player_id),
                                     auction.gacha_name, access_token)
 
-        if mock_check:
-            id = str(UUID("00000000-0000-4000-8000-000000000000"))
-        else:
-            id = str(uuid.uuid4())
+        #if mock_check:
+        #    id = str(UUID("00000000-0000-4000-8000-000000000000"))
+        #else:
+        id = str(uuid.uuid4())
 
         auction_to_insert = {
             "auction_id": str(id),
@@ -121,6 +121,8 @@ class database:
     # HP auction presence == True (check app-side)
     def auction_delete(self, auction_id: str, mock_check: bool):
         auction = self.db["auctions"].find_one({"auction_id": auction_id})
+        if not auction:
+            return False
 
         # Distro update
         if not mock_check:
@@ -137,6 +139,8 @@ class database:
 
         self.db["auctions"].delete_one({"auction_id": auction_id})
         self.db["bids"].delete_many({"auction_id": auction_id})
+
+        return True
 
     # DONE
     # AUCTION_FILTER
@@ -172,8 +176,7 @@ class database:
             raise HTTPException(status_code=400, detail="Bid must be higher than currently winning bid")
 
         # Player existence
-        if not mock_check:
-            self.check_player_presence(str(bid.player_id))
+        self.check_player_presence(str(bid.player_id))
 
         # Tux freeze
         if not mock_check:

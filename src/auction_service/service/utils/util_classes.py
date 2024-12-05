@@ -42,11 +42,11 @@ class Bid(BaseModel):
 
 
 class BidOptional(BaseModel):
-    bid_id: Optional[UUID]
-    auction_id: Optional[UUID]
-    player_id: Optional[UUID]
-    bid: Optional[int]
-    time: Optional[int]
+    bid_id: Optional[UUID] = None
+    auction_id: Optional[UUID] = None
+    player_id: Optional[UUID] = None
+    bid: Optional[int] = None
+    time: Optional[int] = None
 
 
 class AuthId(BaseModel):
