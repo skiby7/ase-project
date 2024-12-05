@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "2aca4329-2093-496e-add0-9cabc1bcd9da",
+		"_postman_id": "c2b64be6-e9bf-4c3c-ab54-888be27dd44d",
 		"name": "Unit-tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39903634"
+		"_exporter_id": "39573642",
+		"_collection_link": "https://solar-meadow-925541.postman.co/workspace/ase-project~d10fc23c-d681-464b-9659-40d096bfb64e/collection/39573642-c2b64be6-e9bf-4c3c-ab54-888be27dd44d?action=share&source=collection_link&creator=39573642"
 	},
 	"item": [
 		{
@@ -273,7 +274,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n\"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n\"active\": true\r\n}\r\n",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -281,7 +282,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/filters",
+					"raw": "https://{{base_url}}:9390/auctions/filters?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -290,6 +291,16 @@
 					"path": [
 						"auctions",
 						"filters"
+					],
+					"query": [
+						{
+							"key": "player_id",
+							"value": "c6529a4d-45f2-4c73-8749-8c206ac1f866"
+						},
+						{
+							"key": "active",
+							"value": "true"
+						}
 					]
 				}
 			},
@@ -475,7 +486,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\"\r\n}\r\n",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -483,7 +494,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bid-filter",
+					"raw": "https://{{base_url}}:9390/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666/bid-filter?player_id=c6529a4d-45f2-4c73-8749-8c206ac16666",
 					"protocol": "https",
 					"host": [
 						"{{base_url}}"
@@ -493,6 +504,12 @@
 						"auctions",
 						"c6529a4d-45f2-4c73-8749-8c206ac16666",
 						"bid-filter"
+					],
+					"query": [
+						{
+							"key": "player_id",
+							"value": "c6529a4d-45f2-4c73-8749-8c206ac16666"
+						}
 					]
 				}
 			},

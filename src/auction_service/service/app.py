@@ -149,8 +149,7 @@ def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(e
     if not mock_check and (str(token_data.sub) != db.auction_owner(str(auction_id))):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
-    if not db.auction_delete(str(auction_id), mock_check):
-        return  {"message": f"auction {auction_id} not present"} 
+    db.auction_delete(str(auction_id), mock_check)
     return {"message": f"auction {auction_id} succesfully deleted"}
 
 
@@ -158,7 +157,7 @@ def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(e
 # AUCTION_FILTER - "active":True
 @app.get("/auctions/filters", status_code=200)
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    auction_filter: AuctionOptional = Body()):
+                    auction_filter: AuctionOptional = Query()):
     check_user(mock_check, token_data)
 
     if auction_filter.active is None or (auction_filter.active is not None and auction_filter.active is False):
@@ -182,11 +181,12 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
     # extract player id
     return db.bid(bid, mock_check)
 
+
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id
 @app.get("/auctions/{player_id}/bid-filter", status_code=200)
 def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
-                    bid_filter: BidOptional = Body()):
+                    bid_filter: BidOptional = Query()):
     check_user(mock_check, token_data)
 
     if player_id != bid_filter.player_id or ((not mock_check) and str(player_id) != token_data.sub):
