@@ -121,7 +121,7 @@ def admin_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
     check_user(mock_check, token_data)
 
-    if (mock_check or str(auction.player_id) != token_data.sub):
+    if not mock_check and (str(auction.player_id) != token_data.sub):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     return db.auction_create(auction, mock_check)
@@ -133,7 +133,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)]):
     check_user(mock_check, token_data)
 
-    if mock_check or (str(token_data.sub) != db.auction_owner(str(auction_id))):
+    if not mock_check and (str(token_data.sub) != db.auction_owner(str(auction_id))):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     db.auction_delete(str(auction_id), mock_check)
