@@ -1,6 +1,5 @@
 services:
     tux_service:
-        container_name: tux_service
         restart: no
         build:
             context: ./service
