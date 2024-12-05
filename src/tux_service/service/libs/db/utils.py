@@ -1,5 +1,4 @@
 from functools import wraps
-from sqlalchemy.exc import SQLAlchemyError
 from logging import getLogger
 
 logger = getLogger("uvicorn.error")
@@ -16,7 +15,7 @@ def transactional(func):
             else:
                 return func(session, *args, **kwargs)
 
-        except SQLAlchemyError as e:
+        except Exception as e:
             logger.error(f"Error during transaction: {e}")
             if not already_in_transaction:
                 logger.info("Rolling back transaction...")

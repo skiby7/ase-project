@@ -5,13 +5,23 @@ services:
         build:
             context: ./service
         environment:
-            - DATABASE_URL=postgresql://postgres@tux_db:5432/
+            - DATABASE_SCHEMA=postgresql+psycopg2://
+            - DATABASE_IP=tux_db
+            - DATABASE_PORT=5432
+            - DATABASE_CA=/run/secrets/pg_ca.crt
+            - DATABASE_CRT=/run/secrets/pg_server.crt
+            - DATABASE_KEY=/run/secrets/pg_server.key
         ports:
             - 9290:9290
         secrets:
+            - tux_db_user
+            - tux_db_password
             - jwt_public_key
             - ssl_private_key
             - ssl_cert
+            - pg_server.key
+            - pg_server.crt
+            - pg_ca.crt
         depends_on:
             tux_db:
                 condition: service_healthy
@@ -20,39 +30,46 @@ services:
 
     tux_db:
         container_name: tux_db
-        image: postgres
-        restart: always
+        build:
+            context: ./service
+            dockerfile: DockerfileDb
+        restart: unless-stopped
         shm_size: 128mb
         volumes:
-            - ./postgres-data:/var/lib/postgresql/data
+            - postgres-data:/var/lib/postgresql/data
         environment:
             # POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-            POSTGRES_HOST_AUTH_METHOD: trust
+            POSTGRES_USER_FILE: /run/secrets/tux_db_user
+            POSTGRES_PASSWORD_FILE: /run/secrets/tux_db_password
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U postgres"]
             interval: 5s
             timeout: 5s
             retries: 5
-        # secrets:
-        #     - db_password
+        secrets:
+            - tux_db_user
+            - tux_db_password
         networks:
             - gacha_network
 
-    pgadmin:
-        container_name: pgadmin
-        image: dpage/pgadmin4
-        environment:
-            PGADMIN_DEFAULT_EMAIL: admin@admin.org
-            PGADMIN_DEFAULT_PASSWORD: admin
-            PGADMIN_CONFIG_SERVER_MODE: "False"
-        volumes:
-            - ./pgadmin:/var/lib/pgadmin
-        ports:
-            - 5050:80
-        networks:
-            - gacha_network
-        restart: unless-stopped
+    # pgadmin:
+    #     container_name: pgadmin
+    #     image: dpage/pgadmin4
+    #     environment:
+    #         PGADMIN_DEFAULT_EMAIL: admin@admin.org
+    #         PGADMIN_DEFAULT_PASSWORD: admin
+    #         PGADMIN_CONFIG_SERVER_MODE: "False"
+    #     volumes:
+    #         - ./pgadmin:/var/lib/pgadmin
+    #     ports:
+    #         - 5050:80
+    #     networks:
+    #         - gacha_network
+    #     restart: unless-stopped
 
+volumes:
+    postgres-data:
+        driver: local
 secrets:
     jwt_public_key:
         file: ./service/secrets/public.pem
@@ -64,6 +81,16 @@ secrets:
         file: ./service/secrets/key.pem
     ssl_cert:
         file: ./service/secrets/cert.pem
+    pg_server.key:
+        file: ./service/secrets/server.key
+    pg_ca.crt:
+        file: ./service/secrets/ca.crt
+    pg_server.crt:
+        file: ./service/secrets/server.crt
+    tux_db_user:
+        file: ./service/secrets/db_user
+    tux_db_password:
+        file: ./service/secrets/db_password
     # ssl_mongo_cert_key:
     #     file: ./service/secrets/mongo_cert_key.pem
     # mongodb_password:

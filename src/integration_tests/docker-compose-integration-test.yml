@@ -99,12 +99,18 @@ services:
             - DATABASE_SCHEMA=postgresql://
             - DATABASE_IP=tux_db
             - DATABASE_PORT=5432
+            - DATABASE_CA=/run/secrets/pg_ca.crt
+            - DATABASE_CRT=/run/secrets/pg_server.crt
+            - DATABASE_KEY=/run/secrets/pg_server.key
         secrets:
             - tux_db_user
             - tux_db_password
             - jwt_public_key
             - ssl_private_key
             - ssl_cert
+            - pg_server.key
+            - pg_server.crt
+            - pg_ca.crt
         depends_on:
             tux_db:
                 condition: service_healthy
@@ -114,7 +120,10 @@ services:
 
     tux_db:
         container_name: tux_db
-        image: postgres
+        build:
+            context: ../tux_service/service
+            dockerfile: DockerfileDb
+        # image: postgres
         restart: always
         shm_size: 128mb
         environment:
@@ -133,6 +142,48 @@ services:
             - gacha_public_network_tests
             - gacha_private_network_tests
 
+    auction:
+        build:
+            context: ../auction_service/service
+            dockerfile: Dockerfile
+        healthcheck:
+            test: curl --silent --fail --insecure https://auction:9390/docs || exit 1
+            interval: 5s
+            retries: 3
+            start_period: 5s
+            timeout: 5s
+        depends_on:
+            - auction_db
+        secrets:
+            - admin_account
+            - auction_cert
+            - auction_key
+            - auction_pw
+            - jwt_private_key
+            - jwt_public_key
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
+    auction_db:
+        container_name: auction_db
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/auction_pw
+        command: mongod --quiet --logpath /dev/null
+            --tlsAllowConnectionsWithoutCertificates
+            --tlsMode preferTLS
+            --tlsCertificateKeyFile /run/secrets/auction_cert_db
+            --tlsCAFile /run/secrets/auction_cert_db
+        secrets:
+            - auction_cert_db
+            - auction_pw
+        networks:
+            - gacha_public_network_tests
+            - gacha_private_network_tests
+
     admin_nginx:
         # container_name: admin_nginx
         image: nginx:latest
@@ -144,8 +195,6 @@ services:
             timeout: 5s
         volumes:
             - ../gateways/admin/nginx:/etc/nginx/conf.d
-        ports:
-            - "8180:443"
         secrets:
             - ssl_admin_api_cert
             - ssl_admin_api_key
@@ -157,6 +206,8 @@ services:
             distro:
                 condition: service_healthy
             tux_service:
+                condition: service_healthy
+            auction:
                 condition: service_healthy
 
     public_nginx:
@@ -170,8 +221,6 @@ services:
             timeout: 5s
         volumes:
             - ../gateways/public/nginx:/etc/nginx/conf.d
-        ports:
-            - "8080:443"
         secrets:
             - ssl_public_api_cert
             - ssl_public_api_key
@@ -183,6 +232,8 @@ services:
             distro:
                 condition: service_healthy
             tux_service:
+                condition: service_healthy
+            auction:
                 condition: service_healthy
 
     newman:
@@ -199,6 +250,8 @@ services:
             public_nginx:
                 condition: service_healthy
             admin_nginx:
+                condition: service_healthy
+            auction:
                 condition: service_healthy
         entrypoint:
             [
@@ -218,6 +271,14 @@ services:
             - gacha_private_network_tests
 
 secrets:
+    auction_pw:
+        file: ../auction_service/service/secrets/pw.txt
+    auction_cert:
+        file: ../auction_service/service/secrets/cert.pem
+    auction_key:
+        file: ../auction_service/service/secrets/key.pem
+    auction_cert_db:
+        file: ../auction_service/service/secrets/server.pem
     pw:
         file: ../gacha_service/service/secrets/pw.txt
     cert:
@@ -254,7 +315,12 @@ secrets:
         file: ../tux_service/service/secrets/db_user
     tux_db_password:
         file: ../tux_service/service/secrets/db_password
-
+    pg_server.key:
+        file: ../tux_service/service/secrets/server.key
+    pg_ca.crt:
+        file: ../tux_service/service/secrets/ca.crt
+    pg_server.crt:
+        file: ../tux_service/service/secrets/server.crt
 networks:
     gacha_public_network_tests:
         driver: bridge
