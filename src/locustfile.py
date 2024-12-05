@@ -120,6 +120,8 @@ class Tasks(TaskSet):
     # Headers and initial setup
     def on_start(self):
         self.users = []
+        for i in range(20):
+            self.register()
         # self.register_url = "/api/auth/accounts"
         # self.login_url = "/api/auth/token"
         # self.user_data = {
@@ -195,7 +197,6 @@ class Tasks(TaskSet):
         return response
 
 
-    @task(weight=50)
     def register(self):
         username = gen_username()
         user_data = {
