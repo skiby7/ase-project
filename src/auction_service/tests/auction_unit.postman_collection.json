@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "c2b64be6-e9bf-4c3c-ab54-888be27dd44d",
-		"name": "Unit-tests",
+		"name": "auction_unit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "39573642",
 		"_collection_link": "https://solar-meadow-925541.postman.co/workspace/ase-project~d10fc23c-d681-464b-9659-40d096bfb64e/collection/39573642-c2b64be6-e9bf-4c3c-ab54-888be27dd44d?action=share&source=collection_link&creator=39573642"
@@ -293,57 +293,178 @@
 					"response": []
 				},
 				{
-					"name": "Auction Filter by player 1 id",
+					"name": "Create Auction 3",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"test\", function(){\r",
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.collectionVariables.set('auction3', pm.response.json().auction_id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check player_id field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Check gacha_name field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.gacha_name).to.eql(\"Fedora\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check starting_price field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.starting_price).to.eql(12);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check end_time field\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.end_time).to.eql(10000000000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"gacha_name\": \"Fedora\",\r\n    \"starting_price\": 12,\r\n    \"end_time\": 10000000000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Auction 3 status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid data\", function(){\r",
 									"    pm.response.to.have.status(200);\r",
 									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.active).to.eql(true);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Check player_id\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
-									"    pm.expect(jsonData[1].player_id).to.eql(\"c6529a4d-45f2-4c73-8749-8c206ac1f866\");\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/{{auction3}}",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"{{auction3}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Auction 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
 									"});\r",
-									"\r",
-									"pm.test(\"Check gacha_name\", function () {\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/{{auction3}}",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"{{auction3}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Auction 3 status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid data\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
 									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].gacha_name.toLowerCase()).to.eql(\"ubuntu\");\r",
-									"    pm.expect(jsonData[1].gacha_name.toLowerCase()).to.eql(\"tails\");\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Check starting_price\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].starting_price).to.eql(10);\r",
-									"    pm.expect(jsonData[1].starting_price).to.eql(12);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Check current_winning_player_id\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].current_winning_player_id).to.be.null;\r",
-									"    pm.expect(jsonData[1].current_winning_player_id).to.be.null;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Check current_winning_bid\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].current_winning_bid).to.eql(0);\r",
-									"    pm.expect(jsonData[1].current_winning_bid).to.eql(0);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Check end_time\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].end_time).to.eql(10000000000);\r",
-									"    pm.expect(jsonData[1].end_time).to.eql(10000000000);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Check active\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData[0].active).to.be.true;\r",
-									"    pm.expect(jsonData[1].active).to.be.true;\r",
+									"    pm.expect(jsonData.active).to.eql(false);\r",
 									"});\r",
 									""
 								],
@@ -368,24 +489,16 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{base_url}}:9390/auctions?player_id=c6529a4d-45f2-4c73-8749-8c206ac1f866&active=true",
+							"raw": "https://{{base_url}}:9390/admin/auctions/{{auction3}}",
 							"protocol": "https",
 							"host": [
 								"{{base_url}}"
 							],
 							"port": "9390",
 							"path": [
-								"auctions"
-							],
-							"query": [
-								{
-									"key": "player_id",
-									"value": "c6529a4d-45f2-4c73-8749-8c206ac1f866"
-								},
-								{
-									"key": "active",
-									"value": "true"
-								}
+								"admin",
+								"auctions",
+								"{{auction3}}"
 							]
 						}
 					},
@@ -556,6 +669,60 @@
 								"auctions",
 								"{{auction2}}",
 								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Market Activity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter test\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has alid data\", function () {\r",
+									"    pm.expect(pm.response.json()).to.have.property('avg');\r",
+									"    pm.expect(pm.response.json()).to.have.property('count');\r",
+									"    pm.expect(pm.response.json().bids).to.have.lengthOf(2);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/stats/auctions",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"stats",
+								"auctions"
 							]
 						}
 					},
@@ -1428,7 +1595,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"c6529a4d-45f2-4c73-8749-8c206ac1f866\",\r\n    \"bid\": 20\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1446,6 +1613,158 @@
 								"auctions",
 								"c6529a4d-45f2-4c73-8749-8c206ac1f866",
 								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify bid_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().bid_id).to.equal(\"00000000-0000-4000-8000-000000000000\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify player_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().player_id).to.equal(\"c6529a4d-45f2-4c73-8749-8c206ac16666\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify auction_id is correct\", function () {\r",
+									"    pm.expect(pm.response.json().auction_id).to.equal(pm.collectionVariables.get(\"auction1\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify value is correct\", function () {\r",
+									"    pm.expect(pm.response.json().value).to.equal(20);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 20\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction1}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bid auction 1 Lower amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auction_create test\", function(){\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player_id\": \"c6529a4d-45f2-4c73-8749-8c206ac16666\",\r\n    \"auction_id\": \"{{auction1}}\",\r\n    \"bid\": 15\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/auctions/{{auction1}}/bids",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"auctions",
+								"{{auction1}}",
+								"bids"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Wrong Auction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Success\", function(){\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{base_url}}:9390/admin/auctions/c6529a4d-45f2-4c73-8749-8c206ac16666",
+							"protocol": "https",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "9390",
+							"path": [
+								"admin",
+								"auctions",
+								"c6529a4d-45f2-4c73-8749-8c206ac16666"
 							]
 						}
 					},
@@ -1514,6 +1833,11 @@
 		{
 			"key": "auction2",
 			"value": ""
+		},
+		{
+			"key": "auction3",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
