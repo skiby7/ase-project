@@ -195,7 +195,7 @@ class Tasks(TaskSet):
         return response
 
 
-    @task(weight=20)
+    @task(weight=50)
     def register(self):
         username = gen_username()
         user_data = {
@@ -234,7 +234,7 @@ class Tasks(TaskSet):
             return
         for i in range(10):
             response = self.buy_tux(user_id, headers, 10)
-            if response.startus_code == 200:
+            if response.status_code == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
