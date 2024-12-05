@@ -46,7 +46,7 @@ services:
 
     newman:
         image: postman/newman:latest
-        container_name: distro_service_tests
+        container_name: auction_service_tests
         restart: no
         depends_on:
             auction:
