@@ -22,7 +22,8 @@ db = database("database/auctions.json", "database/bids.json", "database/users.js
 
 ### CHECKS ###
 
-CHECK_EXPIRY_INTERVAL = 1  # in minute
+CHECK_EXPIRY_INTERVAL_MINUTES = 1  # in minute
+CHECK_EXPIRY_INTERVAL_SECONDS = 2
 
 
 def checkAuctionExpiration():
@@ -37,7 +38,7 @@ def checkAuctionExpiration():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(checkAuctionExpiration, "interval", minutes=CHECK_EXPIRY_INTERVAL, coalesce=False,
+scheduler.add_job(checkAuctionExpiration, "interval", seconds=CHECK_EXPIRY_INTERVAL_SECONDS, coalesce=False,
                   misfire_grace_time=20)
 scheduler.start()
 

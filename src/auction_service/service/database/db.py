@@ -308,9 +308,9 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
 
-    def gacha_add_gacha(uid, gacha_name, token_data):
+    def gacha_add_gacha(self, uid, gacha_name, access_token):
         header = {
-            "Authorization": f"Bearer {token_data.jwt}",
+            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
         data = {
