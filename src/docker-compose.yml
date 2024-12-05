@@ -1,7 +1,7 @@
 services:
     authentication:
         container_name: authentication
-        restart: always
+        restart: unless-stopped
         build:
             context: ./authentication_service/service
         environment:
@@ -111,7 +111,7 @@ services:
             context: ./tux_service/service
             dockerfile: DockerfileDb
         # image: postgres
-        restart: always
+        restart: unless-stopped
         shm_size: 128mb
         volumes:
             - tux_db_data:/var/lib/postgresql/data

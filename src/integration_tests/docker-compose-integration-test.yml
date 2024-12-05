@@ -1,7 +1,7 @@
 services:
     authentication:
         container_name: authentication
-        restart: always
+        restart: unless-stopped
         healthcheck:
             test: curl --silent --fail --insecure https://authentication:9090/docs || exit 1
             interval: 5s
@@ -124,7 +124,7 @@ services:
             context: ../tux_service/service
             dockerfile: DockerfileDb
         # image: postgres
-        restart: always
+        restart: unless-stopped
         shm_size: 128mb
         environment:
             POSTGRES_USER_FILE: /run/secrets/tux_db_user

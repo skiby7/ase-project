@@ -2,6 +2,8 @@ import random
 import string
 from locust import HttpUser, task, between
 import urllib3
+from time import time
+unix_time = lambda: int(time())
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -108,6 +110,8 @@ class Operations():
     system_collection = "/api/distro/user/gacha/all"
     distro_info = "/api/distro/user/gacha/{}"
     transaction_history = "/api/tux-management/transactions/{}"
+    create_auction = "/api/auction/auctions"
+    bid = "/api/auction/auctions/{}/bids"
 
 
 class UserBehavior(HttpUser):
@@ -138,7 +142,7 @@ class UserBehavior(HttpUser):
             Operations.login,
             data=data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
-            verify=False  # Accept self-signed certificates
+            verify=False
         )
 
         if response.status_code == 200:
@@ -154,7 +158,7 @@ class UserBehavior(HttpUser):
             Operations.userinfo,
             data=user_data,
             headers=headers,
-            verify=False  # Accept self-signed certificates
+            verify=False
         )
 
         if response.status_code == 200:
@@ -162,6 +166,34 @@ class UserBehavior(HttpUser):
             return token_data.get("uid")
         print(f"Failed to fetch token: {response.status_code} {response.text}")
         return None
+
+    def do_auth(self, user_data):
+        auth_token, _ = self.fetch_token(user_data)
+        if not auth_token:
+            print("No auth token, skipping...")
+            return None, None
+        user_id = self.login(user_data, auth_token)
+
+        if not user_id:
+            print("No auth token, skipping...")
+            return None, None
+        return user_id, {
+            "Authorization": f"Bearer {auth_token}",
+            "Content-Type": "application/json"
+        }
+
+
+    def buy_tux(self, user_id, headers, amount):
+        data = {"user_id":str(user_id), "amount" : amount}
+        response = self.client.post(
+            Operations.buy,
+            json=data,
+            headers=headers,
+            verify=False
+        )
+
+        return response
+
 
     @task(weight=20)
     def register(self):
@@ -195,32 +227,18 @@ class UserBehavior(HttpUser):
             return
 
         user_data = random.choice(self.users)
-        auth_token, _ = self.fetch_token(user_data)
-        if not auth_token:
-            print("No auth token, skipping...")
+        if not user_data:
             return
-        user_id = self.login(user_data, auth_token)
-
-        if not user_id:
-            print("No auth token, skipping...")
+        user_id, headers = self.do_auth(user_data)
+        if not user_id or not headers:
             return
-        headers = {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json"
-        }
         for i in range(10):
-            data = {"user_id":str(user_id), "amount" : 10}
-            response = self.client.post(
-                Operations.buy,
-                json=data,
-                headers=headers,
-                verify=False
-            )
-
-            if response.status_code == 200:
+            response = self.buy_tux(user_id, headers, 10)
+            if response == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
+                continue
 
             response = self.client.post(
                 Operations.roll.format(user_id),
@@ -240,20 +258,11 @@ class UserBehavior(HttpUser):
             return
 
         user_data = random.choice(self.users)
-        auth_token, _ = self.fetch_token(user_data)
-        if not auth_token:
-            print("No auth token, skipping...")
+        if not user_data:
             return
-
-        user_id = self.login(user_data, auth_token)
-        if not user_id:
-            print("No auth token, skipping...")
+        user_id, headers = self.do_auth(user_data)
+        if not user_id or not headers:
             return
-
-        headers = {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json"
-        }
         response = self.client.get(
             Operations.distro_info.format(random.choice(linux_distros)),
             headers=headers,
@@ -271,20 +280,11 @@ class UserBehavior(HttpUser):
             return
 
         user_data = random.choice(self.users)
-        auth_token, _ = self.fetch_token(user_data)
-        if not auth_token:
-            print("No auth token, skipping...")
+        if not user_data:
             return
-
-        user_id = self.login(user_data, auth_token)
-        if not user_id:
-            print("No auth token, skipping...")
+        user_id, headers = self.do_auth(user_data)
+        if not user_id or not headers:
             return
-
-        headers = {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json"
-        }
         response = self.client.get(
             Operations.system_collection,
             headers=headers,
@@ -302,20 +302,11 @@ class UserBehavior(HttpUser):
             return
 
         user_data = random.choice(self.users)
-        auth_token, _ = self.fetch_token(user_data)
-        if not auth_token:
-            print("No auth token, skipping...")
+        if not user_data:
             return
-
-        user_id = self.login(user_data, auth_token)
-        if not user_id:
-            print("No auth token, skipping...")
+        user_id, headers = self.do_auth(user_data)
+        if not user_id or not headers:
             return
-
-        headers = {
-            "Authorization": f"Bearer {auth_token}",
-            "Content-Type": "application/json"
-        }
         response = self.client.get(
             Operations.transaction_history.format(user_id),
             headers=headers,
@@ -325,3 +316,92 @@ class UserBehavior(HttpUser):
             print("Operation performed successfully")
         else:
             print(f"Failed to perform operation: {response.status_code} {response.text}")
+
+    @task
+    def auction(self):
+        if len(self.users) < 6:
+            print("Not enough users to open an auction")
+            return
+        auction_duration = 10
+        starting_price = 10
+        users = random.sample(self.users, len(self.users) // 2)
+
+        auctioneer = users[0]
+        bidders = users[1:]
+
+
+        user_id, headers = self.do_auth(auctioneer)
+        if not user_id or not headers:
+            return
+        auctioneer["user_id"] = user_id
+        auctioneer["headers"] = headers
+
+
+        response = self.buy_tux(user_id, headers, 10)
+        if response == 200:
+            print("Operation performed successfully")
+        else:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")
+            return
+
+
+        if response.status_code != 200:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")
+            return
+
+        response = self.client.post(
+            Operations.roll.format(auctioneer["user_id"]),
+            headers=auctioneer["headers"],
+            verify=False
+        )
+
+        if response.status_code != 200:
+            print(f"Failed to perform operation: {response.status_code} {response.text}")
+            return
+
+        gacha = response.json()["name"]
+
+        for bidder in bidders:
+            user_id, headers = self.do_auth(auctioneer)
+            if not user_id or not headers:
+                return
+
+            bidder["user_id"] = user_id
+            bidder["headers"] = headers
+
+            response = self.buy_tux(user_id, headers, 1000)
+            if response == 200:
+                print("Operation performed successfully")
+            else:
+                print(f"Failed to perform operation: {response.status_code} {response.text}")
+                continue
+
+        start_time = unix_time()
+        auction_data = {
+            "player_id": f"{auctioneer["user_id"]}",
+            "gacha_name": gacha,
+            "starting_price": starting_price,
+            "end_time": start_time + auction_duration
+        }
+        response = self.client.post(
+            Operations.create_auction.format(auctioneer["user_id"]),
+            headers=auctioneer["headers"],
+            json=auction_data,
+            verify=False
+        )
+        if response.status_code != 201:
+            return
+        auction_id = response.json()["auction_id"]
+        last_bid = starting_price
+        while unix_time() - start_time < auction_duration:
+            bidder = random.choice(bidders)
+            data = {"auction_id": auction_id, "player_id": bidder["user_id"], "bid" : last_bid}
+            response = self.client.post(
+                Operations.bid.format(auction_id),
+                json=data,
+                headers=auctioneer["headers"],
+                verify=False
+            )
+            if response.status_code != 200:
+                continue
+            last_bid += 1

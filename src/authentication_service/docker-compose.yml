@@ -1,7 +1,7 @@
 services:
     authentication:
         container_name: authentication
-        restart: always
+        restart: unless-stopped
         build:
             context: ./service
         environment:
