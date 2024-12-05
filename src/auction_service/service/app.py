@@ -1,3 +1,5 @@
+import logging
+
 from database.db import database
 from uuid import UUID
 from fastapi import Body, FastAPI, HTTPException, Depends
@@ -22,12 +24,15 @@ db = database("database/auctions.json", "database/bids.json", "database/users.js
 
 ### CHECKS ###
 
-CHECK_EXPIRY_INTERVAL = 1  # in minute
+CHECK_EXPIRY_INTERVAL_MINUTES = 1  # in minute
+CHECK_EXPIRY_INTERVAL_SECONDS = 2
 
 
 def checkAuctionExpiration():
     finishedAuctions = db.checkAuctionExpiration()
     for auction in finishedAuctions:
+        auction_id = auction["auction_id"];
+        logging.info(f"Handling expired auction {auction_id}")
         # db.collection["auctions"].update_one({"player_id":auction["player_id"]},{"$set":{"active":False}})
         if mock_check: continue
         token_data = db.auth_get_admin_token()
@@ -37,7 +42,7 @@ def checkAuctionExpiration():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(checkAuctionExpiration, "interval", minutes=CHECK_EXPIRY_INTERVAL, coalesce=False,
+scheduler.add_job(checkAuctionExpiration, "interval", seconds=CHECK_EXPIRY_INTERVAL_SECONDS, coalesce=False,
                   misfire_grace_time=20)
 scheduler.start()
 
