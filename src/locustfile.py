@@ -234,7 +234,7 @@ class UserBehavior(TaskSet):
             return
         for i in range(10):
             response = self.buy_tux(user_id, headers, 10)
-            if response == 200:
+            if response.status_code == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -338,7 +338,7 @@ class UserBehavior(TaskSet):
 
 
         response = self.buy_tux(user_id, headers, 10)
-        if response == 200:
+        if response.status_code == 200:
             print("Operation performed successfully")
         else:
             print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -370,7 +370,7 @@ class UserBehavior(TaskSet):
             bidder["headers"] = headers
 
             response = self.buy_tux(user_id, headers, 1000)
-            if response == 200:
+            if response.status_code == 200:
                 print("Operation performed successfully")
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
