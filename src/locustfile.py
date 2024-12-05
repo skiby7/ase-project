@@ -1,14 +1,11 @@
 import random
-from multiprocessing import Manager
 import string
-from locust import HttpUser, task, between, TaskSet
+from locust import FastHttpUser, task, between, TaskSet
 import urllib3
 from time import time
 unix_time = lambda: int(time())
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-manager = Manager()
 
-global_users = manager.list()
 
 adjectives = [
     "adoring", "affectionate", "agitated", "amazing", "awesome", "beautiful",
@@ -118,12 +115,11 @@ class Operations():
 
 
 
-class Users(HttpUser):
-    wait_time = between(1, 3)
+class Tasks(TaskSet):
 
     # Headers and initial setup
     def on_start(self):
-        pass
+        self.users = []
         # self.register_url = "/api/auth/accounts"
         # self.login_url = "/api/auth/token"
         # self.user_data = {
@@ -187,7 +183,6 @@ class Users(HttpUser):
         }
 
 
-
     def buy_tux(self, user_id, headers, amount):
         data = {"user_id":str(user_id), "amount" : amount}
         response = self.client.post(
@@ -215,11 +210,11 @@ class Users(HttpUser):
         )
         if response.status_code in (200, 201):
             print("Registration successful")
-            global_users.append({  # type: ignore
+            self.users.append({  # type: ignore
                 "username" : user_data["username"],
                 "password" : user_data["password"]
             })
-            print(f"{len(global_users)} available")
+            print(f"{len(self.users)} available")
             return
         else:
             print(f"Failed to register: {response.status_code} {response.text}")
@@ -227,10 +222,11 @@ class Users(HttpUser):
 
     @task(weight=2)
     def they_see_me_rolling(self):
-        if len(global_users) == 0:
+        if len(self.users) == 0:
             print("No users available, skipping...")
             return
-        user_data = random.choice(global_users)
+
+        user_data = random.choice(self.users)
         if not user_data:
             return
         user_id, headers = self.do_auth(user_data)
@@ -257,12 +253,11 @@ class Users(HttpUser):
 
     @task(weight=3)
     def get_distro_info(self):
-        if len(global_users) == 0:
+        if len(self.users) == 0:
             print("No users available, skipping...")
             return
 
-        user_data = random.choice(global_users)
-
+        user_data = random.choice(self.users)
         if not user_data:
             return
         user_id, headers = self.do_auth(user_data)
@@ -280,12 +275,11 @@ class Users(HttpUser):
 
     @task(weight=3)
     def get_distro_available(self):
-        if len(global_users) == 0:
+        if len(self.users) == 0:
             print("No users available, skipping...")
             return
 
-        user_data = random.choice(global_users)
-
+        user_data = random.choice(self.users)
         if not user_data:
             return
         user_id, headers = self.do_auth(user_data)
@@ -303,12 +297,11 @@ class Users(HttpUser):
 
     @task(weight=3)
     def get_user_transactions(self):
-        if len(global_users) == 0:
+        if len(self.users) == 0:
             print("No users available, skipping...")
             return
 
-        user_data = random.choice(global_users)
-
+        user_data = random.choice(self.users)
         if not user_data:
             return
         user_id, headers = self.do_auth(user_data)
@@ -326,13 +319,12 @@ class Users(HttpUser):
 
     @task
     def auction(self):
-        if len(global_users) < 6:
+        if len(self.users) < 6:
             print("Not enough users to open an auction")
             return
         auction_duration = 10
         starting_price = 10
-
-        users = random.sample(global_users, len(global_users) // 2)
+        users = random.sample(self.users, len(self.users) // 2)
 
         auctioneer = users[0]
         bidders = users[1:]
@@ -407,3 +399,8 @@ class Users(HttpUser):
             if response.status_code != 200:
                 continue
             last_bid += 1
+
+
+class Users(FastHttpUser):
+    wait_time = between(1, 3)
+    tasks = [Tasks]
