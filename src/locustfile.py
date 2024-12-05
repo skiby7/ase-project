@@ -1,6 +1,6 @@
 import random
 import string
-from locust import HttpUser, task, between
+from locust import HttpUser, task, between, TaskSet
 import urllib3
 from time import time
 unix_time = lambda: int(time())
@@ -114,7 +114,7 @@ class Operations():
     bid = "/api/auction/auctions/{}/bids"
 
 
-class UserBehavior(HttpUser):
+class UserBehavior(TaskSet):
     wait_time = between(1, 3)  # Users wait between 1 and 3 seconds between tasks
 
     # Headers and initial setup
