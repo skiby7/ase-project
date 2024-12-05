@@ -36,9 +36,13 @@ def checkAuctionExpiration():
         # db.collection["auctions"].update_one({"player_id":auction["player_id"]},{"$set":{"active":False}})
         if mock_check: continue
         token_data = db.auth_get_admin_token()
-        db.gacha_add_gacha(str(auction["current_winning_player_id"]), str(auction["gacha_name"]), token_data)
-        db.tux_settle_auction(str(auction["auction_id"]), str(auction["current_winning_player_id"]),
-                              str(auction["player_id"]), token_data)
+        if auction["winning_winning_player_id"] is not None:
+            db.gacha_add_gacha(str(auction["current_winning_player_id"]), str(auction["gacha_name"]), token_data)
+            db.tux_settle_auction(str(auction["auction_id"]), str(auction["current_winning_player_id"]),
+                                str(auction["player_id"]), token_data)
+        else:
+            db.gacha_add_gacha(str(auction["player_id"]), str(auction["gacha_name"]), token_data)
+            #nessuno ha biddato, no bisogno di chiamare leo
 
 
 scheduler = BackgroundScheduler()
