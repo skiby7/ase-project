@@ -166,15 +166,17 @@ class database:
     def get_roll_gacha(self, id: str, mock):
         id = str(id)
         gachas = self.db["gachas"]
-        gacha_list = list(gachas.find())
 
-        weights = [6 - int(gacha["rarity"]) for gacha in gacha_list]
-        rand = random.choices(gacha_list, weights=weights, k=1)[0]
+        weights = [5, 4, 3, 2, 1] 
+        number = random.choices([1, 2, 3, 4, 5], weights=weights, k=1)[0]
+
+        gacha_list = list(self.db["gachas"].find({"rarity": str(number)}))
+        random_gacha = random.choice(gacha_list)
 
         if mock:
             res = self.add_user_gacha(id,"Ubuntu")
         else:
-            res = self.add_user_gacha(id,rand["name"])
+            res = self.add_user_gacha(id,random_gacha["name"])
         return res
 
     def modify_gacha(self, name: str, rarity: str, image: str):
