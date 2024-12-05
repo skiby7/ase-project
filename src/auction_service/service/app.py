@@ -57,7 +57,7 @@ scheduler.start()
 
 
 # AUCTION_CREATE
-@app.post("/admin/auctions/", status_code=201)
+@app.post("/admin/auctions", status_code=201)
 def admin_auction_create(token_data: Annotated[TokenData, Depends(extract_access_token)], auction: AuctionCreate = Body()):
     if not check_admin(mock_check, token_data):
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -155,7 +155,7 @@ def player_endpoint(auction_id: UUID, token_data: Annotated[TokenData, Depends(e
 
 # DONE
 # AUCTION_FILTER - "active":True
-@app.get("/auctions/filters", status_code=200)
+@app.get("/auctions", status_code=200)
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     auction_filter: AuctionOptional = Query()):
     check_user(mock_check, token_data)
@@ -184,7 +184,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 
 # DONE
 # BID_FILTER - player_id == bid_filter.player_id
-@app.get("/auctions/{player_id}/bid-filter", status_code=200)
+@app.get("/auctions/{player_id}/bids", status_code=200)
 def player_endpoint(player_id: UUID, token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid_filter: BidOptional = Query()):
     check_user(mock_check, token_data)
