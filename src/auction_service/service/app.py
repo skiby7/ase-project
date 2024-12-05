@@ -167,7 +167,7 @@ def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_toke
 def player_endpoint(token_data: Annotated[TokenData, Depends(extract_access_token)],
                     bid: Bid = Body()):
     check_user(mock_check, token_data)
-    if mock_check or (token_data.sub != str(bid.player_id)):
+    if not mock_check and (token_data.sub != str(bid.player_id)):
         raise HTTPException(status_code=400, detail="Player_id not valid")
 
     # extract player id
