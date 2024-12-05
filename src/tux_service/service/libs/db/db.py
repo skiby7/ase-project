@@ -26,7 +26,9 @@ else:
     DATABASE_IP = os.getenv("DATABASE_IP")
     DATABASE_PORT = os.getenv("DATABASE_PORT")
     DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
-
+    DATABASE_CA = os.getenv("DATABASE_CA")
+    DATABASE_CRT = os.getenv("DATABASE_CRT")
+    DATABASE_KEY = os.getenv("DATABASE_KEY")
     with open("/run/secrets/tux_db_user") as f:
         DATABASE_USER = f.read().strip("\n").strip()
 
@@ -34,12 +36,13 @@ else:
         DATABASE_PASSWORD = f.read().strip("\n").strip()
 
     DATABASE_URL = f"{DATABASE_SCHEMA}{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_IP}:{DATABASE_PORT}"
-
+    if DATABASE_CA and DATABASE_CRT and DATABASE_KEY:
+        DATABASE_URL = f"{DATABASE_URL}?sslmode=prefer&sslrootcert={DATABASE_CA}&sslcert={DATABASE_CRT}&sslkey={DATABASE_KEY}"
 if not DATABASE_URL:
     sys.exit(-1)
 
 logger.info(f"Configured url {DATABASE_URL}")
-engine = create_engine(DATABASE_URL, echo=TEST_RUN)
+engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 
 def get_db():

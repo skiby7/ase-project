@@ -6,9 +6,6 @@ services:
             context: ./authentication_service/service
         environment:
             - RESOURCE_PATH=/code/service/resources
-        volumes:
-            #monto la libreria condivisa
-            - ./shared_libs:/code/service/shared_libs
         depends_on:
             - auth_db
         secrets:
@@ -89,12 +86,18 @@ services:
             - DATABASE_SCHEMA=postgresql://
             - DATABASE_IP=tux_db
             - DATABASE_PORT=5432
+            - DATABASE_CA=/run/secrets/pg_ca.crt
+            - DATABASE_CRT=/run/secrets/pg_server.crt
+            - DATABASE_KEY=/run/secrets/pg_server.key
         secrets:
             - tux_db_user
             - tux_db_password
             - jwt_public_key
             - ssl_private_key
             - ssl_cert
+            - pg_server.key
+            - pg_server.crt
+            - pg_ca.crt
         depends_on:
             tux_db:
                 condition: service_healthy
@@ -104,7 +107,10 @@ services:
 
     tux_db:
         container_name: tux_db
-        image: postgres
+        build:
+            context: ./tux_service/service
+            dockerfile: DockerfileDb
+        # image: postgres
         restart: always
         shm_size: 128mb
         volumes:
@@ -124,31 +130,6 @@ services:
         networks:
             - gacha_public_network
             - gacha_private_network
-
-    # pgadmin:
-    #     container_name: pgadmin
-    #     image: dpage/pgadmin4
-    #     environment:
-    #         PGADMIN_DEFAULT_EMAIL: admin@admin.org
-    #         PGADMIN_DEFAULT_PASSWORD: admin
-    #         PGADMIN_CONFIG_SERVER_MODE: "False"
-    #     ports:
-    #         - 5443:443
-    #     secrets:
-    #         - ssl_admin_api_key
-    #         - ssl_admin_api_cert
-    #     volumes:
-    #         - pgadmin:/var/lib/pgadmin
-    #     networks:
-    #         - gacha_public_network
-    #         - gacha_private_network
-    #     restart: unless-stopped
-    #     command: >
-    #         sh -c "
-    #         cp /run/secrets/ssl_admin_api_key /pgadmin4/ssl/server.crt &&
-    #         cp /run/secrets/ssl_admin_api_cert /pgadmin4/ssl/server.key &&
-    #         chmod 600 /pgadmin4/ssl/server.* &&
-    #         python3 /pgadmin4/pgAdmin4.py"
 
     admin_nginx:
         container_name: admin_nginx
@@ -233,6 +214,12 @@ secrets:
         file: ./tux_service/service/secrets/db_user
     tux_db_password:
         file: ./tux_service/service/secrets/db_password
+    pg_server.key:
+        file: ./tux_service/service/secrets/server.key
+    pg_ca.crt:
+        file: ./tux_service/service/secrets/ca.crt
+    pg_server.crt:
+        file: ./tux_service/service/secrets/server.crt
 
 networks:
     gacha_public_network:
