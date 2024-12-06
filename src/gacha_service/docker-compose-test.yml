@@ -56,7 +56,7 @@ services:
                 "run",
                 "/etc/postman/gacha_unit.postman_collection.json",
                 "--delay-request",
-                "100",
+                "10",
                 "--insecure",
                 "--reporters",
                 "cli",

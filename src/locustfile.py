@@ -48,26 +48,26 @@ names = [
 ]
 
 linux_distros = [
-    "Alpine Linux",
-    "Arch Linux",
-    "Bodhi Linux",
+    "Alpine_Linux",
+    "Arch_Linux",
+    "Bodhi_Linux",
     "Debian",
     "Fedora",
     "Gentoo",
-    "HannaMontana Linux",
-    "Kali Linux",
+    "HannaMontana_Linux",
+    "Kali_Linux",
     "Manjaro",
     "Mint",
     "NixOS",
     "openSUSE",
     "Pop!_OS",
-    "Raspberry Pi OS",
+    "Raspberry_Pi_OS",
     "Slackware",
     "Solus",
     "Tails",
     "TempleOS",
     "Ubuntu",
-    "Void Linux",
+    "Void_Linux",
     "Zorin OS"
 ]
 
