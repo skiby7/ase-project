@@ -34,7 +34,7 @@ services:
                 "--environment",
                 "/etc/postman/TuxServiceEnv.postman_environment.json",
                 "--delay-request",
-                "100",
+                "10",
                 "--insecure",
                 "--reporters",
                 "cli",

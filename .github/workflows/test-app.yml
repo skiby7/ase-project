@@ -38,7 +38,13 @@ jobs:
         needs: lint
         strategy:
             matrix:
-                service: [authentication_service, gacha_service, tux_service]
+                service:
+                    [
+                        authentication_service,
+                        gacha_service,
+                        tux_service,
+                        auction_service,
+                    ]
         steps:
             - name: Check out the repository
               uses: actions/checkout@v4

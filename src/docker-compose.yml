@@ -1,7 +1,7 @@
 services:
     authentication:
         container_name: authentication
-        restart: always
+        restart: unless-stopped
         build:
             context: ./authentication_service/service
         environment:
@@ -111,7 +111,7 @@ services:
             context: ./tux_service/service
             dockerfile: DockerfileDb
         # image: postgres
-        restart: always
+        restart: unless-stopped
         shm_size: 128mb
         volumes:
             - tux_db_data:/var/lib/postgresql/data
@@ -131,11 +131,47 @@ services:
             - gacha_public_network
             - gacha_private_network
 
+    auction:
+        build:
+            context: ./auction_service/service
+            dockerfile: Dockerfile
+        depends_on:
+            - auction_db
+        secrets:
+            - admin_account
+            - auction_cert
+            - auction_key
+            - auction_pw
+            - jwt_private_key
+            - jwt_public_key
+        networks:
+            - gacha_public_network
+            - gacha_private_network
+
+    auction_db:
+        container_name: auction_db
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/auction_pw
+        command: mongod --quiet --logpath /dev/null
+            --tlsAllowConnectionsWithoutCertificates
+            --tlsMode preferTLS
+            --tlsCertificateKeyFile /run/secrets/auction_cert_db
+            --tlsCAFile /run/secrets/auction_cert_db
+        secrets:
+            - auction_cert_db
+            - auction_pw
+        volumes:
+            - auction_db_data:/data/db
+        networks:
+            - gacha_public_network
+            - gacha_private_network
+
     admin_nginx:
         container_name: admin_nginx
         image: nginx:latest
-        # environment:
-        #     - NGINX_PORT=80
         volumes:
             - ${PWD}/gateways/admin/nginx:/etc/nginx/conf.d
         ports:
@@ -149,6 +185,7 @@ services:
             - authentication
             - distro
             - tux_service
+            - auction
 
     public_nginx:
         container_name: public_nginx
@@ -166,6 +203,7 @@ services:
             - authentication
             - distro
             - tux_service
+            - auction
 
 volumes:
     auth_db_data:
@@ -176,8 +214,18 @@ volumes:
         driver: local
     pgadmin:
         driver: local
+    auction_db_data:
+        driver: local
 
 secrets:
+    auction_pw:
+        file: ./auction_service/service/secrets/pw.txt
+    auction_cert:
+        file: ./auction_service/service/secrets/cert.pem
+    auction_key:
+        file: ./auction_service/service/secrets/key.pem
+    auction_cert_db:
+        file: ./auction_service/service/secrets/server.pem
     pw:
         file: ./gacha_service/service/secrets/pw.txt
     cert:
@@ -187,15 +235,15 @@ secrets:
     cert_db:
         file: ./gacha_service/service/secrets/server.pem
     jwt_private_key:
-        file: ./authentication_service/secrets/private.pem
+        file: secrets/private.pem
     jwt_public_key:
-        file: ./authentication_service/secrets/public.pem
+        file: secrets/public.pem
     admin_account:
-        file: ./authentication_service/secrets/admin_account.json
+        file: secrets/admin_account.json
     ssl_private_key:
-        file: ./authentication_service/secrets/app_key.pem
+        file: secrets/app_key.pem
     ssl_cert:
-        file: ./authentication_service/secrets/app_cert.pem
+        file: secrets/app_cert.pem
     ssl_mongo_cert_key:
         file: ./authentication_service/secrets/ssl_mongo_cert_key.pem
     mongodb_password:
