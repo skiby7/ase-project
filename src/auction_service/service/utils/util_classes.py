@@ -34,7 +34,7 @@ class AuctionOptional(BaseModel):
     current_winning_player_id: Optional[int] = None
     current_winning_bid: Optional[int] = None
     end_time: Optional[int] = None
-    active: Optional[bool] = None
+    active: Optional[bool] = True
 
 
 class Bid(BaseModel):
