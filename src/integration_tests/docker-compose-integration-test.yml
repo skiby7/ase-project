@@ -288,15 +288,15 @@ secrets:
     cert_db:
         file: ../gacha_service/service/secrets/server.pem
     jwt_private_key:
-        file: ../authentication_service/secrets/private.pem
+        file: ../secrets/private.pem
     jwt_public_key:
-        file: ../authentication_service/secrets/public.pem
+        file: ../secrets/public.pem
     admin_account:
-        file: ../authentication_service/secrets/admin_account.json
+        file: ../secrets/admin_account.json
     ssl_private_key:
-        file: ../authentication_service/secrets/app_key.pem
+        file: ../secrets/app_key.pem
     ssl_cert:
-        file: ../authentication_service/secrets/app_cert.pem
+        file: ../secrets/app_cert.pem
     ssl_mongo_cert_key:
         file: ../authentication_service/secrets/ssl_mongo_cert_key.pem
     mongodb_password:

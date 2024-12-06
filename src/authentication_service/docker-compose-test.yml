@@ -77,9 +77,9 @@ secrets:
     admin_account:
         file: ./tests/test_secrets/admin_account.json
     ssl_private_key:
-        file: ./secrets/app_key.pem
+        file: ../secrets/app_key.pem
     ssl_cert:
-        file: ./secrets/app_cert.pem
+        file: ../secrets/app_cert.pem
     ssl_mongo_cert_key:
         file: ./secrets/ssl_mongo_cert_key.pem
     mongodb_password:
