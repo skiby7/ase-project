@@ -44,6 +44,15 @@ services:
             - gacha_public_network
             - gacha_private_network
 
+
+
+networks:
+    gacha_public_network:
+        driver: bridge
+    gacha_private_network:
+        driver: bridge
+
+
 volumes:
     db_data:
 

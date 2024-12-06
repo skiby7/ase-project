@@ -38,7 +38,6 @@ services:
         volumes:
             - postgres-data:/var/lib/postgresql/data
         environment:
-            # POSTGRES_PASSWORD_FILE: /run/secrets/db_password
             POSTGRES_USER_FILE: /run/secrets/tux_db_user
             POSTGRES_PASSWORD_FILE: /run/secrets/tux_db_password
         healthcheck:

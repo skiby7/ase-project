@@ -16,12 +16,10 @@ class database:
         port = "27017"
         db = "admin"
         database = "mydatabase"
-        #tsl_certificate_file = "/run/secrets/cert"
         with open('/run/secrets/pw', 'r') as file:
             password = file.read().strip()
         uri = f"mongodb://{username}:{password}@{host}:{port}/{database}?authSource={db}&tls=true&tlsAllowInvalidCertificates=true"
         self.client = MongoClient(uri)
-        #self.client = MongoClient("db", 27017, maxPoolSize=50)
         self.db = self.client["mydatabase"]
         if "gachas" not in self.db.list_collection_names():
             self.db_inizialization()
@@ -150,7 +148,7 @@ class database:
         users = self.db["users"]
         user = users.find_one({"id": id})
         gacha = gachas.find_one({"name": name})
- 
+
         if not user:
             return 1
 
@@ -160,14 +158,14 @@ class database:
             gacha = gachas.find_one({"id": gacha_u["gacha_id"]})
             if gacha["name"] == name:
                 return ({"value" : gacha_u["value"], "name" : gacha["name"], "image" : gacha["image"], "rarity" : gacha["rarity"]})
-        
+
         return 2
 
     def get_roll_gacha(self, id: str, mock):
         id = str(id)
         gachas = self.db["gachas"]
 
-        weights = [5, 4, 3, 2, 1] 
+        weights = [5, 4, 3, 2, 1]
         number = random.choices([1, 2, 3, 4, 5], weights=weights, k=1)[0]
 
         gacha_list = list(self.db["gachas"].find({"rarity": str(number)}))

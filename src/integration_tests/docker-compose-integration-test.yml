@@ -123,13 +123,11 @@ services:
         build:
             context: ../tux_service/service
             dockerfile: DockerfileDb
-        # image: postgres
         restart: unless-stopped
         shm_size: 128mb
         environment:
             POSTGRES_USER_FILE: /run/secrets/tux_db_user
             POSTGRES_PASSWORD_FILE: /run/secrets/tux_db_password
-            # POSTGRES_HOST_AUTH_METHOD: trust
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U postgres"]
             interval: 5s
@@ -185,7 +183,6 @@ services:
             - gacha_private_network_tests
 
     admin_nginx:
-        # container_name: admin_nginx
         image: nginx:latest
         healthcheck:
             test: service nginx status || exit 1
@@ -211,7 +208,6 @@ services:
                 condition: service_healthy
 
     public_nginx:
-        # container_name: public_nginx
         image: nginx:latest
         healthcheck:
             test: service nginx status || exit 1
