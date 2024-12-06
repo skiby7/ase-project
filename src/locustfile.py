@@ -400,7 +400,7 @@ class Tasks(FastHttpUser):
 
         # Conduct auction
         last_bid = starting_price
-        while unix_time() - start_time < auction_duration or last_bid < 800:
+        while unix_time() - start_time < auction_duration and last_bid < 800:
             bidder = random.choice(valid_bidders)
             data = {"auction_id": auction_id, "player_id": bidder["user_id"], "bid": last_bid}
             response = self.client.post(
