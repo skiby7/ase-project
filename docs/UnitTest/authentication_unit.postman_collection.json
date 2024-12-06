@@ -1,0 +1,2925 @@
+{
+	"info": {
+		"_postman_id": "dc007d20-e343-45bf-a554-8543075a020d",
+		"name": "Unit testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38251344"
+	},
+	"item": [
+		{
+			"name": "Normal user tests",
+			"item": [
+				{
+					"name": "Successful tests",
+					"item": [
+						{
+							"name": "Register account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New account is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('uid')",
+											"    pm.expect(pm.response.json().username).eqls('Pippo')",
+											"    pm.expect(pm.response.json().role).eqls('user')",
+											"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"Pippo\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "User login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Access token successfully returned\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "User login scope openid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response contains id_token and token_type\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property('id_token');",
+											"    ",
+											"    pm.expect(responseJson.token_type.toLowerCase()).to.eql('bearer');",
+											"});",
+											"",
+											"pm.test(\"Decoded JWT contains required fields\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(require('atob')(base64Url));",
+											"    ",
+											"    pm.expect(decodedPayload).to.have.property('sub'); // ID dell'utente",
+											"    pm.expect(decodedPayload).to.have.property('iss'); // Issuer (emittente)",
+											"    pm.expect(decodedPayload).to.have.property('aud'); // Audience (destinatario)",
+											"    pm.expect(decodedPayload).to.have.property('exp'); // Scadenza",
+											"    pm.expect(decodedPayload).to.have.property('iat'); // Tempo di emissione",
+											"});",
+											"",
+											"pm.test(\"sub field matches user_uid variable\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    const user_uid = pm.variables.get(\"user_uid\");",
+											"",
+											"    pm.expect(decodedPayload.sub).to.eql(user_uid);",
+											"});",
+											"",
+											"pm.test(\"Decoded JWT contains valid field values\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    pm.expect(decodedPayload.iss).to.be.a('string').and.not.empty;",
+											"    pm.expect(decodedPayload.aud).to.be.a('string').and.not.empty;",
+											"    pm.expect(decodedPayload.exp).to.be.a('number');",
+											"    pm.expect(decodedPayload.iat).to.be.a('number');",
+											"});",
+											"",
+											"pm.test(\"Token expiration is in the future\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    const base64Url = responseJson.id_token.split('.')[1];",
+											"    const decodedPayload = JSON.parse(atob(base64Url));",
+											"",
+											"    const currentTime = Math.floor(Date.now() / 1000); ",
+											"    pm.expect(decodedPayload.exp).to.be.above(currentTime);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "openid",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Account info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"User info are returned\", () => {",
+											"    pm.expect(pm.response.json().email).to.eqls('pippo@gmail.com');",
+											"    pm.expect(pm.response.json().username).to.eqls('Pippo');",
+											"    pm.expect(pm.response.json().email).to.eqls('pippo@gmail.com');",
+											"    pm.expect(pm.response.json().role).to.eqls('user');   ",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/userinfo",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"userinfo"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Username successfully updated\", () => {",
+											"    pm.expect(pm.response.json().username).to.eqls('New_Pippo')",
+											"    pm.expect(pm.response.json().email).to.eqls('pippo@gmail.com')",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"New_Pippo\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Email successfully updated\", () => {",
+											"    pm.expect(pm.response.json().username).to.eqls('New_Pippo')",
+											"    pm.expect(pm.response.json().email).to.eqls('new_email@gmail.com')",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"new_email@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Password successfully updated\", () => {",
+											"        pm.response.to.have.status(200);",
+											"",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}/changePassword",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}",
+										"changePassword"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "User login after password changed",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New acocunt is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "New_Pippo",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{new_user_password}}",
+											"type": "text"
+										},
+										{
+											"key": "",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Unregister",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns 200 OK status\", () => {",
+											"    pm.response.to.have.status(200)",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Failure tests",
+					"item": [
+						{
+							"name": "Invalid username in new account: malicious input",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid username: preventing malicious input\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid username');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"<script>console.log(\\\"ciao\\\")\",\r\n    \"password\": \"Ciaociao97??\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid username in new account: invalid character",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid username: invalid character\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid username');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"Pippo<>\",\r\n    \"password\": \"Ciaociao97??\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid password in new account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid password\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid password');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"paolodig\",\r\n    \"password\": \"ciao\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid email in new account: malicious input",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid email format\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid email format');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"paolodig\",\r\n    \"password\": \"Ciaociao97??\",\r\n    \"email\": \"pippo@gmail<script><script>.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid email in new account: error format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid email format\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid email format');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"paolodig\",\r\n    \"password\": \"Ciaociao97??\",\r\n    \"email\": \"pippogmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Register account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New account is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('uid')",
+											"    pm.expect(pm.response.json().username).eqls('PippoMalicious')",
+											"    pm.expect(pm.response.json().role).eqls('user')",
+											"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"PippoMalicious\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Duplicated username in new account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Error if username is duplicated\", () => {",
+											"    pm.response.to.have.status(409);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string(\"Email or username already in use\");",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"PippoMalicious\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "User invalid credentials",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Invalid credentials\", () => {",
+											"    pm.response.to.have.status(401);",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "error_password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "User login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Malicious user authenticated\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "PippoMalicious",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Update password invalid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid password\", () => {",
+											"    pm.response.to.have.status(400);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid password');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"password_<>non<valida?\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}/changePassword",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}",
+										"changePassword"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update username duplicated",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Conflict with exsisting username\", () => {",
+											"    pm.response.to.have.status(409);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string(\"Email or username already in use\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"{{admin_username}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update password: erroneous old password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct error for invalid old password\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Invalid uid_account or password');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"vecchia_password_errata\",\r\n    \"new_password\": \"Ciaociao94??\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}/changePassword",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}",
+										"changePassword"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unauthorized password modification of another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct Unauthorized error code\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('You do not have the permission for the required action');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/yyy/changePassword",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"yyy",
+										"changePassword"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unauthorized username modification of another account Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct Unauthorized error code\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('You do not have the permission for the required action');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"New_Pippo\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unauthorized retrieve of all accounts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct Unauthorized error code\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('You do not have the permission for the required action');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unauthorized retrieve of another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct Unauthorized error code\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('You do not have the permission for the required action');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/xxx",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"xxx"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unauthorized unregister of another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Correct Unauthorized error code\", () => {",
+											"    pm.response.to.have.status(403);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('You do not have the permission for the required action');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+							},
+							"response": []
+						},
+						{
+							"name": "Unregister malicious user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns 200 OK status\", () => {",
+											"    pm.response.to.have.status(200)",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin tests",
+			"item": [
+				{
+					"name": "Successful tests",
+					"item": [
+						{
+							"name": "Admin login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New acocunt is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "{{admin_username}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{admin_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Register another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Username already in use\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('uid')",
+											"    pm.expect(pm.response.json().username).eqls('Pippo')",
+											"    pm.expect(pm.response.json().role).eqls('user')",
+											"    pm.collectionVariables.set('user_uid', pm.response.json().uid)",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"Pippo\",\r\n    \"password\": \"{{user_password}}\",\r\n    \"email\": \"pippo@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve all accounts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"All accounts retrieved and contains username 'Pippo'\", () => {",
+											"    pm.response.to.have.status(200); ",
+											"    const responseJson = pm.response.json(); ",
+											"    pm.expect(responseJson).to.have.property('data').that.is.an('array');",
+											"    const containsPippo = responseJson.data.some(item => item.username === 'Pippo');",
+											"    pm.expect(containsPippo).to.be.true;",
+											"    const containsAdmin = responseJson.data.some(item => item.username === 'admin_test');",
+											"    pm.expect(containsAdmin).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"User retrieved has username 'Pippo'\", () => {",
+											"    pm.response.to.have.status(200);",
+											"    const responseJson = pm.response.json(); ",
+											"    pm.expect(responseJson).to.have.property('username');",
+											"    pm.expect(responseJson.username).to.eql('Pippo');",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update username of another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Username successfully updated\", () => {",
+											"    pm.expect(pm.response.json().username).to.eqls('New_Pippo')",
+											"    pm.expect(pm.response.json().email).to.eqls('pippo@gmail.com')",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"New_Pippo\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update email of another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Email successfully updated\", () => {",
+											"    pm.expect(pm.response.json().username).to.eqls('New_Pippo')",
+											"    pm.expect(pm.response.json().email).to.eqls('new_email@gmail.com')",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"new_email@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Unregister another account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns 200 OK status\", () => {",
+											"    pm.response.to.have.status(200)",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/accounts/{{user_uid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"accounts",
+										"{{user_uid}}"
+									]
+								},
+								"description": "This request un-registers a token by using the token collection variable in the POST body.\n\nWe also added a test to ensure the response has a 200 OK status code."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Failure tests",
+					"item": [
+						{
+							"name": "Admin login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"New acocunt is created\", () => {",
+											"    pm.expect(pm.response.json()).to.have.property('access_token')",
+											"    pm.expect(pm.response.json().token_type).eqls('bearer')",
+											"    pm.collectionVariables.set('token', pm.response.json().access_token)",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{baseUrl}}/auth/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "user_token",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "Pippo",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "password_credentials",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "{{admin_username}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{admin_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/token",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"token"
+									]
+								},
+								"description": "This returns a `token` that you can use to retrieve information later on.\n\nWe have included a test to confirm if a token is returned. We have also added test scripts to copy the token to the `token` collection variable. This makes it easy for us to reuse this token in other requests in the collection."
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve non-existing account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Account not found\", () => {",
+											"    pm.response.to.have.status(404);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Account not found');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"old_password\": \"{{user_password}}\",\r\n    \"new_password\": \"{{new_user_password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update username of non-existing account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Account not found\", () => {",
+											"    pm.response.to.have.status(404);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Account not found');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"New_Pippo\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Update email of non-existing account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Account not found\", () => {",
+											"    pm.response.to.have.status(404);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Account not found');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"new_email@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete of non existing account",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Account not found\", () => {",
+											"    pm.response.to.have.status(404);",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson).to.have.property('detail');",
+											"    pm.expect(responseJson.detail).to.have.string('Account not found');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"new_email@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/accounts/yyy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"accounts",
+										"yyy"
+									]
+								},
+								"description": "This request uses the saved `token` collection variable to access a secret 'name' stored against that token.\n\nIn this request, we used the `token` collection variable as a query param to fetch the name generated for that token. We have added a test to check that a name is correctly returned."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "user_password",
+			"value": "Ciaociao97??"
+		},
+		{
+			"key": "user_uid",
+			"value": ""
+		},
+		{
+			"key": "new_user_password",
+			"value": "Ciaociao98??",
+			"type": "default"
+		},
+		{
+			"key": "base_url",
+			"value": "https://authentication:9090",
+			"type": "string"
+		},
+		{
+			"key": "admin_password",
+			"value": "TESTSecurepassword_TEST123?"
+		},
+		{
+			"key": "admin_username",
+			"value": "admin_test"
+		}
+	]
+}
