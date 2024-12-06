@@ -115,7 +115,7 @@ class Operations():
 
 
 
-class Tasks(TaskSet):
+class Tasks(FastHttpUser):
 
     # Headers and initial setup
     def on_start(self):
@@ -143,8 +143,7 @@ class Tasks(TaskSet):
         response = self.client.post(
             Operations.login,
             data=data,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-            verify=False
+            headers={"Content-Type": "application/x-www-form-urlencoded"}
         )
 
         if response.status_code == 200:
@@ -159,8 +158,7 @@ class Tasks(TaskSet):
         response = self.client.get(
             Operations.userinfo,
             data=user_data,
-            headers=headers,
-            verify=False
+            headers=headers
         )
 
         if response.status_code == 200:
@@ -190,8 +188,7 @@ class Tasks(TaskSet):
         response = self.client.post(
             Operations.buy,
             json=data,
-            headers=headers,
-            verify=False
+            headers=headers
         )
         return response
 
@@ -205,8 +202,7 @@ class Tasks(TaskSet):
         }
         response = self.client.post(
             Operations.register,
-            json=user_data,
-            verify=False  # Accept self-signed certificates
+            json=user_data  # Accept self-signed certificates
         )
         if response.status_code in (200, 201):
             print("Registration successful")
@@ -236,7 +232,7 @@ class Tasks(TaskSet):
             response = self.buy_tux(user_id, headers, 10)
             if response.status_code == 200:
                 print("Operation performed successfully")
-            elif response.statu_code == 402:
+            elif response.status_code == 402:
                 print("User cannot afford more tux, deleting...")
                 self.users.remove(user_data)
             else:
@@ -245,8 +241,7 @@ class Tasks(TaskSet):
 
             response = self.client.post(
                 Operations.roll.format(user_id),
-                headers=headers,
-                verify=False
+                headers=headers
             )
 
             if response.status_code == 200:
@@ -268,8 +263,7 @@ class Tasks(TaskSet):
             return
         response = self.client.get(
             Operations.distro_info.format(random.choice(linux_distros)),
-            headers=headers,
-            verify=False
+            headers=headers
         )
         if response.status_code == 200:
             print("Operation performed successfully")
@@ -290,8 +284,7 @@ class Tasks(TaskSet):
             return
         response = self.client.get(
             Operations.system_collection,
-            headers=headers,
-            verify=False
+            headers=headers
         )
         if response.status_code == 200:
             print("Operation performed successfully")
@@ -312,8 +305,7 @@ class Tasks(TaskSet):
             return
         response = self.client.get(
             Operations.transaction_history.format(user_id),
-            headers=headers,
-            verify=False
+            headers=headers
         )
         if response.status_code == 200:
             print("Operation performed successfully")
@@ -325,15 +317,16 @@ class Tasks(TaskSet):
         if len(self.users) < 6:
             print("Not enough users to open an auction")
             return
+
         auction_duration = 10
         starting_price = 10
+
+        # Select participants and ensure validity
         users = random.sample(self.users, len(self.users) // 2)
+        users = [user for user in users if not user.get("already_sampled")]
         for user in users:
-            if user.get("already_sampled"):
-                users.remove(user)
-                self.users.remove(user)
-            else:
-                user["already_sampled"] = True
+            user["already_sampled"] = True
+
         if len(users) < 3:
             print("Not enough players to start an auction, trying again later...")
             return
@@ -341,59 +334,56 @@ class Tasks(TaskSet):
         auctioneer = users[0]
         bidders = users[1:]
 
-
+        # Authenticate auctioneer
         user_id, headers = self.do_auth(auctioneer)
         if not user_id or not headers:
             return
-        auctioneer["user_id"] = user_id
-        auctioneer["headers"] = headers
+        auctioneer.update({"user_id": user_id, "headers": headers})
 
-
+        # Perform initial tux purchase
         response = self.buy_tux(user_id, headers, 10)
-
         if response.status_code != 200:
             print(f"Failed to perform operation: {response.status_code} {response.text}")
-            if response.statu_code == 402:
+            if response.status_code == 402:
                 print("User cannot afford more tux, deleting...")
                 self.users.remove(auctioneer)
             return
 
+        # Roll for gacha
         response = self.client.post(
             Operations.roll.format(auctioneer["user_id"]),
-            headers=auctioneer["headers"],
-            verify=False
+            headers=auctioneer["headers"]
         )
-
         if response.status_code != 200:
-            print(f"Failed to perform operation: {response.status_code} {response.text}")
+            print(f"Failed to roll gacha: {response.status_code} {response.text}")
             return
-
         gacha = response.json()["name"]
 
+        # Authenticate bidders and perform tux purchases
+        valid_bidders = []
         for bidder in bidders:
             user_id, headers = self.do_auth(bidder)
             if not user_id or not headers:
-                return
-
-            bidder["user_id"] = user_id
-            bidder["headers"] = headers
+                continue
+            bidder.update({"user_id": user_id, "headers": headers})
 
             response = self.buy_tux(user_id, headers, 800)
             if response.status_code == 200:
-                print("Operation performed successfully")
-
+                valid_bidders.append(bidder)
             elif response.status_code == 402:
                 print("User cannot afford more tux, deleting...")
                 self.users.remove(bidder)
-                bidders.remove(bidder)
             else:
                 print(f"Failed to perform operation: {response.status_code} {response.text}")
 
-        if len(bidders) < 2:
+        if len(valid_bidders) < 2:
+            print("Not enough bidders remaining")
             return
+
+        # Create auction
         start_time = unix_time()
         auction_data = {
-            "player_id": f"{auctioneer["user_id"]}",
+            "player_id": auctioneer["user_id"],
             "gacha_name": gacha,
             "starting_price": starting_price,
             "end_time": start_time + auction_duration
@@ -401,29 +391,25 @@ class Tasks(TaskSet):
         response = self.client.post(
             Operations.create_auction.format(auctioneer["user_id"]),
             headers=auctioneer["headers"],
-            json=auction_data,
-            verify=False
+            json=auction_data
         )
         if response.status_code != 201:
-            print(f"Create auction: {response.status_code} - {response.text}")
+            print(f"Failed to create auction: {response.status_code} {response.text}")
             return
         auction_id = response.json()["auction_id"]
+
+        # Conduct auction
         last_bid = starting_price
         while unix_time() - start_time < auction_duration or last_bid < 800:
-            bidder = random.choice(bidders)
-            data = {"auction_id": auction_id, "player_id": bidder["user_id"], "bid" : last_bid}
+            bidder = random.choice(valid_bidders)
+            data = {"auction_id": auction_id, "player_id": bidder["user_id"], "bid": last_bid}
             response = self.client.post(
                 Operations.bid.format(auction_id),
                 json=data,
-                headers=bidder["headers"],
-                verify=False
+                headers=bidder["headers"]
             )
-            if response.status_code != 200:
+            if response.status_code == 200:
+                last_bid += 1
+                print(f"Bid placed successfully: {last_bid}")
+            else:
                 print(f"Failed bid: {response.status_code} {response.text}")
-                continue
-            last_bid += 1
-
-
-class Users(FastHttpUser):
-    wait_time = between(1, 3)
-    tasks = [Tasks]
