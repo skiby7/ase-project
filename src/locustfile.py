@@ -115,12 +115,12 @@ class Operations():
 
 
 
-class Tasks(FastHttpUser):
+class User(FastHttpUser):
 
     # Headers and initial setup
     def on_start(self):
         self.users = []
-        for i in range(20):
+        for i in range(6):
             self.register()
         # self.register_url = "/api/auth/accounts"
         # self.login_url = "/api/auth/token"
@@ -318,10 +318,9 @@ class Tasks(FastHttpUser):
             print("Not enough users to open an auction")
             return
 
-        auction_duration = 10
+        auction_duration = 30
         starting_price = 10
 
-        # Select participants and ensure validity
         users = random.sample(self.users, len(self.users) // 2)
         users = [user for user in users if not user.get("already_sampled")]
         for user in users:
@@ -334,13 +333,11 @@ class Tasks(FastHttpUser):
         auctioneer = users[0]
         bidders = users[1:]
 
-        # Authenticate auctioneer
         user_id, headers = self.do_auth(auctioneer)
         if not user_id or not headers:
             return
         auctioneer.update({"user_id": user_id, "headers": headers})
 
-        # Perform initial tux purchase
         response = self.buy_tux(user_id, headers, 10)
         if response.status_code != 200:
             print(f"Failed to perform operation: {response.status_code} {response.text}")
@@ -349,7 +346,6 @@ class Tasks(FastHttpUser):
                 self.users.remove(auctioneer)
             return
 
-        # Roll for gacha
         response = self.client.post(
             Operations.roll.format(auctioneer["user_id"]),
             headers=auctioneer["headers"]
@@ -359,7 +355,6 @@ class Tasks(FastHttpUser):
             return
         gacha = response.json()["name"]
 
-        # Authenticate bidders and perform tux purchases
         valid_bidders = []
         for bidder in bidders:
             user_id, headers = self.do_auth(bidder)
@@ -380,7 +375,6 @@ class Tasks(FastHttpUser):
             print("Not enough bidders remaining")
             return
 
-        # Create auction
         start_time = unix_time()
         auction_data = {
             "player_id": auctioneer["user_id"],
@@ -399,7 +393,7 @@ class Tasks(FastHttpUser):
         auction_id = response.json()["auction_id"]
 
         # Conduct auction
-        last_bid = starting_price
+        last_bid = starting_price + 1
         while unix_time() - start_time < auction_duration and last_bid < 800:
             bidder = random.choice(valid_bidders)
             data = {"auction_id": auction_id, "player_id": bidder["user_id"], "bid": last_bid}
@@ -408,8 +402,8 @@ class Tasks(FastHttpUser):
                 json=data,
                 headers=bidder["headers"]
             )
-            if response.status_code == 200:
-                last_bid += 1
+            if response.status_code < 400:
                 print(f"Bid placed successfully: {last_bid}")
             else:
                 print(f"Failed bid: {response.status_code} {response.text}")
+            last_bid += 1
