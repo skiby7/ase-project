@@ -59,7 +59,7 @@ services:
                 "run",
                 "/etc/postman/unit_test.postman_collection.json",
                 "--delay-request",
-                "100",
+                "10",
                 "--insecure",
                 "--reporters",
                 "cli",

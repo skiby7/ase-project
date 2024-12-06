@@ -259,7 +259,7 @@ services:
                 "run",
                 "/etc/postman/integration_tests.postman_collection.json",
                 "--delay-request",
-                "100",
+                "10",
                 "--insecure",
                 "--reporters",
                 "cli",

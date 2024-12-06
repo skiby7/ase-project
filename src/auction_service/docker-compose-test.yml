@@ -57,7 +57,7 @@ services:
                 "run",
                 "/etc/postman/auction_unit.postman_collection.json",
                 "--delay-request",
-                "100",
+                "10",
                 "--insecure",
                 "--reporters",
                 "cli",
@@ -84,5 +84,5 @@ secrets:
         file: ./service/secrets/admin_account.json
 
 networks:
-  gacha_network:
-    driver: bridge
+    gacha_network:
+        driver: bridge
