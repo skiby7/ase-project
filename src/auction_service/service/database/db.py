@@ -60,9 +60,8 @@ class database:
 
     ### SCHEDULED CHECK ###
 
-    def checkAuctionExpiration(self):
+    def checkAuctionExpiration(self, mock_check):
         current_time = unix_time()
-        expired_auctions = []
 
         expired_auctions_cursor = self.db["auctions"].find({
             "end_time": {"$lt": current_time},
@@ -70,10 +69,7 @@ class database:
         })
 
         for auction in expired_auctions_cursor:
-            expired_auctions.append(auction)
-            self.db["auctions"].update_one({"auction_id": auction["auction_id"]}, {"$set": {"active": False}})
-
-        return list(expired_auctions)
+            self.edit_auction_status(mock_check, auction["auction_id"], False)
 
     ######### PLAYER #########
 
@@ -150,7 +146,13 @@ class database:
 
         return True
 
-    def edit_auction_status(self, auction_id: UUID, status: bool):
+    def edit_auction_status(self, mock_check, auction_id: UUID, status: bool):
+        if status:
+           raise HTTPException(status_code=400, detail="Cannot activate an inactive auction")
+        auction = self.db["auctions"].find_one({"auction_id": str(auction_id), "active": True})
+        if not auction:
+            raise HTTPException(status_code=404, detail="Auction does not exist or is not active")
+        was_active = auction["active"]
         updated_field = {"active": status}
         result = self.db["auctions"].update_one(
             {"auction_id": str(auction_id)},
@@ -158,7 +160,8 @@ class database:
         )
         if result.modified_count <= 0:
             raise HTTPException(status_code=404, detail="Auction does not exist or is not active")
-
+        if was_active and not status:
+            self.close_auction(auction, mock_check)
 
     # DONE
     # AUCTION_FILTER
@@ -422,6 +425,7 @@ class database:
         if mock_check:
             return
         token_data = self.auth_get_admin_token()
+
         if auction["current_winning_player_id"] is not None:
             self.gacha_add_gacha(str(auction["current_winning_player_id"]), str(auction["gacha_name"]), token_data)
             self.tux_settle_auction(str(auction["auction_id"]), str(auction["current_winning_player_id"]),

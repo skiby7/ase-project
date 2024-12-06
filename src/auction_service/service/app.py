@@ -1,5 +1,3 @@
-import logging
-
 from database.db import database
 from uuid import UUID
 from fastapi import Body, FastAPI, HTTPException, Depends, Query
@@ -27,17 +25,17 @@ CHECK_EXPIRY_INTERVAL_MINUTES = 1  # in minute
 CHECK_EXPIRY_INTERVAL_SECONDS = 2
 
 
-def checkAuctionExpiration():
-    finishedAuctions = db.checkAuctionExpiration()
-    for auction in finishedAuctions:
-        auction_id = auction["auction_id"];
-        logging.info(f"Handling expired auction {auction_id}")
-        db.close_auction(auction, mock_check)
+# def checkAuctionExpiration():
+#     finishedAuctions = db.checkAuctionExpiration()
+#     for auction in finishedAuctions:
+#         auction_id = auction["auction_id"]
+#         logging.info(f"Handling expired auction {auction_id}")
+#         db.close_auction(auction, mock_check)
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(checkAuctionExpiration, "interval", seconds=CHECK_EXPIRY_INTERVAL_SECONDS, coalesce=False,
-                  misfire_grace_time=20)
+scheduler.add_job(db.checkAuctionExpiration, "interval", seconds=CHECK_EXPIRY_INTERVAL_SECONDS, coalesce=False,
+                  misfire_grace_time=20, args=(mock_check,),)
 scheduler.start()
 
 
@@ -123,7 +121,7 @@ def admin_edit_auction_status(auction_id: UUID, token_data: Annotated[TokenData,
     if not check_admin(mock_check, token_data):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    db.edit_auction_status(auction_id, status.status)
+    db.edit_auction_status(mock_check, auction_id, status.status)
 
     return {"detail":"Success!"}
 
