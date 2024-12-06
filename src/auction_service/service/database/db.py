@@ -129,17 +129,14 @@ class database:
         if not auction:
             return False
 
-        # Distro update
+        if auction["end_time"] < unix_time() or not auction["active"]:
+            raise HTTPException(status_code=400, detail="You cannot delete an expired or inactive auction")
+
         if not mock_check:
             token_data = self.auth_get_admin_token()
-
             self.gacha_add_gacha(str(auction["player_id"]), auction["gacha_name"], token_data)
-
-        # Tux return
-        if (not mock_check) and (auction["current_winning_player_id"] is not None):
-            token_data = self.auth_get_admin_token()
-
-            self.tux_delete_auction(str(auction_id), token_data)
+            if auction["current_winning_player_id"] is not None:
+                self.tux_delete_auction(str(auction_id), token_data)
 
         self.db["auctions"].delete_one({"auction_id": auction_id})
         self.db["bids"].delete_many({"auction_id": auction_id})
