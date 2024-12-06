@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import Body, FastAPI, HTTPException, Depends, Query
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
+
 from utils.util_classes import AuctionCreate, AuctionStatus, Bid, AuctionOptional, BidOptional, AuthId
 from utils.check import check_admin, check_user
 from auth.access_token_utils import extract_access_token
@@ -31,16 +32,7 @@ def checkAuctionExpiration():
     for auction in finishedAuctions:
         auction_id = auction["auction_id"];
         logging.info(f"Handling expired auction {auction_id}")
-
-        if mock_check: continue
-        token_data = db.auth_get_admin_token()
-        if auction["current_winning_player_id"] is not None:
-            db.gacha_add_gacha(str(auction["current_winning_player_id"]), str(auction["gacha_name"]), token_data)
-            db.tux_settle_auction(str(auction["auction_id"]), str(auction["current_winning_player_id"]),
-                                str(auction["player_id"]), token_data)
-        else:
-            db.gacha_add_gacha(str(auction["player_id"]), str(auction["gacha_name"]), token_data)
-
+        db.close_auction(auction, mock_check)
 
 
 scheduler = BackgroundScheduler()

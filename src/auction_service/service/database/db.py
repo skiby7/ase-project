@@ -417,3 +417,14 @@ class database:
         except (requests.RequestException, ConnectionError):
             raise HTTPException(status_code=400, detail="Internal Server Error")
         return response.json()["access_token"]
+
+    def close_auction(self, auction, mock_check):
+        if mock_check:
+            return
+        token_data = db.auth_get_admin_token()
+        if auction["current_winning_player_id"] is not None:
+            db.gacha_add_gacha(str(auction["current_winning_player_id"]), str(auction["gacha_name"]), token_data)
+            db.tux_settle_auction(str(auction["auction_id"]), str(auction["current_winning_player_id"]),
+                                  str(auction["player_id"]), token_data)
+        else:
+            db.gacha_add_gacha(str(auction["player_id"]), str(auction["gacha_name"]), token_data)
