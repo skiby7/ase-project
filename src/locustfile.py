@@ -1,9 +1,12 @@
 import random
 import string
-from locust import FastHttpUser, task, between, TaskSet
+from locust import FastHttpUser, HttpUser, task, between, TaskSet
 import urllib3
 from time import time
+from urllib.parse import quote
+
 unix_time = lambda: int(time())
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -68,8 +71,9 @@ linux_distros = [
     "TempleOS",
     "Ubuntu",
     "Void_Linux",
-    "Zorin OS"
+    "Zorin_OS"
 ]
+
 
 def gen_username():
     adjective = random.choice(adjectives)
@@ -117,21 +121,10 @@ class Operations():
 
 class User(FastHttpUser):
 
-    # Headers and initial setup
     def on_start(self):
         self.users = []
         for i in range(6):
             self.register()
-        # self.register_url = "/api/auth/accounts"
-        # self.login_url = "/api/auth/token"
-        # self.user_data = {
-        #     "username" : "testuser",
-        #     "password" : "T3stPassword@!",
-        #     "email"    : "test@gmail.com"
-        # }
-        # self.auth_token = None
-        # self.user_id = None
-        # self.register()
 
     def fetch_token(self, user_data: dict):
         data = {
@@ -268,7 +261,7 @@ class User(FastHttpUser):
         if response.status_code == 200:
             print("Operation performed successfully")
         else:
-            print(f"Failed to perform operation: {response.status_code} {response.text}")
+            print(f"Failed to get disto info: {response.status_code} {response.text}")
 
     @task(weight=5)
     def get_distro_available(self):
